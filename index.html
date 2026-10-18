@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VocaRoot - 어원 연상 영단어 마스터</title>
+  <title>VocaChunk - 스텔라 쌤식 청크 인출 마스터</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Pretendard Webfont -->
@@ -18,360 +18,166 @@
       line-height: 1.6;
       word-break: keep-all;
     }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    @keyframes pulse-subtle {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.02); }
-    }
-    .shake-anim {
-      animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
-    }
-    @keyframes shake {
-      10%, 90% { transform: translate3d(-1px, 0, 0); }
-      20%, 80% { transform: translate3d(2px, 0, 0); }
-      30%, 50%, 70% { transform: translate3d(-3px, 0, 0); }
-      40%, 60% { transform: translate3d(3px, 0, 0); }
-    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans selection:bg-amber-100 selection:text-amber-900">
 
+  <!-- ==================== HEADER ==================== -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-y-2 gap-x-4">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
       
       <!-- Logo -->
-      <div class="flex items-center space-x-2.5 shrink-0">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-700 to-violet-600 flex items-center justify-center text-white shadow-md shadow-indigo-200 shrink-0">
-          <i class="ph-bold ph-tree-structure text-xl"></i>
+      <div class="flex items-center space-x-2.5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center text-white shadow-sm shrink-0">
+          <i class="ph-bold ph-highlighter-circle text-lg"></i>
         </div>
         <div>
-          <div class="flex items-center space-x-2">
-            <h1 class="text-lg font-black text-slate-900 tracking-tight">VocaRoot</h1>
-            <span class="text-[10px] px-2 py-0.5 bg-indigo-50 text-indigo-700 font-extrabold rounded-full border border-indigo-200">어원 연상 공식</span>
-          </div>
-          <p class="text-[11px] text-slate-500 hidden sm:block">틀릴 때마다 접두사+어근 원리로 즉각 뇌에 각인하는 공무원 영어</p>
+          <h1 class="text-base font-black text-slate-900 tracking-tight flex items-center gap-1.5">
+            <span>VocaChunk</span>
+            <span class="text-[10px] px-2 py-0.5 bg-amber-50 text-amber-700 font-extrabold rounded-full border border-amber-200">스텔라 쌤 청크 셀프 테스트</span>
+          </h1>
+          <p class="text-[11px] text-slate-500">핵심 단어 노출 차단 ➔ [한글 덩어리 보고 타깃 단어 + 짝꿍 덩어리 인출]</p>
         </div>
       </div>
 
-      <!-- Navigation tabs -->
-      <nav class="flex items-center bg-slate-100 p-1 rounded-xl text-xs sm:text-sm font-semibold max-w-full overflow-x-auto no-scrollbar gap-1">
-        <button id="tab-btn-trainer" onclick="switchTab('trainer')" class="tab-btn flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-white text-indigo-700 shadow-xs transition-all shrink-0">
-          <i class="ph-bold ph-lightning"></i>
-          <span>어원 인출 훈련</span>
+      <!-- Actions -->
+      <div class="flex items-center space-x-2">
+        <button onclick="openPasteModal()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black text-xs transition shadow-xs">
+          <i class="ph-bold ph-clipboard-text text-sm"></i>
+          <span>청크 덱 붙여넣기</span>
         </button>
-        <button id="tab-btn-roots" onclick="switchTab('roots')" class="tab-btn flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all shrink-0">
-          <i class="ph-bold ph-book-open"></i>
-          <span>어원 사전 (Roots)</span>
+        <button onclick="resetToSeedData()" class="p-2 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-100 transition" title="기본 예시 덱으로 리셋">
+          <i class="ph-bold ph-arrow-counter-clockwise text-base"></i>
         </button>
-        <button id="tab-btn-vault" onclick="switchTab('vault')" class="tab-btn flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all shrink-0">
-          <i class="ph-bold ph-folder-notch"></i>
-          <span>단어 보관함</span>
-        </button>
-        <button onclick="openPasteModal()" class="flex items-center space-x-1 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-all shrink-0 shadow-xs">
-          <i class="ph-bold ph-plus-circle"></i>
-          <span>단어 추가</span>
-        </button>
-      </nav>
-
-      <!-- Quick counters -->
-      <div class="flex items-center space-x-1.5 text-xs shrink-0">
-        <span class="bg-slate-100 px-2.5 py-1 rounded-lg text-slate-600 border border-slate-200">
-          전체: <strong id="stat-total" class="text-indigo-600">0</strong>
-        </span>
-        <span class="bg-amber-50 px-2.5 py-1 rounded-lg text-amber-700 border border-amber-200 flex items-center gap-1">
-          <i class="ph-bold ph-bookmark-simple"></i> 복습: <strong id="stat-review">0</strong>
-        </span>
-        <span class="bg-emerald-50 px-2.5 py-1 rounded-lg text-emerald-700 border border-emerald-200 flex items-center gap-1">
-          <i class="ph-bold ph-check-circle"></i> 마스터: <strong id="stat-mastered">0</strong>
-        </span>
       </div>
     </div>
   </header>
 
-  <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main class="flex-1 max-w-3xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center">
     
-    <!-- ==================== TAB 1: TRAINER ==================== -->
-    <section id="tab-trainer" class="tab-content space-y-6">
-      <!-- Control & Filter Bar -->
-      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-wrap items-center justify-between gap-3">
-        <div class="flex items-center gap-2 flex-wrap">
-          <label class="text-xs font-bold text-slate-500">어원/접두어 필터:</label>
-          <select id="filter-root-select" onchange="applyRootFilter()" class="text-xs font-semibold bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-700 focus:ring-2 focus:ring-indigo-500">
-            <option value="ALL">전체 어원 보기</option>
-          </select>
+    <!-- Status & Filter Bar -->
+    <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs mb-4 flex items-center justify-between text-xs font-semibold">
+      <div class="flex items-center gap-2">
+        <span class="text-slate-500">진행:</span>
+        <button id="filter-btn-all" onclick="setMode('all')" class="px-2.5 py-1 rounded-lg bg-slate-900 text-white font-bold">전체 (<span id="count-all">0</span>)</button>
+        <button id="filter-btn-review" onclick="setMode('review')" class="px-2.5 py-1 rounded-lg text-slate-600 hover:bg-slate-100">헷갈림 (<span id="count-review">0</span>)</button>
+        <button id="filter-btn-mastered" onclick="setMode('mastered')" class="px-2.5 py-1 rounded-lg text-slate-600 hover:bg-slate-100">마스터 (<span id="count-mastered">0</span>)</button>
+      </div>
+      <button onclick="shuffleQueue()" class="text-slate-500 hover:text-slate-900 flex items-center gap-1">
+        <i class="ph-bold ph-shuffle"></i> 섞기
+      </button>
+    </div>
 
-          <!-- Status toggle -->
-          <div class="inline-flex rounded-lg border border-slate-200 p-0.5 bg-slate-100 text-xs font-medium">
-            <button id="filter-status-active" onclick="setStatusFilter('active')" class="px-2.5 py-1 rounded-md bg-white text-slate-900 font-bold shadow-xs">학습중</button>
-            <button id="filter-status-review" onclick="setStatusFilter('review')" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900">오답/헷갈림</button>
-            <button id="filter-status-mastered" onclick="setStatusFilter('mastered')" class="px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900">마스터 보관함</button>
+    <!-- MAIN CARD -->
+    <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-sm relative overflow-hidden min-h-[420px] flex flex-col justify-between text-center">
+      
+      <!-- Card Header & Step Indicator -->
+      <div class="flex items-center justify-between text-xs text-slate-400 pb-2 border-b border-slate-100">
+        <span id="card-tag" class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-bold">
+          Day 1 핵심 청크
+        </span>
+        
+        <!-- Step Indicator -->
+        <div class="flex items-center gap-1.5 text-[11px] font-bold">
+          <span id="step-badge-1" class="px-2 py-0.5 rounded-md bg-amber-500 text-white">1단계: 전체 블라인드</span>
+          <span class="text-slate-300">➔</span>
+          <span id="step-badge-2" class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-400">2단계: 짝꿍 힌트</span>
+          <span class="text-slate-300">➔</span>
+          <span id="step-badge-3" class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-400">3단계: 핵심 단어 정답</span>
+        </div>
+
+        <span id="card-progress">1 / 5</span>
+      </div>
+
+      <!-- Core Question: 한글 덩어리 -->
+      <div class="my-5 space-y-2">
+        <span class="text-[11px] font-black uppercase text-amber-600 tracking-wider flex items-center justify-center gap-1">
+          <i class="ph-bold ph-eye"></i> 한글 청크 (의미 덩어리)
+        </span>
+        <h2 id="card-korean-chunk" class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-snug">
+          희귀 필사본들을 점검하다
+        </h2>
+        
+        <!-- Stage Notice / Hint Bar -->
+        <div class="h-6 flex items-center justify-center">
+          <p id="card-step-guide" class="text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
+            [스페이스바] 누르면 주변 짝꿍 단어 힌트 공개
+          </p>
+        </div>
+      </div>
+
+      <!-- Test Area: 3단계 전환 박스 -->
+      <div id="chunk-display-box" onclick="nextStage()" class="cursor-pointer bg-slate-50 hover:bg-slate-100 border-2 border-dashed border-slate-200 hover:border-amber-300 rounded-2xl p-6 transition my-2 flex flex-col justify-center items-center min-h-[140px]">
+        
+        <!-- 1단계: 전체 블라인드 (영어 글자 완전 차단) -->
+        <div id="view-step-1" class="space-y-3">
+          <div class="flex items-center justify-center gap-2">
+            <span class="px-4 py-2 rounded-xl bg-slate-200 text-slate-400 font-mono font-black text-lg tracking-widest select-none">
+              ■■■■■■■■■■■■■■■■
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 font-semibold flex items-center justify-center gap-1">
+            <i class="ph-bold ph-lock-key"></i> 영어 덩어리를 머릿속으로 먼저 떠올려보세요 [Space: 짝꿍 힌트]
+          </p>
+        </div>
+
+        <!-- 2단계: 짝꿍 단어 힌트 (핵심 단어는 빈칸으로 꽁꽁 숨김) -->
+        <div id="view-step-2" class="hidden space-y-3">
+          <div id="card-cloze-en" class="text-xl sm:text-2xl font-mono font-extrabold text-slate-700 tracking-wide">
+            [ _________ ] the rare manuscripts
+          </div>
+          <p class="text-xs text-indigo-600 font-bold flex items-center justify-center gap-1">
+            <i class="ph-bold ph-lightbulb"></i> 짝꿍 단어 확인! 빈칸에 들어갈 핵심 단어는? [Space: 정답 공개]
+          </p>
+        </div>
+
+        <!-- 3단계: 핵심 단어 및 전체 청크 완전 공개 -->
+        <div id="view-step-3" class="hidden space-y-3">
+          <div class="space-y-1">
+            <span class="text-[11px] font-bold text-slate-400">핵심 타깃 단어: <strong id="card-target-word" class="text-indigo-600 text-sm underline underline-offset-4">inspect</strong></span>
+            <div id="card-full-en" class="text-2xl sm:text-3xl font-mono font-black text-amber-600 tracking-tight">
+              inspect the rare manuscripts
+            </div>
+          </div>
+          <p id="card-full-sentence" class="text-xs text-slate-500 font-medium italic">
+            "The librarian inspected the rare manuscripts for damage."
+          </p>
+          <div class="pt-1">
+            <button onclick="event.stopPropagation(); speakChunk();" class="inline-flex items-center gap-1 px-3 py-1 bg-white hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 shadow-2xs">
+              <i class="ph-bold ph-speaker-high"></i> 발음 듣기 (S)
+            </button>
           </div>
         </div>
+
+      </div>
+
+      <!-- Streak & Action Buttons -->
+      <div class="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+        <span id="card-streak" class="text-xs font-bold text-slate-400">
+          연속 암기: 0 / 2회
+        </span>
 
         <div class="flex items-center gap-2">
-          <!-- Mode switcher: Flashcard vs Spelling -->
-          <div class="inline-flex rounded-lg border border-slate-200 p-0.5 bg-slate-100 text-xs font-semibold">
-            <button id="btn-mode-flash" onclick="setTrainerMode('flash')" class="px-3 py-1 rounded-md bg-white text-indigo-700 shadow-xs">어원 인출</button>
-            <button id="btn-mode-quiz" onclick="setTrainerMode('quiz')" class="px-3 py-1 rounded-md text-slate-600 hover:text-slate-900">철자 퀴즈</button>
-          </div>
-          <button onclick="shuffleTrainerQueue()" class="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-900" title="카드 섞기">
-            <i class="ph-bold ph-arrows-clockwise text-base"></i>
+          <button onclick="markResult(false)" class="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl font-bold text-xs flex items-center gap-1 transition">
+            <i class="ph-bold ph-x-circle text-base"></i> 헷갈림 (1)
+          </button>
+          <button onclick="markResult(true)" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-1 transition shadow-xs">
+            <i class="ph-bold ph-check-circle text-base"></i> 바로 앎 (2 / Enter)
           </button>
         </div>
-      </div>
-
-      <!-- TRAINER MAIN CARD -->
-      <div id="trainer-card-container" class="relative">
-        <div id="flashcard-box" class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-sm text-center relative overflow-hidden transition-all min-h-[440px] flex flex-col justify-between">
-          
-          <!-- Top Badge & Actions -->
-          <div class="flex items-center justify-between w-full">
-            <span id="card-root-category" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-indigo-50 text-indigo-700 border border-indigo-200">
-              <i class="ph-bold ph-tag"></i> <span>Prefix: bi- (two)</span>
-            </span>
-            <div class="flex items-center gap-1">
-              <button onclick="speakCurrentWord()" title="원어민 발음 듣기 (S)" class="w-9 h-9 rounded-xl text-slate-500 hover:bg-indigo-50 hover:text-indigo-600 transition flex items-center justify-center">
-                <i class="ph-bold ph-speaker-high text-lg"></i>
-              </button>
-              <button onclick="toggleBookmarkCurrent()" title="중점 복습 표시 (B)" class="w-9 h-9 rounded-xl text-slate-400 hover:bg-amber-50 hover:text-amber-500 transition flex items-center justify-center">
-                <i id="btn-bookmark-icon" class="ph-bold ph-bookmark-simple text-lg"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Word Display -->
-          <div class="my-5 space-y-2">
-            <h2 id="card-word" class="text-4xl sm:text-5xl font-black text-slate-900 tracking-tight cursor-pointer hover:text-indigo-600 transition" onclick="toggleRevealMeaning()">
-              bilingual
-            </h2>
-            <p id="card-phonetic" class="text-sm font-mono text-slate-400">/baɪˈlɪŋɡwəl/</p>
-          </div>
-
-          <!-- Formula Blocks (Always Visible or Collapsible) -->
-          <div id="card-breakdown-area" class="w-full max-w-xl mx-auto my-1">
-            <div class="bg-slate-50 border border-slate-200/80 rounded-2xl p-3.5 sm:p-4 text-left">
-              <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center justify-between">
-                <span class="flex items-center gap-1.5 text-indigo-600 font-extrabold">
-                  <i class="ph-bold ph-git-fork"></i> Don's 어원 조립 공식
-                </span>
-                <span class="text-[10px] text-slate-400 font-normal">접두사 + 어근 + 접미사</span>
-              </div>
-              <!-- Parts blocks -->
-              <div id="card-formula-blocks" class="flex flex-wrap items-center gap-2 mb-2">
-                <!-- dynamic formula tags -->
-              </div>
-              <p id="card-core-logic" class="text-xs text-slate-700 leading-relaxed font-medium bg-white p-2 rounded-xl border border-slate-100">
-                👉 어원 결합 유추 원리
-              </p>
-            </div>
-          </div>
-
-          <!-- Meaning Area (Blindable) -->
-          <div id="card-meaning-area" class="my-3 min-h-[95px] flex flex-col justify-center">
-            <div id="card-meaning-content" class="transition-all duration-200">
-              <div class="text-2xl sm:text-3xl font-extrabold text-indigo-600 tracking-tight" id="card-meaning-text">
-                두 개 언어를 할 줄 아는, 이중 언어의
-              </div>
-              <p id="card-example-sentence" class="text-xs sm:text-sm text-slate-500 mt-2 italic max-w-lg mx-auto">
-                "The library hired a bilingual cataloger."
-              </p>
-            </div>
-
-            <button id="btn-reveal-meaning" onclick="toggleRevealMeaning()" class="w-full max-w-sm mx-auto py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition">
-              <i class="ph-bold ph-eye"></i> <span>스페이스바 (Space) 또는 클릭하여 뜻 확인</span>
-            </button>
-          </div>
-
-          <!-- Card Progress Indicator -->
-          <div class="flex items-center justify-between text-xs text-slate-400 pt-3 border-t border-slate-100">
-            <span id="trainer-progress-text">1 / 30 단어</span>
-            <span id="trainer-streak-indicator" class="font-bold text-slate-500">연속 정답: 0 / 2회</span>
-          </div>
-        </div>
-
-        <!-- Buttons Area -->
-        <div class="flex flex-wrap items-center justify-center gap-3 mt-6">
-          <button onclick="prevCard()" class="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl font-bold text-xs flex items-center gap-1.5 transition shadow-xs">
-            <i class="ph-bold ph-arrow-left"></i> 이전 (←)
-          </button>
-          
-          <button onclick="triggerMistakeFeedback()" class="px-5 py-2.5 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 rounded-xl font-extrabold text-xs flex items-center gap-1.5 transition shadow-xs">
-            <i class="ph-bold ph-warning-circle text-base"></i> 헷갈림 / 모름 (1) ➔ 어원 처방
-          </button>
-
-          <button onclick="markCardResult(true)" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-extrabold text-xs flex items-center gap-1.5 transition shadow-sm hover:shadow">
-            <i class="ph-bold ph-check-circle text-base"></i> 바로 앎 (+1) (2 / Enter)
-          </button>
-
-          <button onclick="nextCard()" class="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl font-bold text-xs flex items-center gap-1.5 transition shadow-xs">
-            다음 (→) <i class="ph-bold ph-arrow-right"></i>
-          </button>
-        </div>
-      </div>
-
-      <!-- SPELLING QUIZ VIEW -->
-      <div id="spelling-quiz-container" class="hidden bg-white rounded-3xl border border-slate-200 p-8 text-center space-y-6 shadow-sm">
-        <div class="max-w-md mx-auto space-y-4">
-          <div class="flex items-center justify-center gap-2">
-            <span id="quiz-root-badge" class="px-3 py-1 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-full border border-indigo-200">
-              어근: spect (보다)
-            </span>
-          </div>
-          <div class="space-y-1">
-            <p class="text-xs text-slate-400 font-semibold">어원 조립 힌트</p>
-            <p id="quiz-clue-formula" class="text-sm font-extrabold text-indigo-900 bg-indigo-50/70 p-2 rounded-xl">
-              pro- (앞으로) + spect (보다)
-            </p>
-            <h3 id="quiz-meaning" class="text-2xl font-black text-slate-900 mt-2">
-              전망, 기대, 예상
-            </h3>
-          </div>
-
-          <form onsubmit="handleSpellingSubmit(event)" class="space-y-3 pt-2">
-            <input type="text" id="quiz-input" autocomplete="off" autocapitalize="none" placeholder="철자를 입력하세요 (예: prospect)" 
-              class="w-full px-4 py-3 text-lg font-bold text-center border-2 border-slate-300 rounded-2xl focus:border-indigo-600 focus:outline-none tracking-wide" />
-            <button type="submit" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm rounded-xl transition shadow-xs">
-              정답 확인 (Enter)
-            </button>
-          </form>
-
-          <div id="quiz-feedback" class="hidden p-3 rounded-xl text-xs font-bold"></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==================== TAB 2: ROOTS DICTIONARY ==================== -->
-    <section id="tab-roots" class="tab-content hidden space-y-6">
-      <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
-          <div>
-            <h2 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-              <i class="ph-bold ph-tree-structure text-indigo-600"></i> 사서직·공무원 최빈출 핵심 어원 사전
-            </h2>
-            <p class="text-xs text-slate-500 mt-0.5">클릭하면 해당 접두사·어근이 적용된 영단어들만 즉시 모아서 훈련합니다.</p>
-          </div>
-          <input type="text" id="search-root-input" oninput="filterRootsCatalog()" placeholder="접두사/어근 검색 (예: bi, spect)" 
-            class="text-xs px-3 py-2 border border-slate-300 rounded-lg w-full sm:w-56 focus:ring-2 focus:ring-indigo-500" />
-        </div>
-
-        <div id="roots-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-4">
-          <!-- Dynamic root cards will be populated here -->
-        </div>
-      </div>
-    </section>
-
-    <!-- ==================== TAB 3: WORD VAULT (MANAGEMENT) ==================== -->
-    <section id="tab-vault" class="tab-content hidden space-y-6">
-      <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-        <div class="p-5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 class="text-base font-extrabold text-slate-900">전체 단어 보관함</h2>
-            <p class="text-xs text-slate-500">외운 단어는 삭제하거나 1주전 마스터로 관리하세요.</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <button onclick="exportWordsJSON()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition flex items-center gap-1">
-              <i class="ph-bold ph-download-simple"></i> JSON 백업
-            </button>
-            <button onclick="resetAllWords()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-lg transition flex items-center gap-1">
-              <i class="ph-bold ph-trash"></i> 전체 초기화
-            </button>
-          </div>
-        </div>
-
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-slate-700">
-            <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase text-[11px]">
-              <tr>
-                <th class="py-3 px-4">단어</th>
-                <th class="py-3 px-4">어원 분해 (Formula)</th>
-                <th class="py-3 px-4">한국어 뜻</th>
-                <th class="py-3 px-4">상태</th>
-                <th class="py-3 px-4 text-center">동작</th>
-              </tr>
-            </thead>
-            <tbody id="vault-table-body" class="divide-y divide-slate-100">
-              <!-- Populated by JS -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- ==================== MODAL 1: 직관적 어원 오답 피드백 팝업 (핵심 신기능!) ==================== -->
-  <div id="etymology-feedback-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden p-4">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5 border-2 border-rose-300 transform transition-all animate-[bounce_0.25s_ease-out]">
-      
-      <!-- Header -->
-      <div class="flex items-center justify-between border-b border-rose-100 pb-3">
-        <div class="flex items-center gap-2 text-rose-600 font-black text-sm">
-          <span class="w-7 h-7 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600 text-base">
-            <i class="ph-bold ph-lightbulb-filament"></i>
-          </span>
-          <span>Don's 직관 어원 긴급 처방전</span>
-        </div>
-        <span class="text-[10px] font-bold px-2 py-0.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-full">
-          연속성공 리셋됨
-        </span>
-      </div>
-
-      <!-- Word Big Header -->
-      <div class="text-center space-y-1">
-        <h3 id="feedback-modal-word" class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
-          bilingual
-        </h3>
-        <p id="feedback-modal-meaning" class="text-lg font-extrabold text-indigo-600">
-          두 개 언어를 구사하는, 이중 언어의
-        </p>
-      </div>
-
-      <!-- Visual Breakdown Diagram -->
-      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3">
-        <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-          <i class="ph-bold ph-intersect"></i> 어원 구성요소 정밀 분해
-        </div>
-        <div id="feedback-modal-blocks" class="flex flex-wrap items-stretch justify-center gap-2">
-          <!-- Dynamic decomposed badges with explanations -->
-        </div>
-      </div>
-
-      <!-- Intuitive Core Logic Callout -->
-      <div class="bg-amber-50/80 border border-amber-200 rounded-2xl p-4 text-xs space-y-1.5">
-        <div class="font-extrabold text-amber-800 flex items-center gap-1.5">
-          <i class="ph-bold ph-brain text-sm text-amber-600"></i> 왜 이런 뜻이 되는가? (원어민 연상 로직)
-        </div>
-        <p id="feedback-modal-logic" class="text-slate-800 leading-relaxed font-semibold text-xs">
-          👉 "두 개(bi)의 언어/혀(lingu)를 자유롭게 구사하는(-al)" ➔ 두 언어를 능숙하게 쓰는
-        </p>
-      </div>
-
-      <!-- Example Sentence -->
-      <div id="feedback-modal-example-box" class="bg-indigo-50/50 rounded-xl p-3 border border-indigo-100 text-xs">
-        <span class="font-bold text-indigo-700">예문:</span>
-        <span id="feedback-modal-example" class="italic text-slate-600">"The library hired a bilingual cataloger."</span>
-      </div>
-
-      <!-- Actions -->
-      <div class="flex items-center justify-between pt-2">
-        <button onclick="speakCurrentWord()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition flex items-center gap-1.5">
-          <i class="ph-bold ph-speaker-high text-base"></i> 발음 다시 듣기
-        </button>
-        <button onclick="dismissFeedbackModal()" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black rounded-xl transition shadow-sm flex items-center gap-1">
-          <span>이해했습니다 (다음 단어로)</span>
-          <i class="ph-bold ph-arrow-right"></i>
-        </button>
       </div>
 
     </div>
-  </div>
 
-  <!-- MODAL 2: 단어 붙여넣기 등록 모달 -->
+  </main>
+
+  <!-- ==================== MODAL: JSON 붙여넣기 ==================== -->
   <div id="paste-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center hidden p-4">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
-          <i class="ph-bold ph-plus-circle text-indigo-600 text-base"></i> 어원 단어 간편 붙여넣기 등록
+          <i class="ph-bold ph-clipboard-text text-amber-500 text-base"></i> 청크 덱 붙여넣기
         </h3>
         <button onclick="closePasteModal()" class="text-slate-400 hover:text-slate-600">
           <i class="ph-bold ph-x text-lg"></i>
@@ -379,930 +185,310 @@
       </div>
 
       <div class="space-y-2">
-        <p class="text-xs text-slate-500">
-          챗봇에서 받은 <strong>JSON 코드</strong> 또는 <code>단어:어원분해:뜻</code> 형식의 텍스트를 그대로 붙여넣으세요.
+        <p class="text-xs text-slate-500 leading-relaxed">
+          채팅창에서 생성해 드린 <strong>JSON 코드</strong>를 그대로 복사해 붙여넣으세요.
         </p>
-        <textarea id="paste-textarea" rows="8" placeholder='[&#10;  {&#10;    "word": "bilingual",&#10;    "prefix": "bi-",&#10;    "root": "lingu",&#10;    "suffix": "-al",&#10;    "meaning": "두 개 언어를 구사하는",&#10;    "breakdown": "bi(2) + lingu(혀) + al(형용사)",&#10;    "coreLogic": "두 개의 혀(언어)를 쓰는 사람"&#10;  }&#10;]' class="w-full p-3 font-mono text-xs border border-slate-200 rounded-xl focus:border-indigo-600 focus:outline-none"></textarea>
+        <textarea id="paste-textarea" rows="9" placeholder='[
+  {
+    "korean": "희귀 필사본들을 점검하다",
+    "cloze": "[ _________ ] the rare manuscripts",
+    "english": "inspect the rare manuscripts",
+    "target": "inspect",
+    "sentence": "The librarian inspected the rare manuscripts for damage."
+  }
+]' class="w-full p-3 font-mono text-xs border border-slate-200 rounded-xl focus:border-amber-500 focus:outline-none"></textarea>
       </div>
 
       <div class="flex items-center justify-end gap-2 pt-2">
         <button onclick="closePasteModal()" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition">취소</button>
         <button onclick="applyPastedData('append')" class="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-700 transition">추가 등록</button>
-        <button onclick="applyPastedData('overwrite')" class="px-4 py-2 bg-rose-600 text-white text-xs font-bold rounded-xl hover:bg-rose-700 transition">전체 교체</button>
+        <button onclick="applyPastedData('overwrite')" class="px-4 py-2 bg-amber-500 text-white text-xs font-bold rounded-xl hover:bg-amber-600 transition">전체 교체</button>
       </div>
     </div>
   </div>
 
-  <!-- Toast Notification -->
-  <div id="toast" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs font-bold transition-all transform translate-y-10 opacity-0 pointer-events-none flex items-center gap-2">
-    <i class="ph-bold ph-check text-emerald-400"></i>
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2 rounded-xl shadow-xl text-xs font-bold transition-all transform translate-y-10 opacity-0 pointer-events-none flex items-center gap-2">
+    <i class="ph-bold ph-check text-amber-400"></i>
     <span id="toast-message">알림</span>
   </div>
 
   <script>
-    const STORAGE_KEY = 'VOCAROOT_DB_V2';
+    const STORAGE_KEY = 'VOCACHUNK_DB_V2';
 
-    // 사서직 & 공무원 최빈출 어원 30선 기본 탑재 덱 (Don's English 어원 정복 스타일)
-    const SEED_VOCABULARY = [
-      // 1. 접두사 bi- (둘, 2)
+    const SEED_CHUNKS = [
       {
-        id: "voca_bi_01",
-        word: "bilingual",
-        phonetic: "/baɪˈlɪŋɡwəl/",
-        prefix: "bi-",
-        prefixMeaning: "둘 (two)",
-        root: "lingu",
-        rootMeaning: "혀, 말, 언어 (tongue, language)",
-        suffix: "-al",
-        suffixMeaning: "~의 (형용사형 접미사)",
-        meaning: "두 개 언어를 구사하는, 이중 언어의",
-        breakdown: "bi(2, 둘) + lingu(혀, 언어) + al(형용사)",
-        coreLogic: "두 개의(bi) 언어/혀(lingu)를 자유롭게 구사하는(-al) 사람",
-        example: "The library hired a bilingual cataloger for foreign materials.",
-        category: "bi- (two)",
+        id: "chunk_01",
+        korean: "희귀 필사본들을 점검하다",
+        cloze: "[ _________ ] the rare manuscripts",
+        english: "inspect the rare manuscripts",
+        target: "inspect",
+        sentence: "The librarian inspected the rare manuscripts for damage.",
+        tag: "Day 1",
         streak: 0,
-        mistakeCount: 0,
-        isMastered: false,
-        bookmarked: false
+        isMastered: false
       },
       {
-        id: "voca_bi_02",
-        word: "biannual",
-        phonetic: "/baɪˈænjuəl/",
-        prefix: "bi-",
-        prefixMeaning: "둘 (two)",
-        root: "annu",
-        rootMeaning: "해, 년 (year)",
-        suffix: "-al",
-        suffixMeaning: "~의 (형용사형 접미사)",
-        meaning: "연 2회의, 반년마다의 (1년에 2번)",
-        breakdown: "bi(2) + annu(해, 년) + al(형용사)",
-        coreLogic: "한 해(annu) 안에 두 번(bi) 일어나는",
-        example: "The scholarly journal is published on a biannual basis (twice a year).",
-        category: "bi- (two)",
+        id: "chunk_02",
+        korean: "강력한 초당적 지지를 얻다",
+        cloze: "gain strong [ _________ ] support",
+        english: "gain strong bipartisan support",
+        target: "bipartisan",
+        sentence: "The library funding bill gained strong bipartisan support.",
+        tag: "Day 1",
         streak: 0,
-        mistakeCount: 0,
-        isMastered: false,
-        bookmarked: false
+        isMastered: false
       },
       {
-        id: "voca_bi_03",
-        word: "biennial",
-        phonetic: "/baɪˈeniəl/",
-        prefix: "bi-",
-        prefixMeaning: "둘 (two)",
-        root: "enni",
-        rootMeaning: "해, 년 (year)",
-        suffix: "-al",
-        suffixMeaning: "~의 (형용사형 접미사)",
-        meaning: "2년마다의, 2년에 한 번씩의",
-        breakdown: "bi(2) + enni(년) + al(형용사)",
-        coreLogic: "2년(bi)의 주기를 한 단위(enni)로 삼아 돌아오는",
-        example: "The national library conference is a biennial event held every two years.",
-        category: "bi- (two)",
+        id: "chunk_03",
+        korean: "표절된 논문을 공식 철회하다",
+        cloze: "[ _________ ] the plagiarized paper",
+        english: "retract the plagiarized paper",
+        target: "retract",
+        sentence: "The journal retracted the plagiarized paper immediately.",
+        tag: "Day 1",
         streak: 0,
-        mistakeCount: 0,
-        isMastered: false,
-        bookmarked: false
+        isMastered: false
       },
       {
-        id: "voca_bi_04",
-        word: "bipartisan",
-        phonetic: "/baɪˈpɑːrtɪzən/",
-        prefix: "bi-",
-        prefixMeaning: "둘 (two)",
-        root: "parti",
-        rootMeaning: "편, 정당, 부분 (party, part)",
-        suffix: "-san",
-        suffixMeaning: "~를 지지하는 사람/성향",
-        meaning: "양당의, 초당파적인 (여야가 합심하는)",
-        breakdown: "bi(2) + parti(정당, 편) + san(성향)",
-        coreLogic: "두 개(bi)의 서로 다른 정당(parti)이 한목소리를 내는",
-        example: "The public library funding bill received strong bipartisan support.",
-        category: "bi- (two)",
+        id: "chunk_04",
+        korean: "눈에 잘 띄는 곳에 설치되다",
+        cloze: "be placed in [ _________ ] positions",
+        english: "be placed in conspicuous positions",
+        target: "conspicuous",
+        sentence: "Exit signs must be placed in conspicuous positions.",
+        tag: "Day 1",
         streak: 0,
-        mistakeCount: 0,
-        isMastered: false,
-        bookmarked: false
+        isMastered: false
       },
       {
-        id: "voca_bi_05",
-        word: "biped",
-        phonetic: "/ˈbaɪped/",
-        prefix: "bi-",
-        prefixMeaning: "둘 (two)",
-        root: "ped",
-        rootMeaning: "발 (foot)",
-        suffix: "",
-        suffixMeaning: "",
-        meaning: "두 발 동물; 두 발 달린",
-        breakdown: "bi(2) + ped(발)",
-        coreLogic: "두 개의(bi) 발(ped)로 걷는 생명체",
-        example: "Humans are distinct as biped mammals.",
-        category: "bi- (two)",
+        id: "chunk_05",
+        korean: "수백 종의 학술 저널을 정기 구독하다",
+        cloze: "[ _________ ] to hundreds of academic journals",
+        english: "subscribe to hundreds of academic journals",
+        target: "subscribe",
+        sentence: "The library subscribes to hundreds of academic journals.",
+        tag: "Day 1",
         streak: 0,
-        mistakeCount: 0,
-        isMastered: false,
-        bookmarked: false
-      },
-
-      // 2. 어근 spect / spic (보다, look)
-      {
-        id: "voca_spect_01",
-        word: "inspect",
-        phonetic: "/ɪnˈspekt/",
-        prefix: "in-",
-        prefixMeaning: "안으로 (into)",
-        root: "spect",
-        rootMeaning: "보다 (look, see)",
-        suffix: "",
-        suffixMeaning: "",
-        meaning: "점검하다, 검사하다, 사찰하다",
-        breakdown: "in(안으로) + spect(보다)",
-        coreLogic: "속 안(in)까지 샅샅이 파고들어 들여다보다(spect)",
-        example: "The librarian inspected the rare manuscripts for environmental damage.",
-        category: "spect (see/look)",
-        streak: 0,
-        mistakeCount: 0,
-        isMastered: false,
-        bookmarked: false
-      },
-      {
-        id: "voca_spect_02",
-        word: "retrospect",
-        phonetic: "/ˈretrəspekt/",
-        prefix: "retro-",
-        prefixMeaning: "뒤로, 과거로 (backward)",
-        root: "spect",
-        rootMeaning: "보다 (look, see)",
-        suffix: "",
-        suffixMeaning: "",
-        meaning: "회상하다, 추억, 소급",
-        breakdown: "retro(뒤로, 과거로) + spect(보다)",
-        coreLogic: "지나간 과거 뒤쪽(retro)을 되돌아보다(spect)",
-        example: "In retrospect, digitizing the catalog was the best decision for users.",
-        category: "spect (see/look)",
-        streak: 0,
-        mistakeCount: 0,
-        isMastered: false,
-        bookmarked: false
-      },
-      {
-        id: "voca_spect_03",
-        word: "circumspect",
-        phonetic: "/ˈsɜːrkəmspekt/",
-        prefix: "circum-",
-        prefixMeaning: "주변에, 둘레에 (around)",
-        root: "spect",
-        rootMeaning: "보다 (look, see)",
-        suffix: "",
-        suffixMeaning: "",
-        meaning: "신중한, 사방을 둘러보며 조심하는",
-        breakdown: "circum(주변, 사방) + spect(보다)",
-        coreLogic: "돌다리도 두드리듯 사방 둘레(circum)를 두리번두리번 살피다(spect)",
-        example: "The archivist was very circumspect when handling delicate historical documents.",
-        category: "spect (see/look)",
-        streak: 0,
-        mistakeCount: 0,
-        isMastered: false,
-        bookmarked: false
-      },
-      {
-        id: "voca_spect_04",
-        word: "prospect",
-        phonetic: "/ˈprɑːspekt/",
-        prefix: "pro-",
-        prefixMeaning: "앞으로 (forward)",
-        root: "spect",
-        rootMeaning: "보다 (look, see)",
-        suffix: "",
-        suffixMeaning: "",
-        meaning: "전망, 예상, 가능성",
-        breakdown: "pro(앞으로) + spect(보다)",
-        coreLogic: "앞(pro)을 멀리 내다보는(spect) 미래의 시선",
-        example: "The employment prospects for certified librarians look very promising.",
-        category: "spect (see/look)",
-        streak: 0,
-        mistakeCount: 0,
-        isMastered: false,
-        bookmarked: false
-      },
-      {
-        id: "voca_spect_05",
-        word: "conspicuous",
-        phonetic: "/kənˈspɪkjuəs/",
-        prefix: "con-",
-        prefixMeaning: "완전히, 다 같이 (together, completely)",
-        root: "spic",
-        rootMeaning: "보다 (look, see)",
-        suffix: "-uous",
-        suffixMeaning: "~한 성질의 (형용사)",
-        meaning: "눈에 띄는, 돋보이는, 뚜렷한",
-        breakdown: "con(강조, 누구나 다) + spic(보다) + uous(형용사)",
-        coreLogic: "모든 사람(con)이 한눈에 쳐다볼(spic) 수밖에 없을 만큼 뚜렷한",
-        example: "Emergency exit signs must be placed in conspicuous positions.",
-        category: "spect (see/look)",
-        streak: 0,
-        mistakeCount: 0,
-        isMastered: false,
-        bookmarked: false
-      },
-
-      // 3. 어근 tract (끌어당기다, draw)
-      {
-        id: "voca_tract_01",
-        word: "abstract",
-        phonetic: "/ˈæbstrækt/",
-        prefix: "abs-",
-        prefixMeaning: "멀리, 밖으로 (away, from)",
-        root: "tract",
-        rootMeaning: "끌어당기다 (draw, pull)",
-        suffix: "",
-        suffixMeaning: "",
-        meaning: "초록(논문 요약본), 추상적인; 추출하다",
-        breakdown: "abs(밖으로, 멀리) + tract(끌어당기다)",
-        coreLogic: "방대한 본문 글 속에서 핵심 알맹이만 밖으로 쏙 뽑아내다(tract) ➔ 논문 초록",
-        example: "Researchers usually read the abstract before requesting the full-text thesis.",
-        category: "tract (draw)",
-        streak: 0,
-        mistakeCount: 0,
-        isMastered: false,
-        bookmarked: false
-      },
-      {
-        id: "voca_tract_02",
-        word: "retract",
-        phonetic: "/rɪˈtrækt/",
-        prefix: "re-",
-        prefixMeaning: "뒤로, 다시 (back, again)",
-        root: "tract",
-        rootMeaning: "끌어당기다 (draw, pull)",
-        suffix: "",
-        suffixMeaning: "",
-        meaning: "철회하다, 취소하다, 움츠러들다",
-        breakdown: "re(뒤로) + tract(끌어당기다)",
-        coreLogic: "밖으로 내뱉었던 말을 뒤쪽으로(re) 도로 잡아당기다(tract)",
-        example: "The academic journal retracted the plagiarized paper immediately.",
-        category: "tract (draw)",
-        streak: 0,
-        mistakeCount: 0,
-        isMastered: false,
-        bookmarked: false
-      },
-      {
-        id: "voca_tract_03",
-        word: "distract",
-        phonetic: "/dɪˈstrækt/",
-        prefix: "dis-",
-        prefixMeaning: "멀리, 산만하게 딴 데로 (apart, away)",
-        root: "tract",
-        rootMeaning: "끌어당기다 (draw, pull)",
-        suffix: "",
-        suffixMeaning: "",
-        meaning: "집중을 흐트러뜨리다, 주의를 딴 데로 돌리다",
-        breakdown: "dis(딴 곳으로) + tract(끌어당기다)",
-        coreLogic: "한곳에 모여 있던 집중력을 딴 곳으로(dis) 홱 잡아끌다(tract)",
-        example: "Loud mobile conversations distract readers in the study lounge.",
-        category: "tract (draw)",
-        streak: 0,
-        mistakeCount: 0,
-        isMastered: false,
-        bookmarked: false
-      },
-
-      // 4. 어근 scribe / script (쓰다, write)
-      {
-        id: "voca_scribe_01",
-        word: "manuscript",
-        phonetic: "/ˈmænjuskrɪpt/",
-        prefix: "manu-",
-        prefixMeaning: "손 (hand)",
-        root: "script",
-        rootMeaning: "쓰다 (write)",
-        suffix: "",
-        suffixMeaning: "",
-        meaning: "필사본, 원고 (손으로 직접 쓴 책)",
-        breakdown: "manu(손, hand) + script(쓰다, write)",
-        coreLogic: "인쇄 활판기가 나오기 전 손(manu)으로 정성스레 베껴 쓴(script) 책",
-        example: "The national archives preserve rare ancient manuscripts written by hand.",
-        category: "scribe/script (write)",
-        streak: 0,
-        mistakeCount: 0,
-        isMastered: false,
-        bookmarked: false
-      },
-      {
-        id: "voca_scribe_02",
-        word: "prescribe",
-        phonetic: "/prɪˈskraɪb/",
-        prefix: "pre-",
-        prefixMeaning: "미리, 앞서서 (before)",
-        root: "scribe",
-        rootMeaning: "쓰다 (write)",
-        suffix: "",
-        suffixMeaning: "",
-        meaning: "규정하다, 처방하다",
-        breakdown: "pre(미리, 사전에) + scribe(쓰다)",
-        coreLogic: "문제가 생기기 전에 미리(pre) 문서로 규칙을 써서(scribe) 내려주다",
-        example: "Library regulations prescribe ethical standards for information usage.",
-        category: "scribe/script (write)",
-        streak: 0,
-        mistakeCount: 0,
-        isMastered: false,
-        bookmarked: false
-      },
-      {
-        id: "voca_scribe_03",
-        word: "subscribe",
-        phonetic: "/səbˈskraɪb/",
-        prefix: "sub-",
-        prefixMeaning: "아래에 (under)",
-        root: "scribe",
-        rootMeaning: "쓰다, 서명하다 (write, sign)",
-        suffix: "",
-        suffixMeaning: "",
-        meaning: "정기구독하다, 가입하다, 기부 서명하다",
-        breakdown: "sub(아래에) + scribe(쓰다)",
-        coreLogic: "정기 계약서의 맨 밑바닥(sub) 서명란에 내 이름을 써넣다(scribe)",
-        example: "The academic library subscribes to over five hundred peer-reviewed journals.",
-        category: "scribe/script (write)",
-        streak: 0,
-        mistakeCount: 0,
-        isMastered: false,
-        bookmarked: false
-      },
-
-      // 5. 어근 voc / vok (목소리, 부르다, call)
-      {
-        id: "voca_voc_01",
-        word: "advocate",
-        phonetic: "/ˈædvəkeɪt/",
-        prefix: "ad-",
-        prefixMeaning: "~를 향하여 (to, toward)",
-        root: "voc",
-        rootMeaning: "목소리 내다, 부르다 (call, voice)",
-        suffix: "-ate",
-        suffixMeaning: "동사/명사형 접미사",
-        meaning: "옹호하다, 지지하다; 주창자, 변호인",
-        breakdown: "ad(~를 향해) + voc(목소리 내다) + ate",
-        coreLogic: "어떤 약자나 정책을 향해(ad) 편을 들며 큰 목소리를 내어주다(voc)",
-        example: "Modern public librarians actively advocate for equal access to knowledge.",
-        category: "voc/vok (call)",
-        streak: 0,
-        mistakeCount: 0,
-        isMastered: false,
-        bookmarked: false
-      },
-      {
-        id: "voca_voc_02",
-        word: "revoke",
-        phonetic: "/rɪˈvoʊk/",
-        prefix: "re-",
-        prefixMeaning: "뒤로, 다시 (back, again)",
-        root: "voke",
-        rootMeaning: "부르다 (call)",
-        suffix: "",
-        suffixMeaning: "",
-        meaning: "폐지하다, 철회하다, 취소하다",
-        breakdown: "re(뒤로) + voke(불러내다)",
-        coreLogic: "세상 밖으로 내보냈던 허가증이나 법령을 뒤로 도로 불러들이다(voke)",
-        example: "Library borrowing privileges can be revoked if fines remain unpaid.",
-        category: "voc/vok (call)",
-        streak: 0,
-        mistakeCount: 0,
-        isMastered: false,
-        bookmarked: false
-      },
-      {
-        id: "voca_voc_03",
-        word: "provoke",
-        phonetic: "/prəˈvoʊk/",
-        prefix: "pro-",
-        prefixMeaning: "앞으로 (forward)",
-        root: "voke",
-        rootMeaning: "부르다 (call)",
-        suffix: "",
-        suffixMeaning: "",
-        meaning: "도발하다, 자극하다, 유발하다",
-        breakdown: "pro(앞으로) + voke(불러내다)",
-        coreLogic: "상대방을 앞으로 나오라고(pro) 삿대질하며 소리쳐 불러내다(voke)",
-        example: "The censorship attempt provoked fierce public criticism and protest.",
-        category: "voc/vok (call)",
-        streak: 0,
-        mistakeCount: 0,
-        isMastered: false,
-        bookmarked: false
+        isMastered: false
       }
     ];
 
-    let words = [];
-    let trainerQueue = [];
+    let chunks = [];
+    let queue = [];
     let currentIndex = 0;
-    let isMeaningRevealed = false;
-    let activeRootFilter = 'ALL';
-    let activeStatusFilter = 'active'; // 'active', 'review', 'mastered'
-    let trainerMode = 'flash'; // 'flash', 'quiz'
+    let currentStage = 1; // 1: 전체 블라인드, 2: 짝꿍 힌트, 3: 최종 핵심 단어 공개
+    let currentMode = 'all';
 
     function loadDatabase() {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         try {
-          words = JSON.parse(stored);
+          chunks = JSON.parse(stored);
         } catch (e) {
-          words = [...SEED_VOCABULARY];
+          chunks = [...SEED_CHUNKS];
         }
       } else {
-        words = [...SEED_VOCABULARY];
+        chunks = [...SEED_CHUNKS];
         saveDatabase();
       }
-      updateCounters();
-      populateRootFilterOptions();
-      renderRootsEncyclopedia();
-      renderVaultTable();
-      initTrainerSession();
+      updateCounts();
+      buildQueue();
+      renderCard();
     }
 
     function saveDatabase() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
-      updateCounters();
-      populateRootFilterOptions();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(chunks));
+      updateCounts();
     }
 
-    function updateCounters() {
-      document.getElementById('stat-total').innerText = words.length;
-      document.getElementById('stat-review').innerText = words.filter(w => !w.isMastered && (w.mistakeCount > 0 || w.bookmarked)).length;
-      document.getElementById('stat-mastered').innerText = words.filter(w => w.isMastered).length;
+    function resetToSeedData() {
+      if (!confirm('기본 예시 청크 덱으로 초기화하시겠습니까?')) return;
+      chunks = [...SEED_CHUNKS];
+      saveDatabase();
+      buildQueue();
+      renderCard();
+      showToast('기본 예시 덱으로 리셋되었습니다.');
     }
 
-    function populateRootFilterOptions() {
-      const select = document.getElementById('filter-root-select');
-      const currentVal = select.value;
-      const categories = Array.from(new Set(words.map(w => w.category).filter(Boolean)));
-      
-      select.innerHTML = '<option value="ALL">전체 어원 보기</option>' + 
-        categories.map(c => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join('');
-
-      select.value = categories.includes(currentVal) ? currentVal : 'ALL';
+    function updateCounts() {
+      document.getElementById('count-all').innerText = chunks.length;
+      document.getElementById('count-review').innerText = chunks.filter(c => !c.isMastered && c.streak === 0).length;
+      document.getElementById('count-mastered').innerText = chunks.filter(c => c.isMastered).length;
     }
 
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    function setMode(mode) {
+      currentMode = mode;
+      const btnAll = document.getElementById('filter-btn-all');
+      const btnRev = document.getElementById('filter-btn-review');
+      const btnMas = document.getElementById('filter-btn-mastered');
+
+      const idle = 'px-2.5 py-1 rounded-lg text-slate-600 hover:bg-slate-100';
+      btnAll.className = idle;
+      btnRev.className = idle;
+      btnMas.className = idle;
+
+      if (mode === 'all') btnAll.className = 'px-2.5 py-1 rounded-lg bg-slate-900 text-white font-bold';
+      if (mode === 'review') btnRev.className = 'px-2.5 py-1 rounded-lg bg-rose-600 text-white font-bold';
+      if (mode === 'mastered') btnMas.className = 'px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold';
+
+      buildQueue();
+      renderCard();
     }
 
-    function initTrainerSession() {
-      let filtered = words;
-
-      // Filter by category
-      if (activeRootFilter !== 'ALL') {
-        filtered = filtered.filter(w => w.category === activeRootFilter);
+    function buildQueue() {
+      if (currentMode === 'all') {
+        queue = chunks.filter(c => !c.isMastered);
+        if (queue.length === 0) queue = [...chunks];
+      } else if (currentMode === 'review') {
+        queue = chunks.filter(c => !c.isMastered && c.streak === 0);
+      } else if (currentMode === 'mastered') {
+        queue = chunks.filter(c => c.isMastered);
       }
-
-      // Filter by status
-      if (activeStatusFilter === 'active') {
-        filtered = filtered.filter(w => !w.isMastered);
-      } else if (activeStatusFilter === 'review') {
-        filtered = filtered.filter(w => !w.isMastered && (w.mistakeCount > 0 || w.bookmarked));
-      } else if (activeStatusFilter === 'mastered') {
-        filtered = filtered.filter(w => w.isMastered);
-      }
-
-      trainerQueue = shuffleArray(filtered);
       currentIndex = 0;
-      renderCurrentCard();
     }
 
-    function shuffleArray(arr) {
-      const copy = [...arr];
-      for (let i = copy.length - 1; i > 0; i--) {
+    function shuffleQueue() {
+      for (let i = queue.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
+        [queue[i], queue[j]] = [queue[j], queue[i]];
       }
-      return copy;
-    }
-
-    function shuffleTrainerQueue() {
-      trainerQueue = shuffleArray(trainerQueue);
       currentIndex = 0;
-      renderCurrentCard();
-      showToast('카드가 무작위로 재배열되었습니다.');
+      renderCard();
+      showToast('청크 덱이 무작위로 섞였습니다.');
     }
 
-    function renderCurrentCard() {
-      const flashBox = document.getElementById('flashcard-box');
-      if (trainerQueue.length === 0) {
-        flashBox.innerHTML = `
-          <div class="py-16 text-center space-y-3">
-            <div class="w-16 h-16 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto text-2xl font-bold">
-              <i class="ph-bold ph-check-fat"></i>
-            </div>
-            <h3 class="text-xl font-extrabold text-slate-800">모든 단어를 마스터했습니다!</h3>
-            <p class="text-xs text-slate-500">선택한 필터 조건에 해당하는 단어가 없습니다. 필터를 변경하거나 단어를 추가해 보세요.</p>
-            <button onclick="setStatusFilter('active')" class="mt-2 px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold">전체 훈련 덱으로 복귀</button>
-          </div>
-        `;
+    function renderCard() {
+      if (queue.length === 0) {
+        document.getElementById('card-korean-chunk').innerText = "모든 청크 학습을 완료했습니다!";
+        document.getElementById('card-step-guide').innerText = "선택된 조건의 청크가 없습니다.";
+        document.getElementById('card-progress').innerText = "0 / 0";
+        updateStageUI(1);
         return;
       }
 
-      const item = trainerQueue[currentIndex];
-      isMeaningRevealed = false;
+      const item = queue[currentIndex];
+      currentStage = 1;
+      updateStageUI(currentStage);
 
-      document.getElementById('card-root-category').innerHTML = `<i class="ph-bold ph-tag"></i> ${escapeHtml(item.category || '어원')}`;
-      document.getElementById('card-word').innerText = item.word;
-      document.getElementById('card-phonetic').innerText = item.phonetic || '';
+      document.getElementById('card-tag').innerText = item.tag || '핵심 청크';
+      document.getElementById('card-progress').innerText = `${currentIndex + 1} / ${queue.length}`;
+      document.getElementById('card-korean-chunk').innerText = item.korean;
+      document.getElementById('card-target-word').innerText = item.target || '';
       
-      // Etymology breakdown formula blocks
-      const formulaEl = document.getElementById('card-formula-blocks');
-      formulaEl.innerHTML = renderFormulaBlocks(item);
-
-      document.getElementById('card-core-logic').innerText = item.coreLogic ? `👉 ${item.coreLogic}` : `👉 ${item.breakdown || item.meaning}`;
-      document.getElementById('card-meaning-text').innerText = item.meaning;
-      document.getElementById('card-example-sentence').innerText = item.example ? `"${item.example}"` : '';
-
-      // Bookmark state icon
-      const bmIcon = document.getElementById('btn-bookmark-icon');
-      if (item.bookmarked) {
-        bmIcon.className = 'ph-fill ph-bookmark-simple text-amber-500 text-lg';
-      } else {
-        bmIcon.className = 'ph-bold ph-bookmark-simple text-slate-400 text-lg';
+      // 타깃 단어가 cloze에 명시적으로 가려지지 않은 경우 자동 마스킹
+      let displayCloze = item.cloze;
+      if (item.target && displayCloze.includes(item.target)) {
+        displayCloze = displayCloze.replace(new RegExp(item.target, 'gi'), '[ _________ ]');
       }
 
-      // Hide meaning initially
-      document.getElementById('card-meaning-content').classList.add('opacity-0', 'pointer-events-none');
-      document.getElementById('btn-reveal-meaning').classList.remove('hidden');
+      document.getElementById('card-cloze-en').innerText = displayCloze;
+      document.getElementById('card-full-en').innerText = item.english;
+      document.getElementById('card-full-sentence').innerText = item.sentence ? `"${item.sentence}"` : '';
+      document.getElementById('card-streak').innerText = `연속 암기: ${item.streak || 0} / 2회`;
+    }
 
-      document.getElementById('trainer-progress-text').innerText = `${currentIndex + 1} / ${trainerQueue.length} 단어`;
-      document.getElementById('trainer-streak-indicator').innerText = `연속 정답: ${item.streak || 0} / 2회`;
+    function nextStage() {
+      if (queue.length === 0) return;
+      currentStage = currentStage >= 3 ? 1 : currentStage + 1;
+      updateStageUI(currentStage);
+    }
 
-      if (trainerMode === 'quiz') {
-        renderQuizView();
+    function updateStageUI(stage) {
+      const v1 = document.getElementById('view-step-1');
+      const v2 = document.getElementById('view-step-2');
+      const v3 = document.getElementById('view-step-3');
+
+      const b1 = document.getElementById('step-badge-1');
+      const b2 = document.getElementById('step-badge-2');
+      const b3 = document.getElementById('step-badge-3');
+      const guide = document.getElementById('card-step-guide');
+
+      // 뷰 토글
+      v1.classList.add('hidden');
+      v2.classList.add('hidden');
+      v3.classList.add('hidden');
+
+      const activeBadge = 'px-2 py-0.5 rounded-md bg-amber-500 text-white';
+      const idleBadge = 'px-2 py-0.5 rounded-md bg-slate-100 text-slate-400';
+      b1.className = idleBadge;
+      b2.className = idleBadge;
+      b3.className = idleBadge;
+
+      if (stage === 1) {
+        v1.classList.remove('hidden');
+        b1.className = activeBadge;
+        guide.innerText = "[스페이스바] 누르면 짝꿍 단어 힌트 공개";
+        guide.className = "text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200";
+      } else if (stage === 2) {
+        v2.classList.remove('hidden');
+        b2.className = 'px-2 py-0.5 rounded-md bg-indigo-600 text-white';
+        guide.innerText = "[스페이스바] 누르면 핵심 단어 정답 공개";
+        guide.className = "text-xs font-bold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200";
+      } else if (stage === 3) {
+        v3.classList.remove('hidden');
+        b3.className = 'px-2 py-0.5 rounded-md bg-emerald-600 text-white';
+        guide.innerText = "정답 확인 완료! 헷갈림(1) / 바로앎(2)";
+        guide.className = "text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200";
       }
     }
 
-    function renderFormulaBlocks(item) {
-      if (!item.breakdown) {
-        return `<span class="px-2.5 py-1 bg-white rounded-lg border border-slate-200 text-xs font-bold text-slate-700">${escapeHtml(item.word)}</span>`;
-      }
-      const parts = item.breakdown.split('+').map(p => p.trim());
-      return parts.map((part, idx) => {
-        let colorClass = "bg-white border-indigo-200 text-indigo-800";
-        if (idx === 0 && part.includes('-')) colorClass = "bg-blue-50/80 border-blue-200 text-blue-800";
-        if (part.startsWith('-')) colorClass = "bg-emerald-50/80 border-emerald-200 text-emerald-800";
-        return `<span class="px-2.5 py-1 rounded-lg border text-xs font-extrabold shadow-2xs ${colorClass}">${escapeHtml(part)}</span>` + 
-          (idx < parts.length - 1 ? `<span class="text-slate-300 font-bold">+</span>` : '');
-      }).join('');
-    }
-
-    function toggleRevealMeaning() {
-      isMeaningRevealed = !isMeaningRevealed;
-      const content = document.getElementById('card-meaning-content');
-      const btn = document.getElementById('btn-reveal-meaning');
-      if (isMeaningRevealed) {
-        content.classList.remove('opacity-0', 'pointer-events-none');
-        btn.classList.add('hidden');
-      } else {
-        content.classList.add('opacity-0', 'pointer-events-none');
-        btn.classList.remove('hidden');
-      }
-    }
-
-    // ==================== 오답 시 '직관적 어원 피드백' 노출 로직 ====================
-    function triggerMistakeFeedback() {
-      if (trainerQueue.length === 0) return;
-      const item = trainerQueue[currentIndex];
-
-      // 1. 점수/기록 갱신 (오답 처리)
-      item.streak = 0;
-      item.isMastered = false;
-      item.mistakeCount = (item.mistakeCount || 0) + 1;
-
-      const target = words.find(w => w.id === item.id);
-      if (target) {
-        target.streak = 0;
-        target.isMastered = false;
-        target.mistakeCount = item.mistakeCount;
-      }
-      saveDatabase();
-
-      // 2. 어원 피드백 모달 데이터 채우기
-      document.getElementById('feedback-modal-word').innerText = item.word;
-      document.getElementById('feedback-modal-meaning').innerText = item.meaning;
-      document.getElementById('feedback-modal-logic').innerText = item.coreLogic ? `👉 ${item.coreLogic}` : `👉 ${item.breakdown || item.meaning}`;
-      
-      const exBox = document.getElementById('feedback-modal-example-box');
-      if (item.example) {
-        exBox.classList.remove('hidden');
-        document.getElementById('feedback-modal-example').innerText = `"${item.example}"`;
-      } else {
-        exBox.classList.add('hidden');
-      }
-
-      // 3. 구성요소 블록 시각화
-      const blocksContainer = document.getElementById('feedback-modal-blocks');
-      blocksContainer.innerHTML = generateFeedbackBlocks(item);
-
-      // 4. 모달 띄우기 & 발음 재생
-      document.getElementById('etymology-feedback-modal').classList.remove('hidden');
-      speakCurrentWord();
-    }
-
-    function generateFeedbackBlocks(item) {
-      const parts = [];
-
-      if (item.prefix) {
-        parts.push(`
-          <div class="flex-1 min-w-[100px] p-2.5 rounded-xl bg-blue-50 border border-blue-200 text-center">
-            <span class="text-[10px] font-black uppercase text-blue-500 tracking-wider block">접두사 (Prefix)</span>
-            <div class="text-sm font-black text-blue-900 mt-0.5">${escapeHtml(item.prefix)}</div>
-            <div class="text-[11px] text-blue-700 font-bold mt-0.5">${escapeHtml(item.prefixMeaning || '앞에 붙어 방향/성격 부여')}</div>
-          </div>
-        `);
-      }
-
-      if (item.root) {
-        parts.push(`
-          <div class="flex-1 min-w-[110px] p-2.5 rounded-xl bg-indigo-50 border border-indigo-200 text-center">
-            <span class="text-[10px] font-black uppercase text-indigo-500 tracking-wider block">핵심 어근 (Root)</span>
-            <div class="text-sm font-black text-indigo-900 mt-0.5">${escapeHtml(item.root)}</div>
-            <div class="text-[11px] text-indigo-700 font-bold mt-0.5">${escapeHtml(item.rootMeaning || '단어의 뿌리 의미')}</div>
-          </div>
-        `);
-      }
-
-      if (item.suffix) {
-        parts.push(`
-          <div class="flex-1 min-w-[90px] p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-center">
-            <span class="text-[10px] font-black uppercase text-emerald-500 tracking-wider block">접미사 (Suffix)</span>
-            <div class="text-sm font-black text-emerald-900 mt-0.5">${escapeHtml(item.suffix)}</div>
-            <div class="text-[11px] text-emerald-700 font-bold mt-0.5">${escapeHtml(item.suffixMeaning || '품사/성격 결정')}</div>
-          </div>
-        `);
-      }
-
-      // 만약 세부 필드가 분리 안 된 단어라면 breakdown 문자열 활용
-      if (parts.length === 0 && item.breakdown) {
-        return `<div class="p-3 bg-white border border-indigo-200 rounded-xl text-xs font-bold text-indigo-800">${escapeHtml(item.breakdown)}</div>`;
-      }
-
-      return parts.join('<div class="self-center text-slate-300 font-black text-sm">+</div>');
-    }
-
-    function dismissFeedbackModal() {
-      document.getElementById('etymology-feedback-modal').classList.add('hidden');
-      nextCard();
-    }
-
-    function markCardResult(isCorrect) {
-      if (trainerQueue.length === 0) return;
-      const item = trainerQueue[currentIndex];
+    function markResult(isCorrect) {
+      if (queue.length === 0) return;
+      const item = queue[currentIndex];
 
       if (isCorrect) {
         item.streak = (item.streak || 0) + 1;
         if (item.streak >= 2) {
           item.isMastered = true;
-          showToast(`🎉 "${item.word}" 2회 연속 정답! 마스터 보관함으로 졸업했습니다.`);
+          showToast(`🎉 "${item.target || item.english}" 마스터 보관함으로 이동!`);
         } else {
           showToast(`👏 정답! 한 번 더 맞히면 마스터됩니다. (1/2)`);
         }
-
-        const target = words.find(w => w.id === item.id);
-        if (target) {
-          target.streak = item.streak;
-          target.isMastered = item.isMastered;
-        }
-        saveDatabase();
-
-        if (item.isMastered && activeStatusFilter !== 'mastered') {
-          trainerQueue.splice(currentIndex, 1);
-          if (currentIndex >= trainerQueue.length) currentIndex = 0;
-          renderCurrentCard();
-        } else {
-          nextCard();
-        }
       } else {
-        // 모름/헷갈림 누르면 직관적 어원 피드백 모달 실행
-        triggerMistakeFeedback();
+        item.streak = 0;
+        item.isMastered = false;
+        showToast(`💡 오답 등록! 복습 덱에서 다시 인출합니다.`);
+      }
+
+      const original = chunks.find(c => c.id === item.id);
+      if (original) {
+        original.streak = item.streak;
+        original.isMastered = item.isMastered;
+      }
+      saveDatabase();
+
+      if (isCorrect && item.isMastered && currentMode !== 'mastered') {
+        queue.splice(currentIndex, 1);
+        if (currentIndex >= queue.length) currentIndex = 0;
+        renderCard();
+      } else {
+        nextCard();
       }
     }
 
     function nextCard() {
-      if (trainerQueue.length === 0) return;
-      if (currentIndex < trainerQueue.length - 1) {
-        currentIndex++;
-      } else {
-        currentIndex = 0;
-        showToast('모든 카드를 한 바퀴 확인했습니다!');
-      }
-      renderCurrentCard();
+      if (queue.length === 0) return;
+      currentIndex = (currentIndex + 1) % queue.length;
+      renderCard();
     }
 
     function prevCard() {
-      if (currentIndex > 0) {
-        currentIndex--;
-        renderCurrentCard();
-      }
+      if (queue.length === 0) return;
+      currentIndex = (currentIndex - 1 + queue.length) % queue.length;
+      renderCard();
     }
 
-    function toggleBookmarkCurrent() {
-      if (trainerQueue.length === 0) return;
-      const item = trainerQueue[currentIndex];
-      item.bookmarked = !item.bookmarked;
-      const target = words.find(w => w.id === item.id);
-      if (target) target.bookmarked = item.bookmarked;
-      saveDatabase();
-      renderCurrentCard();
-      showToast(item.bookmarked ? '북마크에 등록되었습니다.' : '북마크가 해제되었습니다.');
-    }
-
-    function speakCurrentWord() {
-      if (trainerQueue.length === 0) return;
-      const item = trainerQueue[currentIndex];
+    function speakChunk() {
+      if (queue.length === 0) return;
+      const text = queue[currentIndex].english;
       if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(item.word);
-        utterance.lang = 'en-US';
-        utterance.rate = 0.85;
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-US';
+        u.rate = 0.9;
         window.speechSynthesis.cancel();
-        window.speechSynthesis.speak(utterance);
-      } else {
-        showToast('브라우저가 TTS 음성을 지원하지 않습니다.');
+        window.speechSynthesis.speak(u);
       }
-    }
-
-    function setTrainerMode(mode) {
-      trainerMode = mode;
-      const btnFlash = document.getElementById('btn-mode-flash');
-      const btnQuiz = document.getElementById('btn-mode-quiz');
-      const flashBox = document.getElementById('trainer-card-container');
-      const quizBox = document.getElementById('spelling-quiz-container');
-
-      if (mode === 'flash') {
-        btnFlash.className = 'px-3 py-1 rounded-md bg-white text-indigo-700 shadow-xs';
-        btnQuiz.className = 'px-3 py-1 rounded-md text-slate-600 hover:text-slate-900';
-        flashBox.classList.remove('hidden');
-        quizBox.classList.add('hidden');
-        renderCurrentCard();
-      } else {
-        btnQuiz.className = 'px-3 py-1 rounded-md bg-white text-indigo-700 shadow-xs';
-        btnFlash.className = 'px-3 py-1 rounded-md text-slate-600 hover:text-slate-900';
-        flashBox.classList.add('hidden');
-        quizBox.classList.remove('hidden');
-        renderQuizView();
-      }
-    }
-
-    function renderQuizView() {
-      if (trainerQueue.length === 0) return;
-      const item = trainerQueue[currentIndex];
-      document.getElementById('quiz-root-badge').innerText = `어원: ${item.category || '어원'}`;
-      document.getElementById('quiz-clue-formula').innerText = item.breakdown || '';
-      document.getElementById('quiz-meaning').innerText = item.meaning;
-      const input = document.getElementById('quiz-input');
-      input.value = '';
-      input.focus();
-      document.getElementById('quiz-feedback').classList.add('hidden');
-    }
-
-    function handleSpellingSubmit(e) {
-      e.preventDefault();
-      if (trainerQueue.length === 0) return;
-      const item = trainerQueue[currentIndex];
-      const input = document.getElementById('quiz-input');
-      const feedback = document.getElementById('quiz-feedback');
-      const answer = input.value.trim().toLowerCase();
-
-      feedback.classList.remove('hidden');
-      if (answer === item.word.toLowerCase()) {
-        feedback.className = 'p-3 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200';
-        feedback.innerHTML = `🎉 정답입니다! <strong>${item.word}</strong>`;
-        markCardResult(true);
-      } else {
-        feedback.className = 'p-3 rounded-xl text-xs font-bold bg-rose-50 text-rose-800 border border-rose-200 shake-anim';
-        feedback.innerHTML = `❌ 철자 오류! 정답: <strong class="underline">${item.word}</strong> ➔ 어원 처방전을 확인하세요.`;
-        // 오답 피드백 팝업 실행
-        setTimeout(() => {
-          triggerMistakeFeedback();
-        }, 600);
-      }
-    }
-
-    function applyRootFilter() {
-      activeRootFilter = document.getElementById('filter-root-select').value;
-      initTrainerSession();
-    }
-
-    function setStatusFilter(status) {
-      activeStatusFilter = status;
-      const btnActive = document.getElementById('filter-status-active');
-      const btnReview = document.getElementById('filter-status-review');
-      const btnMastered = document.getElementById('filter-status-mastered');
-
-      const reset = 'px-2.5 py-1 rounded-md text-slate-600 hover:text-slate-900';
-      btnActive.className = reset;
-      btnReview.className = reset;
-      btnMastered.className = reset;
-
-      if (status === 'active') btnActive.className = 'px-2.5 py-1 rounded-md bg-white text-slate-900 font-bold shadow-xs';
-      if (status === 'review') btnReview.className = 'px-2.5 py-1 rounded-md bg-amber-500 text-white font-bold shadow-xs';
-      if (status === 'mastered') btnMastered.className = 'px-2.5 py-1 rounded-md bg-emerald-600 text-white font-bold shadow-xs';
-
-      initTrainerSession();
-    }
-
-    function renderRootsEncyclopedia() {
-      const container = document.getElementById('roots-grid');
-      const categories = Array.from(new Set(words.map(w => w.category).filter(Boolean)));
-
-      container.innerHTML = categories.map(cat => {
-        const catWords = words.filter(w => w.category === cat);
-        return `
-          <div class="p-4 bg-slate-50 hover:bg-indigo-50/50 border border-slate-200 hover:border-indigo-300 rounded-2xl transition cursor-pointer" onclick="selectRootFromCatalog('${escapeHtml(cat)}')">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-sm font-extrabold text-indigo-700">${escapeHtml(cat)}</span>
-              <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-indigo-100 text-indigo-800">${catWords.length} 단어</span>
-            </div>
-            <div class="text-xs text-slate-600 space-y-1">
-              ${catWords.slice(0, 3).map(w => `<div><strong>${escapeHtml(w.word)}</strong>: <span class="text-slate-500">${escapeHtml(w.meaning)}</span></div>`).join('')}
-              ${catWords.length > 3 ? `<div class="text-[10px] text-slate-400 font-semibold">+ ${catWords.length - 3}개 더보기</div>` : ''}
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function selectRootFromCatalog(cat) {
-      document.getElementById('filter-root-select').value = cat;
-      activeRootFilter = cat;
-      switchTab('trainer');
-      initTrainerSession();
-      showToast(`[${cat}] 어원 단어들이 훈련 덱에 로드되었습니다.`);
-    }
-
-    function filterRootsCatalog() {
-      const query = document.getElementById('search-root-input').value.trim().toLowerCase();
-      document.querySelectorAll('#roots-grid > div').forEach(card => {
-        const text = card.innerText.toLowerCase();
-        card.style.display = text.includes(query) ? 'block' : 'none';
-      });
-    }
-
-    function renderVaultTable() {
-      const tbody = document.getElementById('vault-table-body');
-      if (!tbody) return;
-
-      if (words.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-400">등록된 영단어가 없습니다.</td></tr>`;
-        return;
-      }
-
-      tbody.innerHTML = words.map(item => {
-        return `
-          <tr class="hover:bg-slate-50 transition">
-            <td class="py-3 px-4 font-black text-slate-900">${escapeHtml(item.word)}</td>
-            <td class="py-3 px-4 font-mono text-[11px] text-indigo-700 font-semibold">${escapeHtml(item.breakdown || '-')}</td>
-            <td class="py-3 px-4 font-medium text-slate-700 max-w-xs break-keep">${escapeHtml(item.meaning)}</td>
-            <td class="py-3 px-4">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${item.isMastered ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-100 text-slate-600'}">
-                ${item.isMastered ? '마스터 (2/2)' : `학습중 (${item.streak || 0}/2)`}
-              </span>
-            </td>
-            <td class="py-3 px-4 text-center">
-              <button onclick="deleteWord('${item.id}')" title="삭제" class="p-1 text-slate-400 hover:text-rose-600 transition">
-                <i class="ph-bold ph-trash text-sm"></i>
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function deleteWord(id) {
-      words = words.filter(w => w.id !== id);
-      saveDatabase();
-      renderVaultTable();
-      renderRootsEncyclopedia();
-      initTrainerSession();
-      showToast('단어가 삭제되었습니다.');
-    }
-
-    function resetAllWords() {
-      if (!confirm('정말 모든 영단어 데이터를 초기화하시겠습니까?')) return;
-      words = [];
-      saveDatabase();
-      renderVaultTable();
-      renderRootsEncyclopedia();
-      initTrainerSession();
-      showToast('데이터가 초기화되었습니다.');
-    }
-
-    function exportWordsJSON() {
-      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(words, null, 2));
-      const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", dataStr);
-      downloadAnchor.setAttribute("download", `VocaRoot_Data_${new Date().toISOString().slice(0, 10)}.json`);
-      document.body.appendChild(downloadAnchor);
-      downloadAnchor.click();
-      downloadAnchor.remove();
-      showToast('백업 파일이 다운로드되었습니다.');
     }
 
     function openPasteModal() {
@@ -1316,10 +502,7 @@
 
     function applyPastedData(mode = 'append') {
       const raw = document.getElementById('paste-textarea').value.trim();
-      if (!raw) {
-        showToast('내용을 입력하세요.');
-        return;
-      }
+      if (!raw) return;
 
       try {
         let cleaned = raw;
@@ -1327,87 +510,42 @@
           cleaned = cleaned.replace(/^```[a-zA-Z0-9_\-:]*\n?/, '').replace(/```(eof)?$/, '').trim();
         }
 
-        // Try JSON parse first
-        let parsed = null;
-        try {
-          parsed = JSON.parse(cleaned);
-        } catch (e) {
-          // If not JSON, parse line-by-line format: word : breakdown : meaning : coreLogic
-          const lines = cleaned.split('\n').filter(l => l.trim().length > 0);
-          parsed = lines.map(line => {
-            const parts = line.split(':').map(p => p.trim());
-            return {
-              word: parts[0] || '',
-              breakdown: parts[1] || '',
-              meaning: parts[2] || '',
-              coreLogic: parts[3] || '',
-              category: parts[1] ? parts[1].split('+')[0].trim() : '일반 어원'
-            };
-          }).filter(p => p.word);
-        }
-
+        const parsed = JSON.parse(cleaned);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const normalized = parsed.map(p => ({
-            id: p.id || 'voca_' + Date.now().toString() + Math.random().toString(36).substr(2, 4),
-            word: p.word || '',
-            phonetic: p.phonetic || '',
-            prefix: p.prefix || '',
-            prefixMeaning: p.prefixMeaning || '',
-            root: p.root || '',
-            rootMeaning: p.rootMeaning || '',
-            suffix: p.suffix || '',
-            suffixMeaning: p.suffixMeaning || '',
-            meaning: p.meaning || '',
-            breakdown: p.breakdown || '',
-            coreLogic: p.coreLogic || '',
-            example: p.example || '',
-            category: p.category || (p.prefix ? `${p.prefix} 어원` : '공통 어원'),
-            streak: 0,
-            mistakeCount: 0,
-            isMastered: false,
-            bookmarked: false
-          }));
+          const normalized = parsed.map(p => {
+            let clozeVal = p.cloze || p.english || '';
+            if (p.target && clozeVal.includes(p.target)) {
+              clozeVal = clozeVal.replace(new RegExp(p.target, 'gi'), '[ _________ ]');
+            }
+            return {
+              id: p.id || 'chunk_' + Date.now().toString() + Math.random().toString(36).substr(2, 4),
+              korean: p.korean || '',
+              cloze: clozeVal,
+              english: p.english || '',
+              target: p.target || '',
+              sentence: p.sentence || '',
+              tag: p.tag || '형광펜 청크',
+              streak: 0,
+              isMastered: false
+            };
+          });
 
           if (mode === 'overwrite') {
-            words = normalized;
-            showToast(`총 ${words.length}개 단어로 교체되었습니다.`);
+            chunks = normalized;
+            showToast(`총 ${chunks.length}개 청크로 전체 교체되었습니다.`);
           } else {
-            words.unshift(...normalized);
-            showToast(`${normalized.length}개 단어가 추가되었습니다.`);
+            chunks.unshift(...normalized);
+            showToast(`${normalized.length}개 청크가 추가 등록되었습니다.`);
           }
 
           saveDatabase();
-          renderRootsEncyclopedia();
-          renderVaultTable();
-          initTrainerSession();
+          buildQueue();
+          renderCard();
           closePasteModal();
-        } else {
-          showToast('올바른 JSON 또는 단어 형식 목록이 아닙니다.');
         }
       } catch (err) {
-        showToast('파싱 오류입니다. 형식에 맞게 입력해 주세요.');
+        showToast('JSON 형식 오류입니다. 코드를 다시 확인해 주세요.');
       }
-    }
-
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('bg-white', 'text-indigo-700', 'shadow-xs');
-        btn.classList.add('text-slate-600');
-      });
-
-      const targetSection = document.getElementById(`tab-${tabId}`);
-      const targetBtn = document.getElementById(`tab-btn-${tabId}`);
-
-      if (targetSection) targetSection.classList.remove('hidden');
-      if (targetBtn) {
-        targetBtn.classList.add('bg-white', 'text-indigo-700', 'shadow-xs');
-        targetBtn.classList.remove('text-slate-600');
-      }
-
-      if (tabId === 'trainer') initTrainerSession();
-      if (tabId === 'roots') renderRootsEncyclopedia();
-      if (tabId === 'vault') renderVaultTable();
     }
 
     function showToast(msg) {
@@ -1417,43 +555,27 @@
       toast.classList.remove('translate-y-10', 'opacity-0');
       setTimeout(() => {
         toast.classList.add('translate-y-10', 'opacity-0');
-      }, 2400);
+      }, 2000);
     }
 
-    // Keyboard Shortcuts
     window.addEventListener('keydown', (e) => {
-      // Feedback modal active
-      const isFeedbackModalOpen = !document.getElementById('etymology-feedback-modal').classList.contains('hidden');
-      if (isFeedbackModalOpen) {
-        if (e.key === 'Enter' || e.key === ' ' || e.code === 'Space') {
-          e.preventDefault();
-          dismissFeedbackModal();
-        } else if (e.key.toLowerCase() === 's') {
-          speakCurrentWord();
-        }
-        return;
-      }
-
+      const isModalOpen = !document.getElementById('paste-modal').classList.contains('hidden');
+      if (isModalOpen) return;
       if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
-
-      const isTrainerActive = !document.getElementById('tab-trainer').classList.contains('hidden');
-      if (!isTrainerActive) return;
 
       if (e.key === ' ' || e.code === 'Space') {
         e.preventDefault();
-        toggleRevealMeaning();
+        nextStage();
       } else if (e.key === '1') {
-        markCardResult(false);
+        markResult(false);
       } else if (e.key === '2' || e.key === 'Enter') {
-        markCardResult(true);
+        markResult(true);
       } else if (e.key === 'ArrowRight') {
         nextCard();
       } else if (e.key === 'ArrowLeft') {
         prevCard();
       } else if (e.key.toLowerCase() === 's') {
-        speakCurrentWord();
-      } else if (e.key.toLowerCase() === 'b') {
-        toggleBookmarkCurrent();
+        speakChunk();
       }
     });
 
