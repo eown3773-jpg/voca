@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>V-Voca - 김지영 V단어식 영영 뉘앙스 & 실전 독해 인출기</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -11,166 +11,187 @@
   <!-- Phosphor Icons -->
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <style>
-    * { box-sizing: border-box; }
+    * { 
+      box-sizing: border-box; 
+      -webkit-tap-highlight-color: transparent;
+    }
     body {
       font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      letter-spacing: -0.015em;
-      line-height: 1.6;
+      letter-spacing: -0.02em;
+      line-height: 1.5;
       word-break: keep-all;
+      overflow-wrap: break-word;
+    }
+    /* 모바일 스크롤바 미려하게 처리 */
+    ::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 4px;
     }
   </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-rose-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-rose-500 selection:text-white">
 
   <!-- ==================== HEADER ==================== -->
-  <header class="bg-slate-800/90 backdrop-blur-md border-b border-slate-700/80 sticky top-0 z-40 shadow-md">
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
+  <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-2xl mx-auto px-3 py-2.5 flex items-center justify-between gap-2">
       
-      <!-- Logo -->
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 via-amber-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-rose-900/30 shrink-0">
-          <i class="ph-bold ph-lightning text-xl"></i>
+      <!-- Logo & Title -->
+      <div class="flex items-center space-x-2 min-w-0">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-rose-600 via-amber-500 to-indigo-600 flex items-center justify-center text-white shrink-0 shadow-md">
+          <i class="ph-bold ph-lightning text-base"></i>
         </div>
-        <div>
-          <h1 class="text-base font-black text-white tracking-tight flex items-center gap-1.5">
-            <span>V-Voca</span>
-            <span class="text-[10px] px-2 py-0.5 bg-rose-500/20 text-rose-300 font-extrabold rounded-full border border-rose-500/40">김지영 V단어 × 영영사전 뉘앙스</span>
-          </h1>
-          <p class="text-[11px] text-slate-400">사전 속 1차 뜻 ➔ [영영 정의] ➔ [실전 독해 이면의 의미(비필수/중요치 않음 등)]</p>
+        <div class="min-w-0">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="text-sm font-black text-white tracking-tight">V-Voca</span>
+            <span class="text-[9px] px-1.5 py-0.2 bg-rose-500/20 text-rose-300 font-extrabold rounded border border-rose-500/30">
+              김지영 V단어
+            </span>
+          </div>
+          <p class="text-[10px] text-slate-400 truncate">1차 뜻 ➔ 영영 뉘앙스 ➔ 실전 독해 속뜻</p>
         </div>
       </div>
 
-      <!-- Actions -->
-      <div class="flex items-center space-x-2">
-        <button onclick="openPasteModal()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs transition shadow-md shadow-rose-900/40">
-          <i class="ph-bold ph-plus-circle text-sm"></i>
-          <span>V단어 덱 붙여넣기</span>
+      <!-- Action Buttons -->
+      <div class="flex items-center space-x-1.5 shrink-0">
+        <button onclick="openPasteModal()" class="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-black text-[11px] transition shadow">
+          <i class="ph-bold ph-plus-circle text-xs"></i>
+          <span>덱 등록</span>
         </button>
-        <button onclick="resetToSeedData()" class="p-2 text-slate-400 hover:text-amber-400 rounded-lg hover:bg-slate-700/50 transition" title="기본 V단어 덱으로 리셋">
-          <i class="ph-bold ph-arrow-counter-clockwise text-base"></i>
+        <button onclick="resetToSeedData()" class="p-1.5 text-slate-400 hover:text-amber-400 rounded-lg hover:bg-slate-800 transition" title="기본 V단어로 리셋">
+          <i class="ph-bold ph-arrow-counter-clockwise text-sm"></i>
         </button>
       </div>
     </div>
   </header>
 
   <!-- ==================== MAIN CONTENT ==================== -->
-  <main class="flex-1 max-w-3xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center">
+  <main class="flex-1 max-w-2xl w-full mx-auto p-2.5 sm:p-4 flex flex-col justify-start sm:justify-center">
     
-    <!-- Filter & Mode Bar -->
-    <div class="bg-slate-800/80 p-3 rounded-2xl border border-slate-700/80 shadow-sm mb-4 flex items-center justify-between text-xs font-semibold">
-      <div class="flex items-center gap-2">
-        <span class="text-slate-400">인출 진행:</span>
-        <button id="filter-btn-all" onclick="setMode('all')" class="px-2.5 py-1 rounded-lg bg-rose-600 text-white font-bold">전체 (<span id="count-all">0</span>)</button>
-        <button id="filter-btn-review" onclick="setMode('review')" class="px-2.5 py-1 rounded-lg text-slate-300 hover:bg-slate-700">헷갈림 (<span id="count-review">0</span>)</button>
-        <button id="filter-btn-mastered" onclick="setMode('mastered')" class="px-2.5 py-1 rounded-lg text-slate-300 hover:bg-slate-700">체화 완료 (<span id="count-mastered">0</span>)</button>
+    <!-- Filter Bar -->
+    <div class="bg-slate-900 border border-slate-800 p-2 rounded-xl mb-2.5 flex items-center justify-between text-[11px] font-semibold gap-1">
+      <div class="flex items-center gap-1 overflow-x-auto py-0.5">
+        <button id="filter-btn-all" onclick="setMode('all')" class="px-2 py-0.5 rounded-md bg-rose-600 text-white font-bold shrink-0">
+          전체 (<span id="count-all">0</span>)
+        </button>
+        <button id="filter-btn-review" onclick="setMode('review')" class="px-2 py-0.5 rounded-md text-slate-300 hover:bg-slate-800 shrink-0">
+          복습 (<span id="count-review">0</span>)
+        </button>
+        <button id="filter-btn-mastered" onclick="setMode('mastered')" class="px-2 py-0.5 rounded-md text-slate-300 hover:bg-slate-800 shrink-0">
+          완료 (<span id="count-mastered">0</span>)
+        </button>
       </div>
-      <button onclick="shuffleQueue()" class="text-slate-400 hover:text-white flex items-center gap-1">
+      <button onclick="shuffleQueue()" class="text-slate-400 hover:text-white flex items-center gap-1 shrink-0 px-1 text-[10px]">
         <i class="ph-bold ph-shuffle"></i> 섞기
       </button>
     </div>
 
     <!-- MAIN CARD -->
-    <div class="bg-slate-800 border border-slate-700/80 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden min-h-[500px] flex flex-col justify-between text-center">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg flex flex-col justify-between min-h-[460px] sm:min-h-[500px]">
       
-      <!-- Card Header & Step Indicator -->
-      <div class="flex items-center justify-between text-xs text-slate-400 pb-3 border-b border-slate-700/60">
-        <span id="card-tag" class="px-2.5 py-0.5 rounded-full bg-slate-700/80 text-rose-300 font-bold border border-slate-600">
-          김지영 V-Lecture
+      <!-- Card Top: Step Indicator & Progress -->
+      <div class="flex items-center justify-between text-[10px] sm:text-xs text-slate-400 pb-2.5 border-b border-slate-800 gap-1">
+        <span id="card-tag" class="px-2 py-0.5 rounded bg-slate-800 text-rose-300 font-bold border border-slate-700 truncate max-w-[80px] sm:max-w-none">
+          V-Lecture
         </span>
         
-        <!-- Step Indicator -->
-        <div class="flex items-center gap-1.5 text-[11px] font-bold">
-          <span id="step-badge-1" class="px-2.5 py-0.5 rounded-md bg-rose-600 text-white">1: 단어 & 1차 뜻</span>
-          <span class="text-slate-500">➔</span>
-          <span id="step-badge-2" class="px-2.5 py-0.5 rounded-md bg-slate-700 text-slate-400">2: 영영 코어 뉘앙스</span>
-          <span class="text-slate-500">➔</span>
-          <span id="step-badge-3" class="px-2.5 py-0.5 rounded-md bg-slate-700 text-slate-400">3: 실전 독해 속뜻(V-Sense)</span>
+        <!-- Step Indicator (모바일 최적화: 1/2/3 칩) -->
+        <div class="flex items-center gap-1 font-bold">
+          <span id="step-badge-1" class="px-2 py-0.5 rounded bg-rose-600 text-white">1: 기본뜻</span>
+          <span class="text-slate-600">➔</span>
+          <span id="step-badge-2" class="px-2 py-0.5 rounded bg-slate-800 text-slate-400">2: 영영정의</span>
+          <span class="text-slate-600">➔</span>
+          <span id="step-badge-3" class="px-2 py-0.5 rounded bg-slate-800 text-slate-400">3: V-속뜻</span>
         </div>
 
-        <span id="card-progress">1 / 10</span>
+        <span id="card-progress" class="font-mono text-slate-400 text-[11px] shrink-0">1 / 42</span>
       </div>
 
-      <!-- Core Word & 1st Meaning Area -->
-      <div class="my-4 space-y-2">
-        <div class="flex items-center justify-center gap-2">
-          <span class="text-[11px] font-black uppercase text-rose-400 tracking-wider">
+      <!-- Core Word Header -->
+      <div class="my-3 text-center space-y-1">
+        <div class="flex items-center justify-center gap-1.5">
+          <span class="text-[9px] font-black uppercase text-rose-400 tracking-wider">
             TARGET WORD
           </span>
-          <button onclick="speakWord()" class="text-slate-400 hover:text-rose-400 transition" title="발음 듣기 (S)">
-            <i class="ph-bold ph-speaker-high text-base"></i>
+          <button onclick="speakWord()" class="text-slate-400 hover:text-rose-400 p-1" title="발음 듣기">
+            <i class="ph-bold ph-speaker-high text-sm"></i>
           </button>
         </div>
         
-        <h2 id="card-target-word" class="text-3xl sm:text-4xl font-black text-white tracking-tight font-mono">
-          optional
+        <!-- 표제어 (모바일에서도 줄바꿈 안 깨지게) -->
+        <h2 id="card-target-word" class="text-2xl sm:text-3xl font-black text-white tracking-tight break-words px-2 leading-tight">
+          attitude
         </h2>
 
-        <!-- Step Guide -->
-        <div class="h-6 flex items-center justify-center">
-          <p id="card-step-guide" class="text-xs font-bold text-amber-300 bg-amber-950/40 px-3 py-1 rounded-full border border-amber-600/40">
-            [Space] 누르면 영영사전 코어 뉘앙스 오픈
+        <!-- Step Guide Pill -->
+        <div class="pt-1 flex items-center justify-center">
+          <p id="card-step-guide" class="text-[10px] sm:text-xs font-bold text-amber-300 bg-amber-950/40 px-2.5 py-0.5 rounded-full border border-amber-600/40">
+            [터치 / Space] 영영사전 코어 뉘앙스 오픈
           </p>
         </div>
       </div>
 
-      <!-- Interactive 3-Stage Revelation Box -->
-      <div id="voca-display-box" onclick="nextStage()" class="cursor-pointer bg-slate-900/60 hover:bg-slate-900/80 border-2 border-dashed border-slate-700 hover:border-rose-500/50 rounded-2xl p-5 sm:p-6 transition my-2 flex flex-col justify-center items-center min-h-[220px]">
+      <!-- Interactive 3-Stage Box (터치 영역) -->
+      <div id="voca-display-box" onclick="nextStage()" class="cursor-pointer bg-slate-950/70 hover:bg-slate-950/90 border border-dashed border-slate-700/80 active:border-rose-500 rounded-xl p-3.5 sm:p-5 transition my-1 flex flex-col justify-center items-center min-h-[190px]">
         
-        <!-- STEP 1 VIEW: 사전적 1차 의미 (기본) -->
-        <div id="view-step-1" class="space-y-3">
-          <div class="text-slate-400 text-xs font-medium">사전적 1차 뜻 (기본)</div>
-          <div id="card-basic-meaning" class="text-xl sm:text-2xl font-bold text-slate-200">
-            선택적인
+        <!-- STEP 1 VIEW: 기본 1차 의미 -->
+        <div id="view-step-1" class="space-y-2 text-center w-full">
+          <div class="text-slate-400 text-[11px] font-medium">사전적 1차 뜻 (기본)</div>
+          <div id="card-basic-meaning" class="text-lg sm:text-xl font-black text-slate-100 px-2">
+            태도, 입장
           </div>
-          <p class="text-xs text-slate-500 font-semibold flex items-center justify-center gap-1">
-            <i class="ph-bold ph-question"></i> 평가원은 이 단어를 '선택적'으로만 쓰지 않는다! 진짜 뉘앙스는? [Space]
+          <p class="text-[10px] sm:text-[11px] text-slate-500 font-semibold flex items-center justify-center gap-1 pt-1">
+            <i class="ph-bold ph-hand-tap text-xs"></i> 터치하면 영영사전 코어 뉘앙스가 열립니다
           </p>
         </div>
 
-        <!-- STEP 2 VIEW: 영영사전 정의 & 코어 뉘앙스 -->
-        <div id="view-step-2" class="hidden space-y-3 max-w-xl text-center">
-          <div class="text-amber-400 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1">
-            <i class="ph-bold ph-book-open"></i> English-English Dictionary Definition
+        <!-- STEP 2 VIEW: 영영사전 정의 -->
+        <div id="view-step-2" class="hidden space-y-2.5 w-full text-center">
+          <div class="text-amber-400 text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1">
+            <i class="ph-bold ph-book-open"></i> English Definition
           </div>
-          <div id="card-en-def" class="text-base sm:text-lg font-medium text-slate-100 italic bg-slate-800/80 p-3 rounded-xl border border-slate-700">
-            "Available to be chosen but not mandatory; you can choose not to do or have it."
+          <div id="card-en-def" class="text-xs sm:text-sm font-medium text-slate-100 italic bg-slate-900/90 p-3 rounded-lg border border-slate-800 leading-relaxed text-left sm:text-center">
+            "A settled way of thinking or feeling about someone or something."
           </div>
-          <p class="text-xs text-indigo-400 font-bold flex items-center justify-center gap-1">
-            <i class="ph-bold ph-lightbulb"></i> 즉, 안 해도 그만이라는 뜻! 실전 독해에서 문맥상 의미는? [Space]
+          <p class="text-[10px] sm:text-[11px] text-indigo-400 font-bold flex items-center justify-center gap-1">
+            <i class="ph-bold ph-lightbulb text-xs"></i> 한 번 더 터치 ➔ 실전 독해 속뜻(V-Sense) 오픈
           </p>
         </div>
 
-        <!-- STEP 3 VIEW: 김지영 V-Sense (실전 독해 이면의 속뜻 & 대립쌍) -->
-        <div id="view-step-3" class="hidden space-y-3.5 w-full max-w-xl text-left sm:text-center">
+        <!-- STEP 3 VIEW: 김지영 V-Sense (실전 속뜻 & 대립쌍) -->
+        <div id="view-step-3" class="hidden space-y-2.5 w-full text-left">
           
-          <!-- 실전 독해 속뜻 하이라이트 -->
-          <div class="bg-rose-950/40 border border-rose-500/40 rounded-xl p-3.5 space-y-1.5">
-            <span class="text-[11px] font-black uppercase text-rose-400 tracking-wider flex items-center justify-center gap-1">
-              <i class="ph-bold ph-crosshair"></i> 김지영 실전 독해 이면의 속뜻 (V-Sense)
+          <!-- 실전 독해 속뜻 박스 -->
+          <div class="bg-rose-950/30 border border-rose-500/40 rounded-lg p-3 space-y-1">
+            <span class="text-[10px] font-black uppercase text-rose-400 tracking-wider flex items-center gap-1">
+              <i class="ph-bold ph-crosshair"></i> 실전 독해 속뜻 (V-Sense)
             </span>
-            <div id="card-real-meaning" class="text-xl sm:text-2xl font-black text-rose-200 text-center">
-              필수가 아닌 / 덜 중요한 / 무시해도 무방한
+            <div id="card-real-meaning" class="text-sm sm:text-base font-black text-rose-200 leading-snug">
+              지문 속 필자의 관점·가치관·입장 (혼동: altitude/latitude/aptitude)
             </div>
-            <p id="card-core-logic" class="text-xs text-slate-300 font-medium text-center">
-              👉 '선택할 수 있다'는 것은 '반드시 할 필요가 없다(not essential)'는 뜻이므로 지문에서 부차적이거나 중요하지 않은 요소를 지칭할 때 사용됨!
+            <p id="card-core-logic" class="text-[11px] text-slate-300 leading-relaxed pt-0.5">
+              단순 몸짓이 아니라 사안을 바라보는 '정신적 입장'. 형태 혼동 선지 주의!
             </p>
           </div>
 
           <!-- 문맥 대립쌍 (Binary Opposites) -->
-          <div id="card-binary-box" class="flex flex-wrap items-center justify-center gap-2 text-xs font-mono">
-            <span class="text-slate-400 text-[11px] uppercase tracking-wider">문맥 대립쌍:</span>
-            <span id="card-contrast" class="inline-flex items-center gap-1.5 text-amber-300 bg-amber-950/60 px-2.5 py-1 rounded-lg border border-amber-600/50 font-bold">
-              optional (비필수/부차적) ↔ mandatory, essential (필수/핵심)
-            </span>
+          <div id="card-binary-box" class="bg-amber-950/30 border border-amber-600/40 rounded-lg p-2 text-[11px]">
+            <div class="text-amber-400 font-bold text-[10px] uppercase mb-0.5">문맥 대립쌍:</div>
+            <div id="card-contrast" class="text-amber-200 font-medium leading-tight">
+              attitude (태도/입장) ↔ objective fact (객관적 사실)
+            </div>
           </div>
 
           <!-- 실전 예문 & 시역 -->
-          <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700/80 text-left space-y-1">
-            <p id="card-example-en" class="text-xs sm:text-sm text-slate-200 font-medium">
-              "Attendance at the orientation is completely optional, so focus primarily on your core research."
+          <div class="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800 space-y-1">
+            <p id="card-example-en" class="text-[11px] sm:text-xs text-slate-200 font-medium leading-snug">
+              "The author maintains a critical attitude toward unexamined technological optimism."
             </p>
-            <p id="card-example-ko" class="text-xs text-slate-400 italic">
-              "오리엔테이션 참석은 필수가 아니므로(중요하지 않으므로), 핵심 연구에 집중하라."
+            <p id="card-example-ko" class="text-[10px] sm:text-[11px] text-slate-400 leading-snug">
+              "필자는 무비판적인 기술 낙관주의에 대해 비판적인 태도(입장)를 견지한다."
             </p>
           </div>
 
@@ -179,17 +200,17 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="pt-4 border-t border-slate-700/60 flex flex-wrap items-center justify-between gap-3">
-        <span id="card-streak" class="text-xs font-bold text-slate-400">
-          체화 인출: 0 / 2회
+      <div class="pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
+        <span id="card-streak" class="text-[11px] font-bold text-slate-400 shrink-0">
+          인출: 0 / 2회
         </span>
 
         <div class="flex items-center gap-2">
-          <button onclick="markResult(false)" class="px-4 py-2 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-700/50 rounded-xl font-bold text-xs flex items-center gap-1 transition">
-            <i class="ph-bold ph-x-circle text-base"></i> 헷갈림 (1)
+          <button onclick="markResult(false)" class="px-3.5 py-2 bg-rose-950/40 hover:bg-rose-900/60 active:bg-rose-900 text-rose-300 border border-rose-800/60 rounded-xl font-bold text-xs flex items-center gap-1 transition">
+            <i class="ph-bold ph-x-circle text-sm"></i> 헷갈림
           </button>
-          <button onclick="markResult(true)" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-black text-xs flex items-center gap-1 transition shadow-md shadow-emerald-950/50">
-            <i class="ph-bold ph-check-circle text-base"></i> 바로 체화됨 (2 / Enter)
+          <button onclick="markResult(true)" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-1 transition shadow">
+            <i class="ph-bold ph-check-circle text-sm"></i> 알겠음
           </button>
         </div>
       </div>
@@ -199,45 +220,45 @@
   </main>
 
   <!-- ==================== MODAL: JSON 붙여넣기 ==================== -->
-  <div id="paste-modal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center hidden p-4">
-    <div class="bg-slate-800 border border-slate-700 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-700 pb-3">
-        <h3 class="font-bold text-white text-sm flex items-center gap-2">
-          <i class="ph-bold ph-lightning text-rose-400 text-base"></i> 김지영 V단어 덱 등록
+  <div id="paste-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center hidden p-3">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-4 sm:p-5 shadow-2xl space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+        <h3 class="font-bold text-white text-xs sm:text-sm flex items-center gap-1.5">
+          <i class="ph-bold ph-lightning text-rose-400"></i> V단어 덱 등록
         </h3>
-        <button onclick="closePasteModal()" class="text-slate-400 hover:text-white">
-          <i class="ph-bold ph-x text-lg"></i>
+        <button onclick="closePasteModal()" class="text-slate-400 hover:text-white p-1">
+          <i class="ph-bold ph-x text-base"></i>
         </button>
       </div>
 
-      <div class="space-y-2">
-        <p class="text-xs text-slate-400 leading-relaxed">
-          책 사진을 올려주시면 만들어 드리는 <strong>영영 뉘앙스 + 실전 이면의 속뜻 JSON 코드</strong>를 그대로 복사해 붙여넣으세요.
+      <div class="space-y-1.5">
+        <p class="text-[11px] text-slate-400 leading-snug">
+          채팅창에 생성된 <strong>V단어 JSON 코드</strong>를 복사해서 아래에 붙여넣으세요.
         </p>
-        <textarea id="paste-textarea" rows="9" placeholder='[
+        <textarea id="paste-textarea" rows="7" placeholder='[
   {
-    "word": "optional",
-    "basic": "선택적인",
-    "enDef": "Available to be chosen but not mandatory; you can choose not to do it.",
-    "realSense": "필수가 아닌 / 덜 중요한 / 무시해도 무방한",
-    "coreLogic": "선택할 수 있다는 것은 반드시 할 필요가 없다는 뜻 ➔ 부차적인 요소",
-    "contrast": "optional ↔ mandatory, essential",
-    "exampleEn": "Attendance is completely optional.",
-    "exampleKo": "참석은 필수가 아니다(중요하지 않다)."
+    "word": "attitude",
+    "basic": "태도, 입장",
+    "enDef": "A settled way of thinking or feeling about someone.",
+    "realSense": "필자의 관점·가치관·입장",
+    "coreLogic": "사안을 바라보는 정신적 입장",
+    "contrast": "attitude ↔ fact",
+    "exampleEn": "The author maintains a critical attitude.",
+    "exampleKo": "필자는 비판적인 태도를 견지한다."
   }
-]' class="w-full p-3 font-mono text-xs bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:border-rose-500 focus:outline-none"></textarea>
+]' class="w-full p-2.5 font-mono text-[10px] sm:text-xs bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:border-rose-500 focus:outline-none"></textarea>
       </div>
 
-      <div class="flex items-center justify-end gap-2 pt-2">
-        <button onclick="closePasteModal()" class="px-4 py-2 bg-slate-700 text-slate-300 text-xs font-bold rounded-xl hover:bg-slate-600 transition">취소</button>
-        <button onclick="applyPastedData('append')" class="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-500 transition">추가 등록</button>
-        <button onclick="applyPastedData('overwrite')" class="px-4 py-2 bg-rose-600 text-white text-xs font-bold rounded-xl hover:bg-rose-500 transition">전체 교체</button>
+      <div class="flex items-center justify-end gap-1.5 pt-1">
+        <button onclick="closePasteModal()" class="px-3 py-1.5 bg-slate-800 text-slate-300 text-xs font-bold rounded-lg hover:bg-slate-700 transition">취소</button>
+        <button onclick="applyPastedData('append')" class="px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-500 transition">추가</button>
+        <button onclick="applyPastedData('overwrite')" class="px-3 py-1.5 bg-rose-600 text-white text-xs font-bold rounded-lg hover:bg-rose-500 transition">전체 교체</button>
       </div>
     </div>
   </div>
 
   <!-- Toast -->
-  <div id="toast" class="fixed bottom-6 right-6 z-50 bg-slate-800 border border-slate-700 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs font-bold transition-all transform translate-y-10 opacity-0 pointer-events-none flex items-center gap-2">
+  <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-slate-800 border border-slate-700 text-white px-3.5 py-2 rounded-xl shadow-lg text-[11px] font-bold transition-all transform translate-y-10 opacity-0 pointer-events-none flex items-center gap-1.5 whitespace-nowrap">
     <i class="ph-bold ph-check text-rose-400"></i>
     <span id="toast-message">알림</span>
   </div>
@@ -245,58 +266,72 @@
   <script>
     const STORAGE_KEY = 'VVOCA_DB_V1_NUANCE';
 
+    // 기본 시드 데이터 (001~008 핵심)
     const SEED_WORDS = [
       {
-        id: "v_01_optional",
-        word: "optional",
-        basic: "선택적인",
-        enDef: "Available to be chosen but not mandatory; you can choose not to do or have it.",
-        realSense: "필수가 아닌 / 덜 중요한 / 무시해도 무방한",
-        coreLogic: "'선택할 수 있다'는 것은 '반드시 할 필요가 없다(not mandatory)'는 의미이므로, 지문에서는 '핵심이 아닌 부차적인 것'을 가리킴.",
-        contrast: "optional (비필수/부차적) ↔ mandatory, essential (필수/핵심)",
-        exampleEn: "Attendance at the workshop is optional, so you may skip it if you are busy.",
-        exampleKo: "워크숍 참석은 선택사항(필수가 아님)이므로 바쁘다면 건너뛰어도 좋다.",
-        streak: 0,
-        isMastered: false
+        "id": "v_001_attitude",
+        "word": "attitude",
+        "basic": "태도, 입장",
+        "enDef": "A settled way of thinking or feeling about someone or something.",
+        "realSense": "지문 속 필자의 관점·가치관·입장 (혼동: altitude/latitude/aptitude)",
+        "coreLogic": "단순 몸짓이 아니라 사안을 바라보는 '정신적 입장'. 형태가 비슷한 altitude(높이), latitude(위도), aptitude(적성) 선지 함정 빈출!",
+        "contrast": "attitude (태도/입장) ↔ objective fact (객관적 사실)",
+        "exampleEn": "The author maintains a critical attitude toward unexamined technological optimism.",
+        "exampleKo": "필자는 무비판적인 기술 낙관주의에 대해 비판적인 태도(입장)를 견지한다.",
+        "streak": 0,
+        "isMastered": false
       },
       {
-        id: "v_02_discipline",
-        word: "discipline",
-        basic: "규율, 훈육",
-        enDef: "A branch of knowledge, typically one studied in higher education.",
-        realSense: "학문 분야 / 학과",
-        coreLogic: "사전적 1차 뜻은 '규율'이지만, 평가원·공무원 독해에서는 90% 이상 '학문 분야(academic discipline)'로 쓰임!",
-        contrast: "rules / control (규율) ↔ branch of knowledge (학문 분야)",
-        exampleEn: "Library and information science is an interdisciplinary academic discipline.",
-        exampleKo: "문헌정보학은 여러 학문이 융합된 학문 분야이다.",
-        streak: 0,
-        isMastered: false
+        "id": "v_002_affect",
+        "word": "affect",
+        "basic": "영향을 미치다",
+        "enDef": "To produce an effect on; (Psychology) an emotion or feeling state.",
+        "realSense": "1) 감정을 유발하다  2) [명사] 감정, 정서 (affective = 정서적인)",
+        "coreLogic": "심리학·인문 지문에서 '정서/감정(emotion)' 그 자체를 가리키거나 감정을 자극한다는 뜻으로 빈출!",
+        "contrast": "affect (정서/감정) ↔ cognition (이성/인지)",
+        "exampleEn": "Cognitive evaluation and emotional affect operate through interconnected neural pathways.",
+        "exampleKo": "인지적 평가와 정서적 감정(affect)은 상호 연결된 신경 경로를 통해 작동한다.",
+        "streak": 0,
+        "isMastered": false
       },
       {
-        id: "v_03_appreciate",
-        word: "appreciate",
-        basic: "감사하다, 감상하다",
-        enDef: "To recognize the full worth of; to understand a situation fully, recognizing the problem.",
-        realSense: "정확하게 이해하다 / 진가를 제대로 알아보다",
-        coreLogic: "그냥 고마워하는 것이 아니라, 가치를 온전히 '인식하고 이해하다'는 뉘앙스가 독해의 정답 선지 근거가 됨.",
-        contrast: "misunderstand / overlook (간과하다) ↔ appreciate (제대로 인식하다)",
-        exampleEn: "Researchers fully appreciate the difficulty of authenticating ancient manuscripts.",
-        exampleKo: "연구자들은 고대 필사본의 진위를 감정하는 것의 어려움을 정확하게 이해하고 있다.",
-        streak: 0,
-        isMastered: false
+        "id": "v_003_priceless",
+        "word": "priceless",
+        "basic": "값을 매길 수 없는, 대단히 귀중한",
+        "enDef": "So precious that its value cannot be determined; invaluable.",
+        "realSense": "극도로 귀중한 (= invaluable) ↔ 가치 없는(valueless, worthless)",
+        "coreLogic": "-less가 붙었다고 '값어치가 없는'이 아님! 가격을 감히 매길 수 없을 정도로 '엄청나게 소중한'이란 극찬의 표현!",
+        "contrast": "priceless (귀한) ↔ valueless, worthless (가치 없는, 하찮은)",
+        "exampleEn": "Historical manuscripts preserved in the archive are priceless cultural treasures.",
+        "exampleKo": "기록관에 보존된 역사적 필사본들은 값을 매길 수 없이 귀중한 문화적 보물이다.",
+        "streak": 0,
+        "isMastered": false
       },
       {
-        id: "v_04_critical",
-        word: "critical",
-        basic: "비판적인",
-        enDef: "Expressing adverse comments; or extremely important with decisive significance.",
-        realSense: "중대한, 결정적인 (= crucial, vital)",
-        coreLogic: "비판한다는 뜻 외에, 죽느냐 사느냐의 '임계점(critical point)'에 이를 만큼 '극도로 중요한'이란 뜻으로 더 자주 출제됨.",
-        contrast: "trivial / minor (사소한) ↔ critical (결정적으로 중요한)",
-        exampleEn: "Information retrieval speed is critical to user satisfaction in digital libraries.",
-        exampleKo: "정보 검색 속도는 디지털 도서관에서 이용자 만족도에 결정적으로 중요하다.",
-        streak: 0,
-        isMastered: false
+        "id": "v_021_vacuum",
+        "word": "vacuum",
+        "basic": "진공(상태), 공백",
+        "enDef": "A space entirely devoid of matter; a state of isolation from outside influence.",
+        "realSense": "외부와 완전히 단절된 고립된 상태(isolated)",
+        "coreLogic": "'No culture develops in a vacuum' = 고립되어 혼자 생겨나는 문화는 없고 반드시 주변과 상호작용한다!",
+        "contrast": "isolated vacuum (고립 상태) ↔ interconnected context (상호 연결된 맥락)",
+        "exampleEn": "Scientific theories do not emerge in a vacuum; they reflect existing cultural assumptions.",
+        "exampleKo": "과학 이론은 고립된 진공 상태에서 생겨나지 않으며, 기존의 문화적 가정을 반영한다.",
+        "streak": 0,
+        "isMastered": false
+      },
+      {
+        "id": "v_022_myth",
+        "word": "myth",
+        "basic": "신화",
+        "enDef": "A widely held but false belief or idea.",
+        "realSense": "사회적 통념, 사람들이 잘못 믿고 있는 근거 없는 허구/착각",
+        "coreLogic": "독해 첫 줄에 myth가 나오면 그리스 신화가 아니라 99% '일반인들의 잘못된 믿음(통념)'이며, 필자는 뒤에서 이를 반박함!",
+        "contrast": "prevailing myth (잘못된 통념/허구) ↔ scientific reality (과학적 진실)",
+        "exampleEn": "The popular myth that human memory acts like a video recorder has been debunked.",
+        "exampleKo": "인간의 기억이 비디오 녹화기처럼 작동한다는 대중적 통념(myth)은 거짓으로 밝혀졌다.",
+        "streak": 0,
+        "isMastered": false
       }
     ];
 
@@ -329,7 +364,7 @@
     }
 
     function resetToSeedData() {
-      if (!confirm('기본 V단어 예시 덱으로 리셋하시겠습니까?')) return;
+      if (!confirm('기본 V단어 덱으로 리셋하시겠습니까?')) return;
       words = [...SEED_WORDS];
       saveDatabase();
       buildQueue();
@@ -349,14 +384,14 @@
       const btnRev = document.getElementById('filter-btn-review');
       const btnMas = document.getElementById('filter-btn-mastered');
 
-      const idle = 'px-2.5 py-1 rounded-lg text-slate-300 hover:bg-slate-700';
+      const idle = 'px-2 py-0.5 rounded-md text-slate-300 hover:bg-slate-800 shrink-0';
       btnAll.className = idle;
       btnRev.className = idle;
       btnMas.className = idle;
 
-      if (mode === 'all') btnAll.className = 'px-2.5 py-1 rounded-lg bg-rose-600 text-white font-bold';
-      if (mode === 'review') btnRev.className = 'px-2.5 py-1 rounded-lg bg-amber-600 text-white font-bold';
-      if (mode === 'mastered') btnMas.className = 'px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold';
+      if (mode === 'all') btnAll.className = 'px-2 py-0.5 rounded-md bg-rose-600 text-white font-bold shrink-0';
+      if (mode === 'review') btnRev.className = 'px-2 py-0.5 rounded-md bg-amber-600 text-white font-bold shrink-0';
+      if (mode === 'mastered') btnMas.className = 'px-2 py-0.5 rounded-md bg-emerald-600 text-white font-bold shrink-0';
 
       buildQueue();
       renderCard();
@@ -381,14 +416,14 @@
       }
       currentIndex = 0;
       renderCard();
-      showToast('단어 카드가 무작위로 섞였습니다.');
+      showToast('단어 순서를 섞었습니다.');
     }
 
     function renderCard() {
       if (queue.length === 0) {
-        document.getElementById('card-target-word').innerText = "모든 V단어 체화 완료!";
-        document.getElementById('card-basic-meaning').innerText = "선택된 조건의 단어가 없습니다.";
-        document.getElementById('card-step-guide').innerText = "학습 완료";
+        document.getElementById('card-target-word').innerText = "학습 완료!";
+        document.getElementById('card-basic-meaning').innerText = "해당 조건의 단어가 없습니다.";
+        document.getElementById('card-step-guide').innerText = "모든 단어 인출 완료";
         document.getElementById('card-progress').innerText = "0 / 0";
         updateStageUI(1);
         return;
@@ -416,7 +451,7 @@
       document.getElementById('card-example-en').innerText = `"${item.exampleEn || ''}"`;
       document.getElementById('card-example-ko').innerText = `"${item.exampleKo || ''}"`;
 
-      document.getElementById('card-streak').innerText = `체화 인출: ${item.streak || 0} / 2회`;
+      document.getElementById('card-streak').innerText = `인출: ${item.streak || 0} / 2회`;
     }
 
     function nextStage() {
@@ -439,8 +474,8 @@
       v2.classList.add('hidden');
       v3.classList.add('hidden');
 
-      const activeBadge = 'px-2.5 py-0.5 rounded-md bg-rose-600 text-white';
-      const idleBadge = 'px-2.5 py-0.5 rounded-md bg-slate-700 text-slate-400';
+      const activeBadge = 'px-2 py-0.5 rounded bg-rose-600 text-white font-bold';
+      const idleBadge = 'px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-bold';
       b1.className = idleBadge;
       b2.className = idleBadge;
       b3.className = idleBadge;
@@ -448,18 +483,18 @@
       if (stage === 1) {
         v1.classList.remove('hidden');
         b1.className = activeBadge;
-        guide.innerText = "[Space] 머릿속으로 영영사전 뉘앙스 유추 ➔ 정의 오픈";
-        guide.className = "text-xs font-bold text-amber-300 bg-amber-950/40 px-3 py-1 rounded-full border border-amber-600/40";
+        guide.innerText = "[터치 / Space] 영영사전 코어 뉘앙스 오픈";
+        guide.className = "text-[10px] sm:text-xs font-bold text-amber-300 bg-amber-950/40 px-2.5 py-0.5 rounded-full border border-amber-600/40";
       } else if (stage === 2) {
         v2.classList.remove('hidden');
-        b2.className = 'px-2.5 py-0.5 rounded-md bg-indigo-600 text-white';
-        guide.innerText = "[Space] 실전 독해 이면의 속뜻(V-Sense) & 대립쌍 오픈";
-        guide.className = "text-xs font-bold text-indigo-300 bg-indigo-950/40 px-3 py-1 rounded-full border border-indigo-600/40";
+        b2.className = 'px-2 py-0.5 rounded bg-indigo-600 text-white font-bold';
+        guide.innerText = "[터치 / Space] 실전 독해 속뜻(V-Sense) 오픈";
+        guide.className = "text-[10px] sm:text-xs font-bold text-indigo-300 bg-indigo-950/40 px-2.5 py-0.5 rounded-full border border-indigo-600/40";
       } else if (stage === 3) {
         v3.classList.remove('hidden');
-        b3.className = 'px-2.5 py-0.5 rounded-md bg-emerald-600 text-white';
-        guide.innerText = "뉘앙스 체화 완료! 헷갈림(1) / 바로앎(2)";
-        guide.className = "text-xs font-bold text-emerald-300 bg-emerald-950/40 px-3 py-1 rounded-full border border-emerald-600/40";
+        b3.className = 'px-2 py-0.5 rounded bg-emerald-600 text-white font-bold';
+        guide.innerText = "뉘앙스 체화! 하단 [헷갈림] 또는 [알겠음] 선택";
+        guide.className = "text-[10px] sm:text-xs font-bold text-emerald-300 bg-emerald-950/40 px-2.5 py-0.5 rounded-full border border-emerald-600/40";
       }
     }
 
@@ -471,14 +506,14 @@
         item.streak = (item.streak || 0) + 1;
         if (item.streak >= 2) {
           item.isMastered = true;
-          showToast(`🎉 "${item.word}" 체화 완료 보관함으로 이동!`);
+          showToast(`🎉 "${item.word}" 체화 완료!`);
         } else {
-          showToast(`👏 정답! 한 번 더 맞히면 체화 완료됩니다. (1/2)`);
+          showToast(`👏 정답! 한 번 더 맞히면 체화 완료됩니다 (1/2)`);
         }
       } else {
         item.streak = 0;
         item.isMastered = false;
-        showToast(`💡 오답 등록! 복습 덱에서 뉘앙스를 다시 인출합니다.`);
+        showToast(`💡 복습 덱에 보관되었습니다.`);
       }
 
       const original = words.find(w => w.id === item.id);
@@ -558,10 +593,10 @@
 
           if (mode === 'overwrite') {
             words = normalized;
-            showToast(`총 ${words.length}개 V단어로 전체 교체되었습니다.`);
+            showToast(`총 ${words.length}개 V단어로 교체되었습니다.`);
           } else {
             words.unshift(...normalized);
-            showToast(`${normalized.length}개 V단어가 추가 등록되었습니다.`);
+            showToast(`${normalized.length}개 V단어가 추가되었습니다.`);
           }
 
           saveDatabase();
@@ -570,7 +605,7 @@
           closePasteModal();
         }
       } catch (err) {
-        showToast('JSON 형식 오류입니다. 코드를 다시 확인해 주세요.');
+        showToast('JSON 형식 오류입니다.');
       }
     }
 
@@ -581,9 +616,10 @@
       toast.classList.remove('translate-y-10', 'opacity-0');
       setTimeout(() => {
         toast.classList.add('translate-y-10', 'opacity-0');
-      }, 2000);
+      }, 1800);
     }
 
+    // 키보드 지원 (PC/아이패드 외장 키보드용)
     window.addEventListener('keydown', (e) => {
       const isModalOpen = !document.getElementById('paste-modal').classList.contains('hidden');
       if (isModalOpen) return;
