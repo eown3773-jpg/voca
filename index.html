@@ -65,7 +65,7 @@
           <i class="ph-bold ph-plus-circle text-xs"></i>
           <span>덱 등록</span>
         </button>
-        <button onclick="resetToSeedData()" class="p-1.5 text-slate-400 hover:text-amber-400 rounded-lg hover:bg-slate-800 transition" title="기본 V단어로 리셋">
+        <button onclick="resetToSeedData()" class="p-1.5 text-slate-400 hover:text-amber-400 rounded-lg hover:bg-slate-800 transition" title="최신 001~049 V단어로 리셋">
           <i class="ph-bold ph-arrow-counter-clockwise text-sm"></i>
         </button>
       </div>
@@ -137,7 +137,7 @@
           <span id="step-badge-3" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">3</span>
         </div>
 
-        <span id="card-progress" class="font-mono text-slate-400 text-[11px] shrink-0">1 / 42</span>
+        <span id="card-progress" class="font-mono text-slate-400 text-[11px] shrink-0">1 / 49</span>
       </div>
 
       <!-- Core Word Header -->
@@ -242,7 +242,7 @@
 
           <!-- 문맥 대립쌍 -->
           <div id="card-binary-box" class="bg-amber-950/30 border border-amber-600/40 rounded-lg p-2 text-[11px]">
-            <div class="text-amber-400 font-bold text-[10px] uppercase mb-0.5">문맥 대립쌍:</div>
+            <div class="text-amber-400 font-bold text-[10px] uppercase mb-0.5">문맥 대립쌍 / 평가원 공식:</div>
             <div id="card-contrast" class="text-amber-200 font-medium leading-tight">
               attitude (태도/입장) ↔ objective fact (객관적 사실)
             </div>
@@ -382,7 +382,7 @@
     const STORAGE_KEY = 'VVOCA_DB_V2_SPACED';
     const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
-    // 001-042 전체 정밀 분류 42개 단어 기본 내장 완비!
+    // 001번부터 최신 049번까지 완벽 탑재된 내장 기본 덱 (SEED_WORDS)
     const SEED_WORDS = [
       {
         "id": "v_001_attitude",
@@ -1069,13 +1069,13 @@
         "word": "irony",
         "cardType": "💡 인과 반전 모순 [(+) ➔ (-) / (-) ➔ (+)]",
         "basic": "아이러니, 역설적인 점, 반어법",
-        "enDef": "A state of affairs or an event that seems deliberately contrary to what one expects.",
+        "enDef": "A state of affairs or an event that seems deliberately contrary to what one expects (involves a contrast).",
         "realSense": "예상과 완전히 정반대의 결과가 벌어지는 모순적 상황 [(+) ➔ (-) 또는 (-) ➔ (+)]",
         "confusion": "• irony: 아이러니, 역설적인 점[상황], 반어법\n• 평가원 공식: (+) ➔ (-) or (-) ➔ (+)",
-        "coreLogic": "김지영 쌤 평가원 논리 공식! 안전을 위해 만든 장치가 오히려 사고를 유발하는 것처럼, 원인(+)과 결과(-)가 모순으로 충돌하는 지점!",
+        "coreLogic": "김지영 쌤 평가원 논리 공식! 편리함(+)이 창의성을 억제(-)하는 것처럼, 원인(+)과 결과(-)가 모순으로 충돌하는 지점!",
         "contrast": "predictable linear outcome (예측 가능한 순리) ↔ tragic irony (기대와 정반대로 뒤틀린 아이러니)",
-        "exampleEn": "The irony of the digital age is that increased connectivity has accelerated social isolation.",
-        "exampleKo": "디지털 시대의 아이러니는 연결성의 증대가 오히려 사회적 고립을 가속화했다는 점이다.",
+        "exampleEn": "Ironically, the convenience of downloading digital creations restrains people's creativity.",
+        "exampleKo": "역설적이게도(Ironically), 디지털 창작물을 다운로드하는 편리함이 사람들의 창의성을 억제한다.",
         "streak": 0,
         "memoryLevel": 0,
         "nextReviewDate": 0,
@@ -1086,13 +1086,132 @@
         "word": "paradox",
         "cardType": "💡 논리적 양립 모순 [(+) ➔ (-) / (-) ➔ (+)]",
         "basic": "역설, 패러독스",
-        "enDef": "A seemingly absurd or self-contradictory statement that when investigated may prove true.",
-        "realSense": "겉보기엔 말도 안 되는 모순 같지만, 깊이 파고들면 심오한 진실을 담고 있는 역설",
+        "enDef": "A situation when it involves two or more facts or qualities which seem to contradict each other.",
+        "realSense": "겉보기엔 말도 안 되는 모순 같지만, 깊이 파고들면 둘 다 참인 양립 모순",
         "confusion": "• paradox: 역설적인 사람[것/상황], 역설, 패러독스\n• 평가원 공식: (+) ➔ (-) or (-) ➔ (+)",
         "coreLogic": "irony는 '상황의 얄궂은 엇갈림'이고, paradox는 '문장 자체가 양립할 수 없어 보이는데 둘 다 참인 논리적 모순'을 뜻함!",
         "contrast": "simplistic consistency (단순한 일관성) ↔ profound paradox (심오한 역설적 진실)",
-        "exampleEn": "Sociologists point to the paradox that material abundance often coincides with emotional despair.",
-        "exampleKo": "사회학자들은 물질적 풍요가 흔히 정서적 절망과 동시에 공존한다는 역설(paradox)을 지적한다.",
+        "exampleEn": "The paradox of modern life is that while technological acceleration should provide more free time, those inventions increase our options.",
+        "exampleKo": "현대 삶의 역설(paradox)은 기술적 가속이 더 많은 자유 시간을 제공해야 함에도 불구하고, 그 발명품들이 우리가 선택할 수 있는 것을 늘린다는 것이다.",
+        "streak": 0,
+        "memoryLevel": 0,
+        "nextReviewDate": 0,
+        "failedStage": null
+      },
+      {
+        "id": "v_043_assume",
+        "word": "assume",
+        "cardType": "💡 평가원 통념/반전 시그널 & 다의어",
+        "basic": "가정하다, 추정하다",
+        "enDef": "If you assume that something is true, you imagine that it is true, sometimes wrongly; to begin to have that quality.",
+        "realSense": "1) 사실이 아닐 수도 있는 것을 지레짐작하다 (반전 예고)  2) assume + 명사: ~을 취하다, (책임을) 맡다",
+        "confusion": "• assume + that S+V: (사실이 아닐 수도 있는 것을) 가정하다 ➔ 뒤에 반전(However) 기대!\n• assume + 명사: ~을 취하다, 가지다 (assume responsibility = 책임을 맡다)\n• assumption: 가정, 가설; (책임의) 인수",
+        "coreLogic": "김지영 쌤 빨간펜 필기! '주어 assume' 나오면 십중팔구 '사실이 아닐 가능성 높음(wrongly)'이며, 필자는 뒤에서 'However'로 반박함!",
+        "contrast": "empirically proven fact (실증된 사실) ↔ unexamined assumption (검증되지 않은 섣부른 가정)",
+        "exampleEn": "It may be assumed that meta-algorithmics is a human creation. However, this is not necessarily true.",
+        "exampleKo": "메타 알고리즘의 창조도 인간의 창조물이라고 가정할 수도 있다. 하지만 이것이 반드시 사실은 아니다.",
+        "streak": 0,
+        "memoryLevel": 0,
+        "nextReviewDate": 0,
+        "failedStage": null
+      },
+      {
+        "id": "v_044_compromise",
+        "word": "compromise",
+        "cardType": "⚖️ 방향성 (-) & 손상 훼손",
+        "basic": "타협하다, 타협[절충]",
+        "enDef": "To accept something slightly different from what they really want; to do something which damages their beliefs/reputation.",
+        "realSense": "부정적 의미: 굽히다, 양보하다, 훼손시키다, 위태롭게 하다 (-)",
+        "confusion": "• negotiate: 대등하게 협상[교섭]하다, 합의하다 (중립/긍정)\n• compromise: (-) 부정적 의미를 담고 있음! 심지어 굽히다[양보하다], 훼손시키다, 위태롭게 하다",
+        "coreLogic": "김지영 쌤 극찬 빈출! negotiate와 다르게 compromise는 자기 정체성이나 진리를 깎아먹고 훼손(damage)시킨다는 마이너스(-) 의미!",
+        "contrast": "preserve core integrity (본질을 온전히 지키다) ↔ compromise their identity (정체성을 훼손하고 타협하다)",
+        "exampleEn": "The loss philosophy fears is a loss of meaning, the compromising of a truth.",
+        "exampleKo": "철학이 두려워하는 손실은 의미의 손실, 즉 진리의 훼손(compromising)이다.",
+        "streak": 0,
+        "memoryLevel": 0,
+        "nextReviewDate": 0,
+        "failedStage": null
+      },
+      {
+        "id": "v_045_biology",
+        "word": "biology",
+        "cardType": "💡 평가원 선천성 7대 패밀리 시그널",
+        "basic": "생물학, 생명 작용[활동]",
+        "enDef": "The scientific study of life; (Symbolic) innate, inborn, genetic qualities.",
+        "realSense": "상징적 의미: 타고남, 내재됨, 유전적 특질 (= inborn, innate)",
+        "confusion": "• biology 7대 선천성 패밀리: biology, infant, inborn, innate, gene(genetic), DNA, hardwire\n• infant: 아기 ➔ 평가원에서는 '사회화 이전의 모든 인간의 순수 본성'",
+        "coreLogic": "김지영 쌤 빨간펜 강조! 'biology는 타고남, 유전적을 상징! biology, infant, inborn, innate, gene, DNA, hardwire는 단 하나도 모르면 안 된다!'",
+        "contrast": "acquired / learned / cultural (후천적 학습/환경) ↔ biology / innate / genetic (선천적/타고남)",
+        "exampleEn": "To some degree, biology is destiny when it comes to communication style.",
+        "exampleKo": "어느 정도는, 의사소통 스타일에 관한 한 생물학(biology=유전적 본성)이 숙명이다.",
+        "streak": 0,
+        "memoryLevel": 0,
+        "nextReviewDate": 0,
+        "failedStage": null
+      },
+      {
+        "id": "v_046_exclusive",
+        "word": "exclusive",
+        "cardType": "💡 영영 코어 뉘앙스 & ONLY 시그널",
+        "basic": "배타적인, 독점적인",
+        "enDef": "Used or owned by only one person/group; exclusively: involving only the thing mentioned and nothing else.",
+        "realSense": "exclusively = only (오로지, 오직, 전적으로)",
+        "confusion": "• I exclusively love you: 나는 너를 배타적으로 사랑한다(X) ➔ 너만 사랑해(O)\n• exclusive report: 독점 보도\n• exclusively: 배타적으로, 독점적으로 ➔ 실전 독해에서는 '오로지(only)'",
+        "coreLogic": "어려운 한자어 '배타적'에 갇히면 독해 붕괴! exclusively가 나오면 0.1초 만에 'only(오직 ~만)'로 바꿔 읽어야 필자의 단독 강조점이 보임!",
+        "contrast": "widely shared / inclusive (두루 공유하는) ↔ exclusive / only (오로지 하나만을 위한 독점적인)",
+        "exampleEn": "Science on planet Earth could be found almost exclusively in the Islamic world.",
+        "exampleKo": "지구상의 과학은 거의 오로지(almost exclusively = only) 이슬람 세계에서만 발견될 수 있었다.",
+        "streak": 0,
+        "memoryLevel": 0,
+        "nextReviewDate": 0,
+        "failedStage": null
+      },
+      {
+        "id": "v_047_prescribe",
+        "word": "prescribe",
+        "cardType": "💡 다의어 및 평가원 규정 시그널",
+        "basic": "처방을 내리다, 처방하다",
+        "enDef": "To advise or authorize the use of medicine; (Formal) to state that an action or duty must be carried out.",
+        "realSense": "규정하다, 지시하다, 명령하다 (= dictate, stipulate)",
+        "confusion": "• 1차 뜻: 약을 처방하다 (prescribe medicine)\n• 독해 킬러 뜻: 규정하다, 지시하다, 명령하다 (prescribe behaviors = 행동을 규정하다)",
+        "coreLogic": "김지영 쌤 빨간펜 필기! '우선순위 규정하다!' 지문에서 약사 이야기가 아니면 99% '사회가 규칙이나 규범을 딱 정해두다(규정하다)'로 출제!",
+        "contrast": "freely improvised (자유롭게 즉흥적으로 한) ↔ in a prescribed manner (정해진 규정대로의)",
+        "exampleEn": "People may be more willing to step outside the culturally prescribed behaviors.",
+        "exampleKo": "사람들은 문화적으로 규정된(prescribed) 행동 밖으로 더 기꺼이 발을 디디려 할 수도 있다.",
+        "streak": 0,
+        "memoryLevel": 0,
+        "nextReviewDate": 0,
+        "failedStage": null
+      },
+      {
+        "id": "v_048_presume",
+        "word": "presume",
+        "cardType": "💡 영영 코어 뉘앙스 & assume 쌍둥이",
+        "basic": "추정하다, 여기다, 생각하다",
+        "enDef": "If you presume that something is the case, you think that it is the case, although you are not certain.",
+        "realSense": "실질적인 증거는 없지만 사실일 것이라고 지레짐작하다 (= assume)",
+        "confusion": "• presume = assume과 동일한 숨은 뜻!\n• although you are not certain (확실하지도 않으면서)",
+        "coreLogic": "단순 추측이 아님! '확실한 물증도 없으면서 자기 편견에 기대어 지레짐작하다'는 뉘앙스이므로 뒤이어 반박 논리가 따라붙기 쉬움!",
+        "contrast": "conclusive proof (결정적 증거) ↔ generally presumed bias (일반적으로 지레짐작하는 편견)",
+        "exampleEn": "Based on our biases in Western culture, we generally presume that all actions have an antecedent cause.",
+        "exampleKo": "서양 문화 속에서 우리가 갖고 있는 편견에 근거하여, 우리는 일반적으로 모든 행위에는 선행하는 원인이 있다고 지레짐작한다(presume).",
+        "streak": 0,
+        "memoryLevel": 0,
+        "nextReviewDate": 0,
+        "failedStage": null
+      },
+      {
+        "id": "v_049_mere",
+        "word": "mere",
+        "cardType": "💡 뉘앙스 반전 & 극대화 시그널",
+        "basic": "그저, 겨우 ~의, 단지 ~에 불과한",
+        "enDef": "To emphasize how small or unimportant something is; (Reversal) to indicate that an unimportant action has a very strong effect.",
+        "realSense": "1) 얕보고 무시(겨우, 고작)  2) 역으로 '그 사소한 것 하나만으로도 큰 역할'로 전환",
+        "confusion": "• mere / merely: 한낱, 그저, 단지 (무시하고 깔보는 뉘앙스)\n• 문맥 속 반전: His mere presence made her afraid ➔ 단지 그가 있었다는 사실만으로도 두려웠다 (역으로 큰 영향!)",
+        "coreLogic": "단순 '겨우'가 아님! 김지영 쌤 포인트: 얕보는 뉘앙스로 쓰이다가도, '그 사소한 것 하나만으로도 엄청난 파급력을 낳았다'는 강조로 급변함!",
+        "contrast": "substantial / monumental (거대하고 중요한) ↔ mere / negligible (사소하고 미미한)",
+        "exampleEn": "His mere presence made her feel afraid.",
+        "exampleKo": "단지 그가 거기 있다는 사소한 사실만으로도(His mere presence) 그녀는 두려웠다.",
         "streak": 0,
         "memoryLevel": 0,
         "nextReviewDate": 0,
@@ -1125,6 +1244,13 @@
         words = [...SEED_WORDS];
         saveDatabase();
       }
+      
+      // 최신 043~049가 누락되어 있다면 자동 동기화
+      if (words.length < SEED_WORDS.length) {
+        words = [...SEED_WORDS];
+        saveDatabase();
+      }
+
       // 마이그레이션 방어 코드
       words.forEach(w => {
         if (typeof w.memoryLevel === 'undefined') w.memoryLevel = 0;
@@ -1147,7 +1273,7 @@
       saveDatabase();
       buildQueue();
       renderCard();
-      showToast('기본 덱으로 초기화되었습니다.');
+      showToast('001~049 최신 V단어 덱으로 초기화되었습니다.');
     }
 
     function updateCounts() {
@@ -1755,7 +1881,6 @@
       try {
         let cleaned = rawInput;
         
-        // 1. 마크다운 코드 블록 및 LaTeX/특수 이스케이프 찌꺼기 제거
         cleaned = cleaned.replace(/^```[a-zA-Z0-9_\-:]*\s*\n?/i, '')
                          .replace(/\n?```(eof)?\s*$/i, '')
                          .replace(/^\\\[\s*/, '[')
@@ -1764,12 +1889,10 @@
                          .replace(/\s*\$\$$/, '')
                          .trim();
 
-        // 2. 혹시 앞뒤가 대괄호 [] 로 안 묶여 있고 단일 객체만 복사된 경우 대응
         if (cleaned.startsWith('{') && cleaned.endsWith('}')) {
           cleaned = `[${cleaned}]`;
         }
 
-        // 3. 배열 안 마지막 요소 뒤의 불필요한 쉼표(,]) 제거
         cleaned = cleaned.replace(/,\s*([\]}])/g, '$1');
 
         const parsed = JSON.parse(cleaned);
