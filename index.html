@@ -56,6 +56,11 @@
 
       <!-- Action Buttons -->
       <div class="flex items-center space-x-1.5 shrink-0">
+        <!-- 퀴즈 모드 토글 버튼 -->
+        <button id="toggle-quiz-mode-btn" onclick="toggleQuizMode()" class="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 font-black text-[11px] border border-amber-500/40 transition shadow-sm">
+          <i class="ph-bold ph-lightning text-xs"></i>
+          <span id="quiz-toggle-label">혼동어 테스트</span>
+        </button>
         <button onclick="openPasteModal()" class="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-black text-[11px] transition shadow">
           <i class="ph-bold ph-plus-circle text-xs"></i>
           <span>덱 등록</span>
@@ -70,8 +75,8 @@
   <!-- ==================== MAIN CONTENT ==================== -->
   <main class="flex-1 max-w-2xl w-full mx-auto p-2.5 sm:p-4 flex flex-col justify-start sm:justify-center">
     
-    <!-- Filter Tabs (보관함 선택 바) -->
-    <div class="bg-slate-900 border border-slate-800 p-2 rounded-2xl mb-2.5 space-y-1.5 shadow-sm">
+    <!-- Filter Tabs (보관함 선택 바 - 일반 모드에서만 표시) -->
+    <div id="standard-filter-bar" class="bg-slate-900 border border-slate-800 p-2 rounded-2xl mb-2.5 space-y-1.5 shadow-sm">
       
       <!-- 상단: 기본 학습 큐 -->
       <div class="flex items-center justify-between text-[11px] font-semibold gap-1">
@@ -103,12 +108,15 @@
         <button id="filter-btn-fail3" onclick="setMode('fail_step3')" class="px-2 py-0.5 rounded-md hover:bg-slate-800 shrink-0 text-indigo-400 border border-transparent">
           V-속뜻/대립쌍 (<span id="count-fail3">0</span>)
         </button>
+        <button id="filter-btn-failconf" onclick="setMode('fail_conf')" class="px-2 py-0.5 rounded-md hover:bg-slate-800 shrink-0 text-fuchsia-400 border border-transparent flex items-center gap-1">
+          <i class="ph-bold ph-warning-octagon"></i> 혼동어 오답 (<span id="count-failconf">0</span>)
+        </button>
       </div>
 
     </div>
 
-    <!-- MAIN CARD -->
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col justify-between min-h-[470px] sm:min-h-[510px]">
+    <!-- MAIN CARD (일반 V단어 인출 뷰) -->
+    <div id="standard-card-view" class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col justify-between min-h-[470px] sm:min-h-[510px]">
       
       <!-- Card Top: Step Indicator & Spaced Repetition Level -->
       <div class="flex items-center justify-between text-[10px] sm:text-xs text-slate-400 pb-2.5 border-b border-slate-800 gap-1">
@@ -167,7 +175,7 @@
             기본 사전 뜻과 뉘앙스를 먼저 머릿속으로 떠올려보세요!
           </div>
           <p class="text-[11px] text-rose-400/90 font-semibold flex items-center justify-center gap-1">
-            <i class="ph-bold ph-hand-tap text-xs"></i> 터치 시 1차 기본 뜻 오픈 (기본 뜻 모르면 즉시 [헷갈림])
+            <i class="ph-bold ph-hand-tap text-xs"></i> 터치 시 1차 기본 뜻 오픈 (기본 뜻 모르면 즉시 [기본뜻 모름])
           </p>
         </div>
 
@@ -195,21 +203,44 @@
           </p>
         </div>
 
-        <!-- STEP 3 VIEW: 김지영 V-Sense (실전 속뜻 & 대립쌍) -->
+        <!-- STEP 3 VIEW: 김지영 V-Sense (실전 속뜻 & 혼동어 대조 & 대립쌍) -->
         <div id="view-step-3" class="hidden space-y-2.5 w-full text-left">
           
+          <!-- 카드 유형 배지 및 즉석 퀴즈 링크 -->
+          <div class="flex items-center justify-between gap-1 flex-wrap">
+            <span id="card-type-badge" class="px-2 py-0.5 rounded text-[10px] font-black bg-rose-500/20 text-rose-300 border border-rose-500/40">
+              🚨 형태 낚시 혼동어휘
+            </span>
+            <button id="card-instant-quiz-btn" onclick="startInstantConfusionQuiz(event)" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50 flex items-center gap-1 transition">
+              <i class="ph-bold ph-lightning"></i> 이 혼동어 지금 시험보기
+            </button>
+          </div>
+
+          <!-- 실전 독해 속뜻 -->
           <div class="bg-rose-950/30 border border-rose-500/40 rounded-lg p-3 space-y-1">
             <span class="text-[10px] font-black uppercase text-rose-400 tracking-wider flex items-center gap-1">
               <i class="ph-bold ph-crosshair"></i> 실전 독해 속뜻 (V-Sense)
             </span>
             <div id="card-real-meaning" class="text-sm sm:text-base font-black text-rose-200 leading-snug">
-              지문 속 필자의 관점·가치관·입장 (혼동: altitude/latitude/aptitude)
+              지문 속 필자의 관점·가치관·입장
             </div>
             <p id="card-core-logic" class="text-[11px] text-slate-300 leading-relaxed pt-0.5">
               단순 몸짓이 아니라 사안을 바라보는 '정신적 입장'. 형태 혼동 선지 주의!
             </p>
           </div>
 
+          <!-- 형태 낚시 / 혼동어휘 전용 대조 상자 (있을 때만 표시) -->
+          <div id="card-confusion-box" class="bg-indigo-950/40 border border-indigo-500/50 rounded-lg p-2.5 text-[11px] space-y-1">
+            <div class="text-indigo-300 font-bold text-[10px] uppercase flex items-center gap-1 justify-between">
+              <span class="flex items-center gap-1">
+                <i class="ph-bold ph-warning-octagon text-indigo-400"></i> 혼동 어휘 & 파생어 정밀 대조:
+              </span>
+              <span class="text-[9px] text-indigo-300/80">아래 퀴즈 모드로 1초 테스트 가능</span>
+            </div>
+            <pre id="card-confusion-text" class="text-slate-200 font-mono text-[10px] sm:text-[11px] whitespace-pre-wrap leading-relaxed"></pre>
+          </div>
+
+          <!-- 문맥 대립쌍 -->
           <div id="card-binary-box" class="bg-amber-950/30 border border-amber-600/40 rounded-lg p-2 text-[11px]">
             <div class="text-amber-400 font-bold text-[10px] uppercase mb-0.5">문맥 대립쌍:</div>
             <div id="card-contrast" class="text-amber-200 font-medium leading-tight">
@@ -217,6 +248,7 @@
             </div>
           </div>
 
+          <!-- 실전 예문 -->
           <div class="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800 space-y-1">
             <p id="card-example-en" class="text-[11px] sm:text-xs text-slate-200 font-medium leading-snug">
               "The author maintains a critical attitude toward unexamined technological optimism."
@@ -241,7 +273,7 @@
           <!-- 헷갈림 버튼: 현재 멈춘 단계를 감지해 해당 서랍으로 분류 -->
           <button onclick="markResult(false)" class="px-3.5 py-2.5 bg-rose-950/40 hover:bg-rose-900/60 active:bg-rose-900 text-rose-300 border border-rose-800/60 rounded-xl font-bold text-xs flex items-center gap-1 transition shadow-sm">
             <i class="ph-bold ph-x-circle text-base"></i>
-            <span id="btn-label-doubt">헷갈림</span>
+            <span id="btn-label-doubt">기본뜻 모름</span>
           </button>
           
           <button onclick="markResult(true)" class="px-4.5 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-1.5 transition shadow-md">
@@ -249,6 +281,53 @@
             <span>알겠음</span>
           </button>
         </div>
+      </div>
+
+    </div>
+
+    <!-- ==================== SPEED DRILL: 혼동어 1초 킬러 매칭 퀴즈 뷰 ==================== -->
+    <div id="quiz-card-view" class="hidden bg-slate-900 border border-amber-500/40 rounded-2xl p-4 sm:p-6 shadow-2xl flex flex-col justify-between min-h-[470px] sm:min-h-[510px]">
+      
+      <!-- Quiz Header -->
+      <div class="flex items-center justify-between pb-2.5 border-b border-slate-800 text-[11px]">
+        <span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-black border border-amber-500/40 flex items-center gap-1">
+          <i class="ph-bold ph-lightning"></i> 혼동어휘 1초 킬러 매칭
+        </span>
+        <span id="quiz-progress" class="font-mono text-slate-400 text-xs">1 / 10</span>
+        <button onclick="toggleQuizMode(false)" class="text-slate-400 hover:text-white text-xs font-bold px-2 py-0.5 rounded bg-slate-800">
+          일반 인출로 복귀
+        </button>
+      </div>
+
+      <!-- Quiz Question Area -->
+      <div class="my-3 space-y-2 text-center">
+        <span id="quiz-badge-target" class="text-[10px] font-bold text-indigo-300 bg-indigo-950/60 border border-indigo-500/40 px-2 py-0.5 rounded-full inline-block">
+          형태 낚시 식별 훈련
+        </span>
+        <p class="text-xs text-slate-400 font-medium">다음 한국어 뜻에 일치하는 정확한 단어를 0.5초 만에 고르세요:</p>
+        <div id="quiz-question-meaning" class="text-xl sm:text-2xl font-black text-amber-300 py-2 px-3 bg-slate-950/60 rounded-xl border border-slate-800">
+          위도 (또는 행동의 자유재량)
+        </div>
+      </div>
+
+      <!-- Options (4지선다 버튼) -->
+      <div id="quiz-options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2 my-2">
+        <!-- JS로 동적 생성 -->
+      </div>
+
+      <!-- Feedback Banner (정답/오답 후 노출) -->
+      <div id="quiz-feedback-box" class="hidden p-3 rounded-xl border text-xs space-y-1 transition-all">
+        <div id="quiz-feedback-title" class="font-black text-sm flex items-center gap-1.5"></div>
+        <p id="quiz-feedback-desc" class="text-slate-300 text-[11px] leading-relaxed"></p>
+      </div>
+
+      <!-- Quiz Bottom Actions -->
+      <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
+        <span id="quiz-score-indicator" class="text-[11px] font-mono text-slate-400">정답률: 0/0 (0%)</span>
+        <button id="quiz-next-btn" onclick="nextQuizQuestion()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-black text-xs flex items-center gap-1 transition shadow">
+          <span>다음 혼동어</span>
+          <i class="ph-bold ph-arrow-right"></i>
+        </button>
       </div>
 
     </div>
@@ -303,7 +382,7 @@
     const STORAGE_KEY = 'VVOCA_DB_V2_SPACED';
     const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
-    // 기본 시드 데이터
+    // ... existing SEED_WORDS ...
     const SEED_WORDS = [
       {
         "id": "v_001_attitude",
@@ -388,6 +467,13 @@
     let currentStage = 0; // 0: 블라인드, 1: 기본뜻, 2: 영영, 3: V-속뜻
     let currentMode = 'all';
 
+    // ==================== 혼동어 퀴즈 모드 상태 ====================
+    let isQuizMode = false;
+    let quizBank = [];
+    let currentQuizIndex = 0;
+    let quizScore = { total: 0, correct: 0 };
+    let quizAnswered = false;
+
     function loadDatabase() {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
@@ -405,6 +491,7 @@
         if (typeof w.memoryLevel === 'undefined') w.memoryLevel = 0;
         if (typeof w.nextReviewDate === 'undefined') w.nextReviewDate = 0;
         if (typeof w.failedStage === 'undefined') w.failedStage = null;
+        if (typeof w.confMistakes === 'undefined') w.confMistakes = 0;
       });
       updateCounts();
       buildQueue();
@@ -439,14 +526,16 @@
       document.getElementById('count-fail0').innerText = words.filter(w => w.failedStage === 'step0').length;
       document.getElementById('count-fail12').innerText = words.filter(w => w.failedStage === 'step12').length;
       document.getElementById('count-fail3').innerText = words.filter(w => w.failedStage === 'step3').length;
+      document.getElementById('count-failconf').innerText = words.filter(w => w.failedStage === 'conf' || (w.confMistakes && w.confMistakes > 0)).length;
     }
 
     function setMode(mode) {
+      if (isQuizMode) toggleQuizMode(false);
       currentMode = mode;
       
       const buttons = [
         'filter-btn-all', 'filter-btn-today', 'filter-btn-mastered',
-        'filter-btn-fail0', 'filter-btn-fail12', 'filter-btn-fail3'
+        'filter-btn-fail0', 'filter-btn-fail12', 'filter-btn-fail3', 'filter-btn-failconf'
       ];
 
       buttons.forEach(id => {
@@ -456,7 +545,7 @@
         }
       });
 
-      const activeBtn = document.getElementById(`filter-btn-${mode.replace('_review', '').replace('step', '')}`);
+      const activeBtn = document.getElementById(`filter-btn-${mode.replace('_review', '').replace('step', '').replace('_', '')}`);
       if (activeBtn) {
         activeBtn.classList.add('bg-rose-600', 'text-white');
       }
@@ -481,6 +570,8 @@
         queue = words.filter(w => w.failedStage === 'step12');
       } else if (currentMode === 'fail_step3') {
         queue = words.filter(w => w.failedStage === 'step3');
+      } else if (currentMode === 'fail_conf') {
+        queue = words.filter(w => w.failedStage === 'conf' || (w.confMistakes && w.confMistakes > 0));
       }
 
       currentIndex = 0;
@@ -518,7 +609,7 @@
       document.getElementById('card-basic-meaning').innerText = item.basic;
       document.getElementById('card-en-def').innerText = `"${item.enDef}"`;
       document.getElementById('card-real-meaning').innerText = item.realSense;
-      document.getElementById('card-core-logic').innerText = item.coreLogic ? `👉 ${item.coreLogic}` : '';
+      document.getElementById('card-coreLogic').innerText = item.coreLogic ? `👉 ${item.coreLogic}` : '';
       
       const contrastBox = document.getElementById('card-binary-box');
       if (item.contrast) {
@@ -526,6 +617,29 @@
         document.getElementById('card-contrast').innerText = item.contrast;
       } else {
         contrastBox.classList.add('hidden');
+      }
+
+      // 혼동 어휘 대조 박스 렌더링
+      const confBox = document.getElementById('card-confusion-box');
+      const confText = document.getElementById('card-confusion-text');
+      const instantQuizBtn = document.getElementById('card-instant-quiz-btn');
+
+      if (item.confusion) {
+        confBox.classList.remove('hidden');
+        confText.innerText = item.confusion;
+        instantQuizBtn.classList.remove('hidden');
+      } else {
+        confBox.classList.add('hidden');
+        instantQuizBtn.classList.add('hidden');
+      }
+
+      // 유형 배지 렌더링
+      const typeBadge = document.getElementById('card-type-badge');
+      if (item.cardType) {
+        typeBadge.innerText = item.cardType;
+        typeBadge.classList.remove('hidden');
+      } else {
+        typeBadge.classList.add('hidden');
       }
 
       document.getElementById('card-example-en').innerText = `"${item.exampleEn || ''}"`;
@@ -559,6 +673,9 @@
       } else if (item.failedStage === 'step3') {
         lastFailEl.innerText = "🎯 지난번 [V-속뜻/대립쌍]에서 헷갈렸던 단어";
         lastFailEl.className = "text-[9px] font-black text-indigo-400 tracking-wider";
+      } else if (item.failedStage === 'conf' || (item.confMistakes && item.confMistakes > 0)) {
+        lastFailEl.innerText = "⚡ 혼동어 퀴즈에서 오답이 났던 짝꿍 단어";
+        lastFailEl.className = "text-[9px] font-black text-fuchsia-400 tracking-wider";
       } else {
         lastFailEl.innerText = "TARGET WORD";
         lastFailEl.className = "text-[9px] font-black uppercase text-slate-500 tracking-wider";
@@ -701,15 +818,285 @@
       renderCard();
     }
 
-    function speakWord() {
-      if (queue.length === 0) return;
-      const text = queue[currentIndex].word;
+    function speakWord(customWord) {
+      let text = customWord;
+      if (!text) {
+        if (isQuizMode && quizBank[currentQuizIndex]) {
+          text = quizBank[currentQuizIndex].targetWord;
+        } else if (queue.length > 0) {
+          text = queue[currentIndex].word;
+        }
+      }
+      if (!text) return;
+
       if ('speechSynthesis' in window) {
         const u = new SpeechSynthesisUtterance(text);
         u.lang = 'en-US';
         u.rate = 0.9;
         window.speechSynthesis.cancel();
         window.speechSynthesis.speak(u);
+      }
+    }
+
+    // ========================================================
+    // ⚡ 혼동어휘 1초 킬러 매칭 퀴즈 엔진 (Speed Drill Quiz)
+    // ========================================================
+
+    // confusion 텍스트를 파싱하여 개별 단어/의미 아이템 추출
+    function parseConfusionItems(rawConfusion) {
+      if (!rawConfusion) return [];
+      const lines = rawConfusion.split('\n');
+      const items = [];
+
+      lines.forEach(line => {
+        const trimmed = line.replace(/^[•\-\*]\s*/, '').trim();
+        if (!trimmed) return;
+        const match = trimmed.match(/^([a-zA-Z\s\(\)\/\-]+):\s*(.+)$/);
+        if (match) {
+          const wordPart = match[1].replace(/\(.*\)/, '').trim().split('/')[0].trim();
+          const meaningPart = match[2].trim();
+          if (wordPart && meaningPart) {
+            items.push({ word: wordPart, meaning: meaningPart, raw: trimmed });
+          }
+        }
+      });
+      return items;
+    }
+
+    // 전체 DB에서 퀴즈 문제 생성
+    function buildQuizBank(filterWordId = null) {
+      quizBank = [];
+      const targetWords = filterWordId 
+        ? words.filter(w => w.id === filterWordId && w.confusion)
+        : words.filter(w => w.confusion);
+
+      targetWords.forEach(w => {
+        const parsed = parseConfusionItems(w.confusion);
+        if (parsed.length === 0) return;
+
+        // 원본 표제어도 혼동어 풀에 함께 투입!
+        const fullPool = [
+          { word: w.word, meaning: w.basic, raw: `${w.word}: ${w.basic}` },
+          ...parsed
+        ];
+
+        // 각 혼동 항목을 정답으로 하는 문제 생성
+        fullPool.forEach(correctItem => {
+          // 오답 보기 후보군 추출
+          let distractors = fullPool.filter(p => p.word.toLowerCase() !== correctItem.word.toLowerCase());
+          
+          // 풀이 4개 미만이면 전체 words에서 무작위 단어 보충
+          if (distractors.length < 3) {
+            const others = words.filter(ow => ow.word.toLowerCase() !== correctItem.word.toLowerCase());
+            for (let i = 0; i < 3 - distractors.length && i < others.length; i++) {
+              distractors.push({ word: others[i].word, meaning: others[i].basic, raw: `${others[i].word}: ${others[i].basic}` });
+            }
+          }
+
+          // 보기 4개 섞기
+          const options = [correctItem.word, ...distractors.slice(0, 3).map(d => d.word)];
+          for (let i = options.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [options[i], options[j]] = [options[j], options[i]];
+          }
+
+          quizBank.push({
+            parentWordId: w.id,
+            targetWord: correctItem.word,
+            questionMeaning: correctItem.meaning,
+            fullInfo: correctItem.raw,
+            options: options,
+            parentWord: w.word
+          });
+        });
+      });
+
+      // 퀴즈 문제 셔플
+      for (let i = quizBank.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [quizBank[i], quizBank[j]] = [quizBank[j], quizBank[i]];
+      }
+
+      currentQuizIndex = 0;
+      quizScore = { total: 0, correct: 0 };
+    }
+
+    function toggleQuizMode(forceState) {
+      isQuizMode = typeof forceState === 'boolean' ? forceState : !isQuizMode;
+
+      const stdView = document.getElementById('standard-card-view');
+      const quizView = document.getElementById('quiz-card-view');
+      const filterBar = document.getElementById('standard-filter-bar');
+      const toggleBtn = document.getElementById('toggle-quiz-mode-btn');
+      const toggleLabel = document.getElementById('quiz-toggle-label');
+
+      if (isQuizMode) {
+        buildQuizBank();
+        if (quizBank.length === 0) {
+          showToast('혼동어휘가 등록된 카드가 없습니다. 덱을 확인하세요.');
+          isQuizMode = false;
+          return;
+        }
+        stdView.classList.add('hidden');
+        filterBar.classList.add('hidden');
+        quizView.classList.remove('hidden');
+
+        toggleBtn.className = "flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-rose-600 text-white font-black text-[11px] border border-rose-500 transition shadow";
+        toggleLabel.innerText = "일반 인출 복귀";
+        renderQuizQuestion();
+      } else {
+        quizView.classList.add('hidden');
+        stdView.classList.remove('hidden');
+        filterBar.classList.remove('hidden');
+
+        toggleBtn.className = "flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 font-black text-[11px] border border-amber-500/40 transition shadow-sm";
+        toggleLabel.innerText = "혼동어 테스트";
+        buildQueue();
+        renderCard();
+      }
+    }
+
+    // 3단계 카드에서 [이 혼동어 지금 시험보기] 클릭 시 호출
+    function startInstantConfusionQuiz(event) {
+      if (event) event.stopPropagation();
+      if (queue.length === 0) return;
+      const currentItem = queue[currentIndex];
+      
+      buildQuizBank(currentItem.id);
+      if (quizBank.length === 0) {
+        showToast('이 단어에는 등록된 혼동어 대조군이 없습니다.');
+        return;
+      }
+
+      isQuizMode = true;
+      document.getElementById('standard-card-view').classList.add('hidden');
+      document.getElementById('standard-filter-bar').classList.add('hidden');
+      document.getElementById('quiz-card-view').classList.remove('hidden');
+
+      const toggleBtn = document.getElementById('toggle-quiz-mode-btn');
+      toggleBtn.className = "flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-rose-600 text-white font-black text-[11px] border border-rose-500 transition shadow";
+      document.getElementById('quiz-toggle-label').innerText = "일반 인출 복귀";
+
+      renderQuizQuestion();
+      showToast(`⚡ "${currentItem.word}" 연관 혼동어 즉석 테스트 시작!`);
+    }
+
+    function renderQuizQuestion() {
+      if (quizBank.length === 0 || currentQuizIndex >= quizBank.length) {
+        showToast('혼동어 퀴즈 세트를 완료했습니다!');
+        toggleQuizMode(false);
+        return;
+      }
+
+      quizAnswered = false;
+      const q = quizBank[currentQuizIndex];
+
+      document.getElementById('quiz-progress').innerText = `${currentQuizIndex + 1} / ${quizBank.length}`;
+      document.getElementById('quiz-badge-target').innerText = `🚨 [${q.parentWord}] 계열 형태 낚시 분별`;
+      document.getElementById('quiz-question-meaning').innerText = q.questionMeaning;
+
+      // 피드백 상자 숨김 초기화
+      const fbBox = document.getElementById('quiz-feedback-box');
+      fbBox.classList.add('hidden');
+
+      // 선택지 4개 렌더링
+      const container = document.getElementById('quiz-options-container');
+      container.innerHTML = '';
+
+      q.options.forEach((optWord, idx) => {
+        const btn = document.createElement('button');
+        btn.id = `quiz-opt-btn-${idx}`;
+        btn.className = "w-full text-left p-3 rounded-xl bg-slate-950/80 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/60 font-mono text-sm sm:text-base font-bold text-slate-100 flex items-center justify-between transition group shadow-sm active:scale-[0.98]";
+        btn.innerHTML = `
+          <div class="flex items-center gap-2.5">
+            <span class="w-6 h-6 rounded-lg bg-slate-800 text-amber-300 text-xs font-black flex items-center justify-center shrink-0 border border-slate-700">
+              ${idx + 1}
+            </span>
+            <span class="break-all">${optWord}</span>
+          </div>
+          <i class="ph-bold ph-caret-right text-slate-600 group-hover:text-amber-400"></i>
+        `;
+        btn.onclick = () => handleQuizSelect(optWord, idx);
+        container.appendChild(btn);
+      });
+
+      // 점수 업데이트
+      updateQuizScoreDisplay();
+    }
+
+    function handleQuizSelect(selectedWord, selectedIdx) {
+      if (quizAnswered) return;
+      quizAnswered = true;
+
+      const q = quizBank[currentQuizIndex];
+      const isCorrect = selectedWord.toLowerCase() === q.targetWord.toLowerCase();
+      quizScore.total++;
+      if (isCorrect) quizScore.correct++;
+
+      // UI 피드백 표시
+      const fbBox = document.getElementById('quiz-feedback-box');
+      const fbTitle = document.getElementById('quiz-feedback-title');
+      const fbDesc = document.getElementById('quiz-feedback-desc');
+
+      fbBox.classList.remove('hidden');
+
+      // 원본 데이터에 혼동어 오답 기록 & 서랍 태깅
+      const original = words.find(w => w.id === q.parentWordId);
+
+      if (isCorrect) {
+        fbBox.className = "p-3 rounded-xl border border-emerald-500/50 bg-emerald-950/40 text-xs space-y-1";
+        fbTitle.className = "font-black text-sm text-emerald-300 flex items-center gap-1.5";
+        fbTitle.innerHTML = `<i class="ph-bold ph-check-circle text-base"></i> 0.5초 킬러 정답! 정확히 식별했습니다.`;
+        fbDesc.innerHTML = `<span class="font-mono font-bold text-emerald-200">${q.targetWord}</span> ➔ ${q.questionMeaning}`;
+        
+        // 정답 버튼 초록색 강조
+        const correctBtn = document.getElementById(`quiz-opt-btn-${selectedIdx}`);
+        if (correctBtn) {
+          correctBtn.classList.add('border-emerald-500', 'bg-emerald-950/70', 'text-emerald-200');
+        }
+      } else {
+        fbBox.className = "p-3 rounded-xl border border-rose-500/50 bg-rose-950/40 text-xs space-y-1";
+        fbTitle.className = "font-black text-sm text-rose-300 flex items-center gap-1.5";
+        fbTitle.innerHTML = `<i class="ph-bold ph-x-circle text-base"></i> 오답! 철자 낚시에 걸렸습니다.`;
+        fbDesc.innerHTML = `정답은 <strong class="font-mono text-amber-300 text-sm underline">${q.targetWord}</strong> (${q.questionMeaning}) 입니다.<br><span class="text-slate-400">내가 선택한 단어: <span class="font-mono text-rose-300">${selectedWord}</span></span>`;
+
+        // 오답 기록 및 [혼동어 오답] 서랍으로 격리!
+        if (original) {
+          original.failedStage = 'conf';
+          original.confMistakes = (original.confMistakes || 0) + 1;
+          saveDatabase();
+        }
+
+        // 선택한 버튼 붉은색, 진짜 정답 버튼 초록색 강조
+        const wrongBtn = document.getElementById(`quiz-opt-btn-${selectedIdx}`);
+        if (wrongBtn) {
+          wrongBtn.classList.add('border-rose-500', 'bg-rose-950/70', 'text-rose-200');
+        }
+        // 정답 버튼 인덱스 찾아서 점등
+        q.options.forEach((opt, idx) => {
+          if (opt.toLowerCase() === q.targetWord.toLowerCase()) {
+            const rightBtn = document.getElementById(`quiz-opt-btn-${idx}`);
+            if (rightBtn) rightBtn.classList.add('border-emerald-500', 'bg-emerald-950/70', 'text-emerald-200');
+          }
+        });
+      }
+
+      speakWord(q.targetWord);
+      updateQuizScoreDisplay();
+    }
+
+    function updateQuizScoreDisplay() {
+      const rate = quizScore.total > 0 ? Math.round((quizScore.correct / quizScore.total) * 100) : 0;
+      document.getElementById('quiz-score-indicator').innerText = `적중률: ${quizScore.correct}/${quizScore.total} (${rate}%)`;
+    }
+
+    function nextQuizQuestion() {
+      currentQuizIndex++;
+      if (currentQuizIndex >= quizBank.length) {
+        showToast(`🎉 혼동어 퀴즈 완료! 최종 적중률: ${Math.round((quizScore.correct / quizScore.total) * 100)}%`);
+        toggleQuizMode(false);
+      } else {
+        renderQuizQuestion();
       }
     }
 
@@ -737,9 +1124,11 @@
           const normalized = parsed.map(p => ({
             id: p.id || 'vword_' + Date.now().toString() + Math.random().toString(36).substr(2, 4),
             word: p.word || '',
+            cardType: p.cardType || '',
             basic: p.basic || '',
             enDef: p.enDef || '',
             realSense: p.realSense || '',
+            confusion: p.confusion || '',
             coreLogic: p.coreLogic || '',
             contrast: p.contrast || '',
             exampleEn: p.exampleEn || '',
@@ -747,7 +1136,8 @@
             streak: 0,
             memoryLevel: 0,
             nextReviewDate: 0,
-            failedStage: null
+            failedStage: null,
+            confMistakes: 0
           }));
 
           if (mode === 'overwrite') {
@@ -778,11 +1168,25 @@
       }, 1900);
     }
 
-    // 키보드 컨트롤
+    // 키보드 컨트롤 (혼동어 퀴즈 모드 1,2,3,4 숫자키 및 Space 지원)
     window.addEventListener('keydown', (e) => {
       const isModalOpen = !document.getElementById('paste-modal').classList.contains('hidden');
       if (isModalOpen) return;
       if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+      if (isQuizMode) {
+        if (['1', '2', '3', '4'].includes(e.key)) {
+          const idx = parseInt(e.key, 10) - 1;
+          const btn = document.getElementById(`quiz-opt-btn-${idx}`);
+          if (btn) btn.click();
+        } else if (e.key === ' ' || e.code === 'Space' || e.key === 'Enter') {
+          e.preventDefault();
+          if (quizAnswered) {
+            nextQuizQuestion();
+          }
+        }
+        return;
+      }
 
       if (e.key === ' ' || e.code === 'Space') {
         e.preventDefault();
