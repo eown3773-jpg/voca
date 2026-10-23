@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VocaChunk - 스텔라 쌤식 청크 & 어원 인출 마스터</title>
+  <title>V-Voca - 김지영 V단어식 영영 뉘앙스 & 실전 독해 인출기</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Pretendard Webfont -->
@@ -20,33 +20,33 @@
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans selection:bg-amber-100 selection:text-amber-900">
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-rose-500 selection:text-white">
 
   <!-- ==================== HEADER ==================== -->
-  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+  <header class="bg-slate-800/90 backdrop-blur-md border-b border-slate-700/80 sticky top-0 z-40 shadow-md">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
       
       <!-- Logo -->
-      <div class="flex items-center space-x-2.5">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-indigo-600 flex items-center justify-center text-white shadow-sm shrink-0">
-          <i class="ph-bold ph-tree-structure text-lg"></i>
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-rose-600 via-amber-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-rose-900/30 shrink-0">
+          <i class="ph-bold ph-lightning text-xl"></i>
         </div>
         <div>
-          <h1 class="text-base font-black text-slate-900 tracking-tight flex items-center gap-1.5">
-            <span>VocaChunk</span>
-            <span class="text-[10px] px-2 py-0.5 bg-amber-50 text-amber-700 font-extrabold rounded-full border border-amber-200">청크 인출 + 어원 코어 결합</span>
+          <h1 class="text-base font-black text-white tracking-tight flex items-center gap-1.5">
+            <span>V-Voca</span>
+            <span class="text-[10px] px-2 py-0.5 bg-rose-500/20 text-rose-300 font-extrabold rounded-full border border-rose-500/40">김지영 V단어 × 영영사전 뉘앙스</span>
           </h1>
-          <p class="text-[11px] text-slate-500">한글 청크 ➔ [블라인드 인출] ➔ [짝꿍 힌트] ➔ [정답 & 어원 분석 각인]</p>
+          <p class="text-[11px] text-slate-400">사전 속 1차 뜻 ➔ [영영 정의] ➔ [실전 독해 이면의 의미(비필수/중요치 않음 등)]</p>
         </div>
       </div>
 
       <!-- Actions -->
       <div class="flex items-center space-x-2">
-        <button onclick="openPasteModal()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black text-xs transition shadow-xs">
-          <i class="ph-bold ph-clipboard-text text-sm"></i>
-          <span>청크 덱 붙여넣기</span>
+        <button onclick="openPasteModal()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-black text-xs transition shadow-md shadow-rose-900/40">
+          <i class="ph-bold ph-plus-circle text-sm"></i>
+          <span>V단어 덱 붙여넣기</span>
         </button>
-        <button onclick="resetToSeedData()" class="p-2 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-slate-100 transition" title="기본 예시 덱으로 리셋">
+        <button onclick="resetToSeedData()" class="p-2 text-slate-400 hover:text-amber-400 rounded-lg hover:bg-slate-700/50 transition" title="기본 V단어 덱으로 리셋">
           <i class="ph-bold ph-arrow-counter-clockwise text-base"></i>
         </button>
       </div>
@@ -56,132 +56,140 @@
   <!-- ==================== MAIN CONTENT ==================== -->
   <main class="flex-1 max-w-3xl w-full mx-auto p-4 sm:p-6 flex flex-col justify-center">
     
-    <!-- Status & Filter Bar -->
-    <div class="bg-white p-3 rounded-2xl border border-slate-200 shadow-xs mb-4 flex items-center justify-between text-xs font-semibold">
+    <!-- Filter & Mode Bar -->
+    <div class="bg-slate-800/80 p-3 rounded-2xl border border-slate-700/80 shadow-sm mb-4 flex items-center justify-between text-xs font-semibold">
       <div class="flex items-center gap-2">
-        <span class="text-slate-500">진행:</span>
-        <button id="filter-btn-all" onclick="setMode('all')" class="px-2.5 py-1 rounded-lg bg-slate-900 text-white font-bold">전체 (<span id="count-all">0</span>)</button>
-        <button id="filter-btn-review" onclick="setMode('review')" class="px-2.5 py-1 rounded-lg text-slate-600 hover:bg-slate-100">헷갈림 (<span id="count-review">0</span>)</button>
-        <button id="filter-btn-mastered" onclick="setMode('mastered')" class="px-2.5 py-1 rounded-lg text-slate-600 hover:bg-slate-100">마스터 (<span id="count-mastered">0</span>)</button>
+        <span class="text-slate-400">인출 진행:</span>
+        <button id="filter-btn-all" onclick="setMode('all')" class="px-2.5 py-1 rounded-lg bg-rose-600 text-white font-bold">전체 (<span id="count-all">0</span>)</button>
+        <button id="filter-btn-review" onclick="setMode('review')" class="px-2.5 py-1 rounded-lg text-slate-300 hover:bg-slate-700">헷갈림 (<span id="count-review">0</span>)</button>
+        <button id="filter-btn-mastered" onclick="setMode('mastered')" class="px-2.5 py-1 rounded-lg text-slate-300 hover:bg-slate-700">체화 완료 (<span id="count-mastered">0</span>)</button>
       </div>
-      <button onclick="shuffleQueue()" class="text-slate-500 hover:text-slate-900 flex items-center gap-1">
+      <button onclick="shuffleQueue()" class="text-slate-400 hover:text-white flex items-center gap-1">
         <i class="ph-bold ph-shuffle"></i> 섞기
       </button>
     </div>
 
     <!-- MAIN CARD -->
-    <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm relative overflow-hidden min-h-[460px] flex flex-col justify-between text-center">
+    <div class="bg-slate-800 border border-slate-700/80 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden min-h-[500px] flex flex-col justify-between text-center">
       
       <!-- Card Header & Step Indicator -->
-      <div class="flex items-center justify-between text-xs text-slate-400 pb-2 border-b border-slate-100">
-        <span id="card-tag" class="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-bold">
-          Day 01
+      <div class="flex items-center justify-between text-xs text-slate-400 pb-3 border-b border-slate-700/60">
+        <span id="card-tag" class="px-2.5 py-0.5 rounded-full bg-slate-700/80 text-rose-300 font-bold border border-slate-600">
+          김지영 V-Lecture
         </span>
         
         <!-- Step Indicator -->
         <div class="flex items-center gap-1.5 text-[11px] font-bold">
-          <span id="step-badge-1" class="px-2 py-0.5 rounded-md bg-amber-500 text-white">1: 전체 블라인드</span>
-          <span class="text-slate-300">➔</span>
-          <span id="step-badge-2" class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-400">2: 짝꿍 힌트</span>
-          <span class="text-slate-300">➔</span>
-          <span id="step-badge-3" class="px-2 py-0.5 rounded-md bg-slate-100 text-slate-400">3: 정답 & 어원</span>
+          <span id="step-badge-1" class="px-2.5 py-0.5 rounded-md bg-rose-600 text-white">1: 단어 & 1차 뜻</span>
+          <span class="text-slate-500">➔</span>
+          <span id="step-badge-2" class="px-2.5 py-0.5 rounded-md bg-slate-700 text-slate-400">2: 영영 코어 뉘앙스</span>
+          <span class="text-slate-500">➔</span>
+          <span id="step-badge-3" class="px-2.5 py-0.5 rounded-md bg-slate-700 text-slate-400">3: 실전 독해 속뜻(V-Sense)</span>
         </div>
 
-        <span id="card-progress">1 / 50</span>
+        <span id="card-progress">1 / 10</span>
       </div>
 
-      <!-- Core Question: 한글 덩어리 -->
+      <!-- Core Word & 1st Meaning Area -->
       <div class="my-4 space-y-2">
-        <span class="text-[11px] font-black uppercase text-amber-600 tracking-wider flex items-center justify-center gap-1">
-          <i class="ph-bold ph-translate"></i> 한글 청크 (의미 덩어리 시역 훈련)
-        </span>
-        <h2 id="card-korean-chunk" class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-snug">
-          희귀 필사본들을 점검하다
-        </h2>
+        <div class="flex items-center justify-center gap-2">
+          <span class="text-[11px] font-black uppercase text-rose-400 tracking-wider">
+            TARGET WORD
+          </span>
+          <button onclick="speakWord()" class="text-slate-400 hover:text-rose-400 transition" title="발음 듣기 (S)">
+            <i class="ph-bold ph-speaker-high text-base"></i>
+          </button>
+        </div>
         
-        <!-- Stage Notice / Hint Bar -->
+        <h2 id="card-target-word" class="text-3xl sm:text-4xl font-black text-white tracking-tight font-mono">
+          optional
+        </h2>
+
+        <!-- Step Guide -->
         <div class="h-6 flex items-center justify-center">
-          <p id="card-step-guide" class="text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">
-            [Space] 머릿속으로 영어 청크 인출 ➔ 짝꿍 단어 힌트 공개
+          <p id="card-step-guide" class="text-xs font-bold text-amber-300 bg-amber-950/40 px-3 py-1 rounded-full border border-amber-600/40">
+            [Space] 누르면 영영사전 코어 뉘앙스 오픈
           </p>
         </div>
       </div>
 
-      <!-- Test Area: 3단계 전환 박스 -->
-      <div id="chunk-display-box" onclick="nextStage()" class="cursor-pointer bg-slate-50 hover:bg-slate-100 border-2 border-dashed border-slate-200 hover:border-amber-300 rounded-2xl p-6 transition my-2 flex flex-col justify-center items-center min-h-[170px]">
+      <!-- Interactive 3-Stage Revelation Box -->
+      <div id="voca-display-box" onclick="nextStage()" class="cursor-pointer bg-slate-900/60 hover:bg-slate-900/80 border-2 border-dashed border-slate-700 hover:border-rose-500/50 rounded-2xl p-5 sm:p-6 transition my-2 flex flex-col justify-center items-center min-h-[220px]">
         
-        <!-- 1단계: 전체 블라인드 -->
+        <!-- STEP 1 VIEW: 사전적 1차 의미 (기본) -->
         <div id="view-step-1" class="space-y-3">
-          <div class="flex items-center justify-center gap-2">
-            <span class="px-5 py-2.5 rounded-xl bg-slate-200 text-slate-400 font-mono font-black text-lg tracking-widest select-none">
-              ■■■■■■■■■■■■■■■■
-            </span>
+          <div class="text-slate-400 text-xs font-medium">사전적 1차 뜻 (기본)</div>
+          <div id="card-basic-meaning" class="text-xl sm:text-2xl font-bold text-slate-200">
+            선택적인
           </div>
-          <p class="text-xs text-slate-400 font-semibold flex items-center justify-center gap-1">
-            <i class="ph-bold ph-lock-key"></i> 통역사 시역 훈련! 입으로 영어 덩어리를 먼저 뱉어보세요 [Space]
+          <p class="text-xs text-slate-500 font-semibold flex items-center justify-center gap-1">
+            <i class="ph-bold ph-question"></i> 평가원은 이 단어를 '선택적'으로만 쓰지 않는다! 진짜 뉘앙스는? [Space]
           </p>
         </div>
 
-        <!-- 2단계: 짝꿍 단어 힌트 -->
-        <div id="view-step-2" class="hidden space-y-3">
-          <div id="card-cloze-en" class="text-xl sm:text-2xl font-mono font-extrabold text-slate-700 tracking-wide">
-            [ _________ ] the rare manuscripts
+        <!-- STEP 2 VIEW: 영영사전 정의 & 코어 뉘앙스 -->
+        <div id="view-step-2" class="hidden space-y-3 max-w-xl text-center">
+          <div class="text-amber-400 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1">
+            <i class="ph-bold ph-book-open"></i> English-English Dictionary Definition
           </div>
-          <p class="text-xs text-indigo-600 font-bold flex items-center justify-center gap-1">
-            <i class="ph-bold ph-lightbulb"></i> 문맥 확인! 빈칸의 핵심 단어와 어원은? [Space: 최종 정답 & 어원 분석]
+          <div id="card-en-def" class="text-base sm:text-lg font-medium text-slate-100 italic bg-slate-800/80 p-3 rounded-xl border border-slate-700">
+            "Available to be chosen but not mandatory; you can choose not to do or have it."
+          </div>
+          <p class="text-xs text-indigo-400 font-bold flex items-center justify-center gap-1">
+            <i class="ph-bold ph-lightbulb"></i> 즉, 안 해도 그만이라는 뜻! 실전 독해에서 문맥상 의미는? [Space]
           </p>
         </div>
 
-        <!-- 3단계: 핵심 단어, 전체 청크 및 어원 분석 완전 공개 -->
+        <!-- STEP 3 VIEW: 김지영 V-Sense (실전 독해 이면의 속뜻 & 대립쌍) -->
         <div id="view-step-3" class="hidden space-y-3.5 w-full max-w-xl text-left sm:text-center">
           
-          <!-- 영어 완성 청크 -->
-          <div class="space-y-1 text-center">
-            <span class="text-[11px] font-bold text-slate-400">타깃 단어: <strong id="card-target-word" class="text-indigo-600 text-sm font-black underline underline-offset-4">inspect</strong></span>
-            <div id="card-full-en" class="text-2xl sm:text-3xl font-mono font-black text-amber-600 tracking-tight">
-              inspect the rare manuscripts
+          <!-- 실전 독해 속뜻 하이라이트 -->
+          <div class="bg-rose-950/40 border border-rose-500/40 rounded-xl p-3.5 space-y-1.5">
+            <span class="text-[11px] font-black uppercase text-rose-400 tracking-wider flex items-center justify-center gap-1">
+              <i class="ph-bold ph-crosshair"></i> 김지영 실전 독해 이면의 속뜻 (V-Sense)
+            </span>
+            <div id="card-real-meaning" class="text-xl sm:text-2xl font-black text-rose-200 text-center">
+              필수가 아닌 / 덜 중요한 / 무시해도 무방한
             </div>
+            <p id="card-core-logic" class="text-xs text-slate-300 font-medium text-center">
+              👉 '선택할 수 있다'는 것은 '반드시 할 필요가 없다(not essential)'는 뜻이므로 지문에서 부차적이거나 중요하지 않은 요소를 지칭할 때 사용됨!
+            </p>
           </div>
 
-          <!-- ✨ 어원 분석 박스 (신설) ✨ -->
-          <div id="card-etymology-box" class="bg-white border border-indigo-100 rounded-xl p-3 shadow-2xs space-y-2">
-            <div class="flex flex-wrap items-center justify-center gap-2 text-xs font-mono font-bold">
-              <span class="text-slate-400 text-[11px] uppercase tracking-wider mr-1">어원 분해:</span>
-              <span id="card-etymology-parts" class="inline-flex flex-wrap items-center gap-1.5 text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-200">
-                in(안에) + spect(보다)
-              </span>
-            </div>
-            <div id="card-core-logic" class="text-xs text-slate-700 bg-amber-50/70 p-2 rounded-lg border border-amber-200/60 font-medium text-center">
-              👉 속 안을 깊숙이 들여다보며 살피다 ➔ 조사하다, 점검하다
-            </div>
+          <!-- 문맥 대립쌍 (Binary Opposites) -->
+          <div id="card-binary-box" class="flex flex-wrap items-center justify-center gap-2 text-xs font-mono">
+            <span class="text-slate-400 text-[11px] uppercase tracking-wider">문맥 대립쌍:</span>
+            <span id="card-contrast" class="inline-flex items-center gap-1.5 text-amber-300 bg-amber-950/60 px-2.5 py-1 rounded-lg border border-amber-600/50 font-bold">
+              optional (비필수/부차적) ↔ mandatory, essential (필수/핵심)
+            </span>
           </div>
 
-          <!-- 실전 고품질 예문 -->
-          <p id="card-full-sentence" class="text-xs text-slate-500 font-medium italic text-center">
-            "The safety engineers inspect the facilities for structural defects."
-          </p>
-
-          <div class="text-center pt-0.5">
-            <button onclick="event.stopPropagation(); speakChunk();" class="inline-flex items-center gap-1.5 px-3 py-1 bg-white hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg border border-slate-200 shadow-2xs">
-              <i class="ph-bold ph-speaker-high"></i> 발음 듣기 (S)
-            </button>
+          <!-- 실전 예문 & 시역 -->
+          <div class="bg-slate-800/80 p-3 rounded-xl border border-slate-700/80 text-left space-y-1">
+            <p id="card-example-en" class="text-xs sm:text-sm text-slate-200 font-medium">
+              "Attendance at the orientation is completely optional, so focus primarily on your core research."
+            </p>
+            <p id="card-example-ko" class="text-xs text-slate-400 italic">
+              "오리엔테이션 참석은 필수가 아니므로(중요하지 않으므로), 핵심 연구에 집중하라."
+            </p>
           </div>
+
         </div>
 
       </div>
 
-      <!-- Streak & Action Buttons -->
-      <div class="pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+      <!-- Action Buttons -->
+      <div class="pt-4 border-t border-slate-700/60 flex flex-wrap items-center justify-between gap-3">
         <span id="card-streak" class="text-xs font-bold text-slate-400">
-          연속 암기: 0 / 2회
+          체화 인출: 0 / 2회
         </span>
 
         <div class="flex items-center gap-2">
-          <button onclick="markResult(false)" class="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 rounded-xl font-bold text-xs flex items-center gap-1 transition">
+          <button onclick="markResult(false)" class="px-4 py-2 bg-rose-950/40 hover:bg-rose-900/60 text-rose-300 border border-rose-700/50 rounded-xl font-bold text-xs flex items-center gap-1 transition">
             <i class="ph-bold ph-x-circle text-base"></i> 헷갈림 (1)
           </button>
-          <button onclick="markResult(true)" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-1 transition shadow-xs">
-            <i class="ph-bold ph-check-circle text-base"></i> 바로 앎 (2 / Enter)
+          <button onclick="markResult(true)" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-black text-xs flex items-center gap-1 transition shadow-md shadow-emerald-950/50">
+            <i class="ph-bold ph-check-circle text-base"></i> 바로 체화됨 (2 / Enter)
           </button>
         </div>
       </div>
@@ -191,94 +199,108 @@
   </main>
 
   <!-- ==================== MODAL: JSON 붙여넣기 ==================== -->
-  <div id="paste-modal" class="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center hidden p-4">
-    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <h3 class="font-bold text-slate-900 text-sm flex items-center gap-2">
-          <i class="ph-bold ph-clipboard-text text-amber-500 text-base"></i> 청크 & 어원 덱 붙여넣기
+  <div id="paste-modal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center hidden p-4">
+    <div class="bg-slate-800 border border-slate-700 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-700 pb-3">
+        <h3 class="font-bold text-white text-sm flex items-center gap-2">
+          <i class="ph-bold ph-lightning text-rose-400 text-base"></i> 김지영 V단어 덱 등록
         </h3>
-        <button onclick="closePasteModal()" class="text-slate-400 hover:text-slate-600">
+        <button onclick="closePasteModal()" class="text-slate-400 hover:text-white">
           <i class="ph-bold ph-x text-lg"></i>
         </button>
       </div>
 
       <div class="space-y-2">
-        <p class="text-xs text-slate-500 leading-relaxed">
-          채팅창에서 생성해 드린 <strong>어원 분석 포함 JSON 코드</strong>를 그대로 복사해 붙여넣으세요.
+        <p class="text-xs text-slate-400 leading-relaxed">
+          책 사진을 올려주시면 만들어 드리는 <strong>영영 뉘앙스 + 실전 이면의 속뜻 JSON 코드</strong>를 그대로 복사해 붙여넣으세요.
         </p>
         <textarea id="paste-textarea" rows="9" placeholder='[
   {
-    "korean": "전례 없는 수의 관객들을 끌어모으다",
-    "cloze": "attract an unprecedented number of [ _________ ]",
-    "english": "attract an unprecedented number of spectators",
-    "target": "spectators",
-    "etymology": "spect(보다) + -ator(사람)",
-    "coreLogic": "무언가를 보고(spect) 있는 사람 ➔ 관객, 구경꾼",
-    "sentence": "The international literary festival attracted an unprecedented number of spectators."
+    "word": "optional",
+    "basic": "선택적인",
+    "enDef": "Available to be chosen but not mandatory; you can choose not to do it.",
+    "realSense": "필수가 아닌 / 덜 중요한 / 무시해도 무방한",
+    "coreLogic": "선택할 수 있다는 것은 반드시 할 필요가 없다는 뜻 ➔ 부차적인 요소",
+    "contrast": "optional ↔ mandatory, essential",
+    "exampleEn": "Attendance is completely optional.",
+    "exampleKo": "참석은 필수가 아니다(중요하지 않다)."
   }
-]' class="w-full p-3 font-mono text-xs border border-slate-200 rounded-xl focus:border-amber-500 focus:outline-none"></textarea>
+]' class="w-full p-3 font-mono text-xs bg-slate-900 border border-slate-700 rounded-xl text-slate-200 focus:border-rose-500 focus:outline-none"></textarea>
       </div>
 
       <div class="flex items-center justify-end gap-2 pt-2">
-        <button onclick="closePasteModal()" class="px-4 py-2 bg-slate-100 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-200 transition">취소</button>
-        <button onclick="applyPastedData('append')" class="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-700 transition">추가 등록</button>
-        <button onclick="applyPastedData('overwrite')" class="px-4 py-2 bg-amber-500 text-white text-xs font-bold rounded-xl hover:bg-amber-600 transition">전체 교체</button>
+        <button onclick="closePasteModal()" class="px-4 py-2 bg-slate-700 text-slate-300 text-xs font-bold rounded-xl hover:bg-slate-600 transition">취소</button>
+        <button onclick="applyPastedData('append')" class="px-4 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-500 transition">추가 등록</button>
+        <button onclick="applyPastedData('overwrite')" class="px-4 py-2 bg-rose-600 text-white text-xs font-bold rounded-xl hover:bg-rose-500 transition">전체 교체</button>
       </div>
     </div>
   </div>
 
   <!-- Toast -->
-  <div id="toast" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-4 py-2 rounded-xl shadow-xl text-xs font-bold transition-all transform translate-y-10 opacity-0 pointer-events-none flex items-center gap-2">
-    <i class="ph-bold ph-check text-amber-400"></i>
+  <div id="toast" class="fixed bottom-6 right-6 z-50 bg-slate-800 border border-slate-700 text-white px-4 py-2.5 rounded-xl shadow-xl text-xs font-bold transition-all transform translate-y-10 opacity-0 pointer-events-none flex items-center gap-2">
+    <i class="ph-bold ph-check text-rose-400"></i>
     <span id="toast-message">알림</span>
   </div>
 
   <script>
-    const STORAGE_KEY = 'VOCACHUNK_DB_V3_ETYMO';
+    const STORAGE_KEY = 'VVOCA_DB_V1_NUANCE';
 
-    const SEED_CHUNKS = [
+    const SEED_WORDS = [
       {
-        id: "chunk_01_spectator",
-        korean: "전례 없는 수의 관객들을 끌어모으다",
-        cloze: "attract an unprecedented number of [ _________ ]",
-        english: "attract an unprecedented number of spectators",
-        target: "spectators",
-        etymology: "spect(보다) + -ator(사람)",
-        coreLogic: "무언가를 지켜보고(spect) 있는 사람들 ➔ 관객, 구경꾼",
-        sentence: "The international festival attracted an unprecedented number of spectators from around the world.",
-        tag: "Day 01",
+        id: "v_01_optional",
+        word: "optional",
+        basic: "선택적인",
+        enDef: "Available to be chosen but not mandatory; you can choose not to do or have it.",
+        realSense: "필수가 아닌 / 덜 중요한 / 무시해도 무방한",
+        coreLogic: "'선택할 수 있다'는 것은 '반드시 할 필요가 없다(not mandatory)'는 의미이므로, 지문에서는 '핵심이 아닌 부차적인 것'을 가리킴.",
+        contrast: "optional (비필수/부차적) ↔ mandatory, essential (필수/핵심)",
+        exampleEn: "Attendance at the workshop is optional, so you may skip it if you are busy.",
+        exampleKo: "워크숍 참석은 선택사항(필수가 아님)이므로 바쁘다면 건너뛰어도 좋다.",
         streak: 0,
         isMastered: false
       },
       {
-        id: "chunk_02_spectacular",
-        korean: "눈부신 경제적 성과를 거두다",
-        cloze: "achieve [ _________ ] economic performance",
-        english: "achieve spectacular economic performance",
-        target: "spectacular",
-        etymology: "spect(보다) + -acul + -ar(형용사)",
-        coreLogic: "보는(spect) 순간 감탄이 나오는 멋진 광경 ➔ 장관을 이루는, 눈부신",
-        sentence: "The administrative reforms achieved spectacular economic performance within a short period.",
-        tag: "Day 01",
+        id: "v_02_discipline",
+        word: "discipline",
+        basic: "규율, 훈육",
+        enDef: "A branch of knowledge, typically one studied in higher education.",
+        realSense: "학문 분야 / 학과",
+        coreLogic: "사전적 1차 뜻은 '규율'이지만, 평가원·공무원 독해에서는 90% 이상 '학문 분야(academic discipline)'로 쓰임!",
+        contrast: "rules / control (규율) ↔ branch of knowledge (학문 분야)",
+        exampleEn: "Library and information science is an interdisciplinary academic discipline.",
+        exampleKo: "문헌정보학은 여러 학문이 융합된 학문 분야이다.",
         streak: 0,
         isMastered: false
       },
       {
-        id: "chunk_03_respect",
-        korean: "모든 중요한 측면에서 서로 다르다 (다의어: 측면/점)",
-        cloze: "differ in every significant [ _________ ]",
-        english: "differ in every significant respect",
-        target: "respect",
-        etymology: "re-(다시) + spect(보다)",
-        coreLogic: "사물을 다시(re) 돌려가며 각도마다 뜯어보는 포인트 ➔ 측면, 점 / 존경하다",
-        sentence: "The revised library regulations differ in every significant respect from the original draft.",
-        tag: "Day 01",
+        id: "v_03_appreciate",
+        word: "appreciate",
+        basic: "감사하다, 감상하다",
+        enDef: "To recognize the full worth of; to understand a situation fully, recognizing the problem.",
+        realSense: "정확하게 이해하다 / 진가를 제대로 알아보다",
+        coreLogic: "그냥 고마워하는 것이 아니라, 가치를 온전히 '인식하고 이해하다'는 뉘앙스가 독해의 정답 선지 근거가 됨.",
+        contrast: "misunderstand / overlook (간과하다) ↔ appreciate (제대로 인식하다)",
+        exampleEn: "Researchers fully appreciate the difficulty of authenticating ancient manuscripts.",
+        exampleKo: "연구자들은 고대 필사본의 진위를 감정하는 것의 어려움을 정확하게 이해하고 있다.",
+        streak: 0,
+        isMastered: false
+      },
+      {
+        id: "v_04_critical",
+        word: "critical",
+        basic: "비판적인",
+        enDef: "Expressing adverse comments; or extremely important with decisive significance.",
+        realSense: "중대한, 결정적인 (= crucial, vital)",
+        coreLogic: "비판한다는 뜻 외에, 죽느냐 사느냐의 '임계점(critical point)'에 이를 만큼 '극도로 중요한'이란 뜻으로 더 자주 출제됨.",
+        contrast: "trivial / minor (사소한) ↔ critical (결정적으로 중요한)",
+        exampleEn: "Information retrieval speed is critical to user satisfaction in digital libraries.",
+        exampleKo: "정보 검색 속도는 디지털 도서관에서 이용자 만족도에 결정적으로 중요하다.",
         streak: 0,
         isMastered: false
       }
     ];
 
-    let chunks = [];
+    let words = [];
     let queue = [];
     let currentIndex = 0;
     let currentStage = 1;
@@ -288,12 +310,12 @@
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         try {
-          chunks = JSON.parse(stored);
+          words = JSON.parse(stored);
         } catch (e) {
-          chunks = [...SEED_CHUNKS];
+          words = [...SEED_WORDS];
         }
       } else {
-        chunks = [...SEED_CHUNKS];
+        words = [...SEED_WORDS];
         saveDatabase();
       }
       updateCounts();
@@ -302,23 +324,23 @@
     }
 
     function saveDatabase() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(chunks));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
       updateCounts();
     }
 
     function resetToSeedData() {
-      if (!confirm('기본 예시 청크 덱으로 초기화하시겠습니까?')) return;
-      chunks = [...SEED_CHUNKS];
+      if (!confirm('기본 V단어 예시 덱으로 리셋하시겠습니까?')) return;
+      words = [...SEED_WORDS];
       saveDatabase();
       buildQueue();
       renderCard();
-      showToast('기본 예시 덱으로 리셋되었습니다.');
+      showToast('기본 V단어 덱으로 리셋되었습니다.');
     }
 
     function updateCounts() {
-      document.getElementById('count-all').innerText = chunks.length;
-      document.getElementById('count-review').innerText = chunks.filter(c => !c.isMastered && c.streak === 0).length;
-      document.getElementById('count-mastered').innerText = chunks.filter(c => c.isMastered).length;
+      document.getElementById('count-all').innerText = words.length;
+      document.getElementById('count-review').innerText = words.filter(w => !w.isMastered && w.streak === 0).length;
+      document.getElementById('count-mastered').innerText = words.filter(w => w.isMastered).length;
     }
 
     function setMode(mode) {
@@ -327,13 +349,13 @@
       const btnRev = document.getElementById('filter-btn-review');
       const btnMas = document.getElementById('filter-btn-mastered');
 
-      const idle = 'px-2.5 py-1 rounded-lg text-slate-600 hover:bg-slate-100';
+      const idle = 'px-2.5 py-1 rounded-lg text-slate-300 hover:bg-slate-700';
       btnAll.className = idle;
       btnRev.className = idle;
       btnMas.className = idle;
 
-      if (mode === 'all') btnAll.className = 'px-2.5 py-1 rounded-lg bg-slate-900 text-white font-bold';
-      if (mode === 'review') btnRev.className = 'px-2.5 py-1 rounded-lg bg-rose-600 text-white font-bold';
+      if (mode === 'all') btnAll.className = 'px-2.5 py-1 rounded-lg bg-rose-600 text-white font-bold';
+      if (mode === 'review') btnRev.className = 'px-2.5 py-1 rounded-lg bg-amber-600 text-white font-bold';
       if (mode === 'mastered') btnMas.className = 'px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-bold';
 
       buildQueue();
@@ -342,12 +364,12 @@
 
     function buildQueue() {
       if (currentMode === 'all') {
-        queue = chunks.filter(c => !c.isMastered);
-        if (queue.length === 0) queue = [...chunks];
+        queue = words.filter(w => !w.isMastered);
+        if (queue.length === 0) queue = [...words];
       } else if (currentMode === 'review') {
-        queue = chunks.filter(c => !c.isMastered && c.streak === 0);
+        queue = words.filter(w => !w.isMastered && w.streak === 0);
       } else if (currentMode === 'mastered') {
-        queue = chunks.filter(c => c.isMastered);
+        queue = words.filter(w => w.isMastered);
       }
       currentIndex = 0;
     }
@@ -359,13 +381,14 @@
       }
       currentIndex = 0;
       renderCard();
-      showToast('청크 덱이 무작위로 섞였습니다.');
+      showToast('단어 카드가 무작위로 섞였습니다.');
     }
 
     function renderCard() {
       if (queue.length === 0) {
-        document.getElementById('card-korean-chunk').innerText = "모든 청크 학습을 완료했습니다!";
-        document.getElementById('card-step-guide').innerText = "선택된 조건의 청크가 없습니다.";
+        document.getElementById('card-target-word').innerText = "모든 V단어 체화 완료!";
+        document.getElementById('card-basic-meaning').innerText = "선택된 조건의 단어가 없습니다.";
+        document.getElementById('card-step-guide').innerText = "학습 완료";
         document.getElementById('card-progress').innerText = "0 / 0";
         updateStageUI(1);
         return;
@@ -375,31 +398,25 @@
       currentStage = 1;
       updateStageUI(currentStage);
 
-      document.getElementById('card-tag').innerText = item.tag || '핵심 청크';
       document.getElementById('card-progress').innerText = `${currentIndex + 1} / ${queue.length}`;
-      document.getElementById('card-korean-chunk').innerText = item.korean;
-      document.getElementById('card-target-word').innerText = item.target || '';
+      document.getElementById('card-target-word').innerText = item.word;
+      document.getElementById('card-basic-meaning').innerText = item.basic;
+      document.getElementById('card-en-def').innerText = `"${item.enDef}"`;
+      document.getElementById('card-real-meaning').innerText = item.realSense;
+      document.getElementById('card-core-logic').innerText = item.coreLogic ? `👉 ${item.coreLogic}` : '';
       
-      let displayCloze = item.cloze;
-      if (item.target && displayCloze.includes(item.target)) {
-        displayCloze = displayCloze.replace(new RegExp(item.target, 'gi'), '[ _________ ]');
-      }
-
-      document.getElementById('card-cloze-en').innerText = displayCloze;
-      document.getElementById('card-full-en').innerText = item.english;
-      document.getElementById('card-full-sentence').innerText = item.sentence ? `"${item.sentence}"` : '';
-      
-      // 어원 분석 파트 주입
-      const etymoBox = document.getElementById('card-etymology-box');
-      if (item.etymology || item.coreLogic) {
-        etymoBox.classList.remove('hidden');
-        document.getElementById('card-etymology-parts').innerText = item.etymology || '어원 정보';
-        document.getElementById('card-core-logic').innerText = item.coreLogic ? `👉 ${item.coreLogic}` : '';
+      const contrastBox = document.getElementById('card-binary-box');
+      if (item.contrast) {
+        contrastBox.classList.remove('hidden');
+        document.getElementById('card-contrast').innerText = item.contrast;
       } else {
-        etymoBox.classList.add('hidden');
+        contrastBox.classList.add('hidden');
       }
 
-      document.getElementById('card-streak').innerText = `연속 암기: ${item.streak || 0} / 2회`;
+      document.getElementById('card-example-en').innerText = `"${item.exampleEn || ''}"`;
+      document.getElementById('card-example-ko').innerText = `"${item.exampleKo || ''}"`;
+
+      document.getElementById('card-streak').innerText = `체화 인출: ${item.streak || 0} / 2회`;
     }
 
     function nextStage() {
@@ -422,8 +439,8 @@
       v2.classList.add('hidden');
       v3.classList.add('hidden');
 
-      const activeBadge = 'px-2 py-0.5 rounded-md bg-amber-500 text-white';
-      const idleBadge = 'px-2 py-0.5 rounded-md bg-slate-100 text-slate-400';
+      const activeBadge = 'px-2.5 py-0.5 rounded-md bg-rose-600 text-white';
+      const idleBadge = 'px-2.5 py-0.5 rounded-md bg-slate-700 text-slate-400';
       b1.className = idleBadge;
       b2.className = idleBadge;
       b3.className = idleBadge;
@@ -431,18 +448,18 @@
       if (stage === 1) {
         v1.classList.remove('hidden');
         b1.className = activeBadge;
-        guide.innerText = "[Space] 머릿속으로 영어 청크 인출 ➔ 짝꿍 단어 힌트 공개";
-        guide.className = "text-xs font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-200";
+        guide.innerText = "[Space] 머릿속으로 영영사전 뉘앙스 유추 ➔ 정의 오픈";
+        guide.className = "text-xs font-bold text-amber-300 bg-amber-950/40 px-3 py-1 rounded-full border border-amber-600/40";
       } else if (stage === 2) {
         v2.classList.remove('hidden');
-        b2.className = 'px-2 py-0.5 rounded-md bg-indigo-600 text-white';
-        guide.innerText = "[Space] 누르면 최종 타깃 정답 & 어원 분석 공개";
-        guide.className = "text-xs font-bold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200";
+        b2.className = 'px-2.5 py-0.5 rounded-md bg-indigo-600 text-white';
+        guide.innerText = "[Space] 실전 독해 이면의 속뜻(V-Sense) & 대립쌍 오픈";
+        guide.className = "text-xs font-bold text-indigo-300 bg-indigo-950/40 px-3 py-1 rounded-full border border-indigo-600/40";
       } else if (stage === 3) {
         v3.classList.remove('hidden');
-        b3.className = 'px-2 py-0.5 rounded-md bg-emerald-600 text-white';
-        guide.innerText = "어원 코어 각인 완료! 헷갈림(1) / 바로앎(2)";
-        guide.className = "text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200";
+        b3.className = 'px-2.5 py-0.5 rounded-md bg-emerald-600 text-white';
+        guide.innerText = "뉘앙스 체화 완료! 헷갈림(1) / 바로앎(2)";
+        guide.className = "text-xs font-bold text-emerald-300 bg-emerald-950/40 px-3 py-1 rounded-full border border-emerald-600/40";
       }
     }
 
@@ -454,17 +471,17 @@
         item.streak = (item.streak || 0) + 1;
         if (item.streak >= 2) {
           item.isMastered = true;
-          showToast(`🎉 "${item.target || item.english}" 마스터 보관함으로 이동!`);
+          showToast(`🎉 "${item.word}" 체화 완료 보관함으로 이동!`);
         } else {
-          showToast(`👏 정답! 한 번 더 맞히면 마스터됩니다. (1/2)`);
+          showToast(`👏 정답! 한 번 더 맞히면 체화 완료됩니다. (1/2)`);
         }
       } else {
         item.streak = 0;
         item.isMastered = false;
-        showToast(`💡 오답 등록! 복습 덱에서 다시 인출합니다.`);
+        showToast(`💡 오답 등록! 복습 덱에서 뉘앙스를 다시 인출합니다.`);
       }
 
-      const original = chunks.find(c => c.id === item.id);
+      const original = words.find(w => w.id === item.id);
       if (original) {
         original.streak = item.streak;
         original.isMastered = item.isMastered;
@@ -492,9 +509,9 @@
       renderCard();
     }
 
-    function speakChunk() {
+    function speakWord() {
       if (queue.length === 0) return;
-      const text = queue[currentIndex].english;
+      const text = queue[currentIndex].word;
       if ('speechSynthesis' in window) {
         const u = new SpeechSynthesisUtterance(text);
         u.lang = 'en-US';
@@ -525,32 +542,26 @@
 
         const parsed = JSON.parse(cleaned);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          const normalized = parsed.map(p => {
-            let clozeVal = p.cloze || p.english || '';
-            if (p.target && clozeVal.includes(p.target)) {
-              clozeVal = clozeVal.replace(new RegExp(p.target, 'gi'), '[ _________ ]');
-            }
-            return {
-              id: p.id || 'chunk_' + Date.now().toString() + Math.random().toString(36).substr(2, 4),
-              korean: p.korean || '',
-              cloze: clozeVal,
-              english: p.english || '',
-              target: p.target || '',
-              etymology: p.etymology || '',
-              coreLogic: p.coreLogic || '',
-              sentence: p.sentence || '',
-              tag: p.tag || '형광펜 청크',
-              streak: 0,
-              isMastered: false
-            };
-          });
+          const normalized = parsed.map(p => ({
+            id: p.id || 'vword_' + Date.now().toString() + Math.random().toString(36).substr(2, 4),
+            word: p.word || '',
+            basic: p.basic || '',
+            enDef: p.enDef || '',
+            realSense: p.realSense || '',
+            coreLogic: p.coreLogic || '',
+            contrast: p.contrast || '',
+            exampleEn: p.exampleEn || '',
+            exampleKo: p.exampleKo || '',
+            streak: 0,
+            isMastered: false
+          }));
 
           if (mode === 'overwrite') {
-            chunks = normalized;
-            showToast(`총 ${chunks.length}개 청크로 전체 교체되었습니다.`);
+            words = normalized;
+            showToast(`총 ${words.length}개 V단어로 전체 교체되었습니다.`);
           } else {
-            chunks.unshift(...normalized);
-            showToast(`${normalized.length}개 청크가 추가 등록되었습니다.`);
+            words.unshift(...normalized);
+            showToast(`${normalized.length}개 V단어가 추가 등록되었습니다.`);
           }
 
           saveDatabase();
@@ -590,7 +601,7 @@
       } else if (e.key === 'ArrowLeft') {
         prevCard();
       } else if (e.key.toLowerCase() === 's') {
-        speakChunk();
+        speakWord();
       }
     });
 
