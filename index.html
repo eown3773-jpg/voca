@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>V-Voca - 에빙하우스 간격 반복 & 단계별 인출기</title>
+  <title>V-Sentence - 김지영 V단어 실전 예문 대조 해석기</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Pretendard Webfont -->
@@ -27,8 +27,14 @@
       height: 4px;
     }
     ::-webkit-scrollbar-thumb {
-      background: #475569;
+      background: #334155;
       border-radius: 4px;
+    }
+    .cloze-blank {
+      border-bottom: 2px dashed #f59e0b;
+      padding: 0 4px;
+      font-weight: 900;
+      color: #fbbf24;
     }
   </style>
 </head>
@@ -36,36 +42,30 @@
 
   <!-- ==================== HEADER ==================== -->
   <header class="bg-slate-900/95 backdrop-blur-md border-b border-slate-800 sticky top-0 z-40 shadow-sm">
-    <div class="max-w-2xl mx-auto px-3 py-2.5 flex items-center justify-between gap-2">
+    <div class="max-w-2xl mx-auto px-3 py-2 flex items-center justify-between gap-2">
       
       <!-- Logo & Title -->
       <div class="flex items-center space-x-2 min-w-0">
         <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-rose-600 via-amber-500 to-indigo-600 flex items-center justify-center text-white shrink-0 shadow-md">
-          <i class="ph-bold ph-brain text-base"></i>
+          <i class="ph-bold ph-book-open-text text-base"></i>
         </div>
         <div class="min-w-0">
           <div class="flex items-center gap-1.5 flex-wrap">
-            <span class="text-sm font-black text-white tracking-tight">V-Voca</span>
-            <span class="text-[9px] px-1.5 py-0.2 bg-indigo-500/20 text-indigo-300 font-extrabold rounded border border-indigo-500/30">
-              에빙하우스 3·7·30
+            <span class="text-sm font-black text-white tracking-tight">V-Sentence</span>
+            <span class="text-[9px] px-1.5 py-0.2 bg-amber-500/20 text-amber-300 font-extrabold rounded border border-amber-500/40">
+              3단계 문맥 대조기
             </span>
           </div>
-          <p class="text-[10px] text-slate-400 truncate">틀린 단계별 분리 보관 & 간격 반복 시스템</p>
+          <p class="text-[10px] text-slate-400 truncate">기본예문 ➔ 킬러속뜻 ➔ 0.5초 빈칸 펀치</p>
         </div>
       </div>
 
-      <!-- Action Buttons -->
+      <!-- Controls -->
       <div class="flex items-center space-x-1.5 shrink-0">
-        <!-- 퀴즈 모드 토글 버튼 -->
-        <button id="toggle-quiz-mode-btn" onclick="toggleQuizMode()" class="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 font-black text-[11px] border border-amber-500/40 transition shadow-sm">
-          <i class="ph-bold ph-lightning text-xs"></i>
-          <span id="quiz-toggle-label">혼동어 테스트</span>
+        <button onclick="shuffleQueue()" class="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition" title="예문 순서 섞기">
+          <i class="ph-bold ph-shuffle text-sm"></i>
         </button>
-        <button onclick="openPasteModal()" class="flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-black text-[11px] transition shadow">
-          <i class="ph-bold ph-plus-circle text-xs"></i>
-          <span>덱 등록</span>
-        </button>
-        <button onclick="resetToSeedData()" class="p-1.5 text-slate-400 hover:text-amber-400 rounded-lg hover:bg-slate-800 transition" title="최신 001~049 V단어로 리셋">
+        <button onclick="resetData()" class="p-1.5 text-slate-400 hover:text-amber-400 rounded-lg hover:bg-slate-800 transition" title="초기화">
           <i class="ph-bold ph-arrow-counter-clockwise text-sm"></i>
         </button>
       </div>
@@ -75,1244 +75,638 @@
   <!-- ==================== MAIN CONTENT ==================== -->
   <main class="flex-1 max-w-2xl w-full mx-auto p-2.5 sm:p-4 flex flex-col justify-start sm:justify-center">
     
-    <!-- Filter Tabs (보관함 선택 바 - 일반 모드에서만 표시) -->
-    <div id="standard-filter-bar" class="bg-slate-900 border border-slate-800 p-2 rounded-2xl mb-2.5 space-y-1.5 shadow-sm">
-      
-      <!-- 상단: 기본 학습 큐 -->
-      <div class="flex items-center justify-between text-[11px] font-semibold gap-1">
-        <div class="flex items-center gap-1 overflow-x-auto py-0.5 no-scrollbar">
-          <button id="filter-btn-all" onclick="setMode('all')" class="px-2.5 py-1 rounded-lg bg-rose-600 text-white font-bold shrink-0">
-            전체 (<span id="count-all">0</span>)
+    <!-- 필터 & 스프린트 컨트롤 바 -->
+    <div class="bg-slate-900 border border-slate-800 p-2.5 rounded-2xl mb-2.5 space-y-2 shadow-sm">
+      <div class="flex items-center justify-between text-[11px] font-bold gap-1.5">
+        <div class="flex items-center gap-1 overflow-x-auto py-0.5 no-scrollbar flex-1">
+          <button id="mode-all-btn" onclick="setMode('all')" class="px-2.5 py-1 rounded-lg bg-rose-600 text-white shrink-0 shadow-sm">
+            전체 예문 (<span id="count-all">0</span>)
           </button>
-          <button id="filter-btn-today" onclick="setMode('today_review')" class="px-2.5 py-1 rounded-lg text-amber-300 bg-amber-950/40 border border-amber-500/40 font-bold shrink-0 flex items-center gap-1">
-            <i class="ph-bold ph-alarm"></i> 오늘 복습 (<span id="count-today">0</span>)
+          
+          <button id="mode-trouble-btn" onclick="setMode('trouble')" class="px-2.5 py-1 rounded-lg bg-rose-950/60 text-rose-300 hover:bg-rose-900/60 border border-rose-500/50 shrink-0 flex items-center gap-1 transition">
+            <i class="ph-bold ph-fire text-rose-400 animate-pulse"></i>
+            <span>오답 빈칸 감옥 (<span id="count-trouble">0</span>)</span>
           </button>
-          <button id="filter-btn-mastered" onclick="setMode('mastered')" class="px-2.5 py-1 rounded-lg text-slate-300 hover:bg-slate-800 shrink-0">
-            기억 승급 (<span id="count-mastered">0</span>)
+
+          <button id="mode-mastered-btn" onclick="setMode('mastered')" class="px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 shrink-0">
+            체화 통과 (<span id="count-mastered">0</span>)
           </button>
         </div>
-        <button onclick="shuffleQueue()" class="text-slate-400 hover:text-white flex items-center gap-1 shrink-0 px-1 text-[10px]">
-          <i class="ph-bold ph-shuffle"></i> 섞기
-        </button>
-      </div>
 
-      <!-- 하단: 틀린 단계별 세부 약점 보관함 -->
-      <div class="flex items-center gap-1 overflow-x-auto pt-1 border-t border-slate-800/80 text-[10px] font-medium text-slate-400">
-        <span class="text-slate-500 shrink-0 px-1 font-bold">약점 서랍:</span>
-        <button id="filter-btn-fail0" onclick="setMode('fail_step0')" class="px-2 py-0.5 rounded-md hover:bg-slate-800 shrink-0 text-rose-400 border border-transparent">
-          기본뜻 미흡 (<span id="count-fail0">0</span>)
-        </button>
-        <button id="filter-btn-fail12" onclick="setMode('fail_step12')" class="px-2 py-0.5 rounded-md hover:bg-slate-800 shrink-0 text-amber-400 border border-transparent">
-          영영 뉘앙스 (<span id="count-fail12">0</span>)
-        </button>
-        <button id="filter-btn-fail3" onclick="setMode('fail_step3')" class="px-2 py-0.5 rounded-md hover:bg-slate-800 shrink-0 text-indigo-400 border border-transparent">
-          V-속뜻/대립쌍 (<span id="count-fail3">0</span>)
-        </button>
-        <button id="filter-btn-failconf" onclick="setMode('fail_conf')" class="px-2 py-0.5 rounded-md hover:bg-slate-800 shrink-0 text-fuchsia-400 border border-transparent flex items-center gap-1">
-          <i class="ph-bold ph-warning-octagon"></i> 혼동어 오답 (<span id="count-failconf">0</span>)
-        </button>
+        <span id="streak-indicator" class="text-[10px] font-mono text-amber-300 shrink-0 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
+          연속 정답: 0 / 2
+        </span>
       </div>
-
     </div>
 
-    <!-- MAIN CARD (일반 V단어 인출 뷰) -->
-    <div id="standard-card-view" class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col justify-between min-h-[470px] sm:min-h-[510px]">
+    <!-- MAIN EXERCISE CARD -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-2xl flex flex-col justify-between min-h-[500px]">
       
-      <!-- Card Top: Step Indicator & Spaced Repetition Level -->
-      <div class="flex items-center justify-between text-[10px] sm:text-xs text-slate-400 pb-2.5 border-b border-slate-800 gap-1">
-        
-        <!-- 에빙하우스 기억 레벨 배지 -->
-        <span id="card-memory-badge" class="px-2 py-0.5 rounded-md bg-slate-800 text-rose-300 font-extrabold border border-slate-700 flex items-center gap-1">
-          <i class="ph-bold ph-hourglass"></i> 습득중 (0단계)
-        </span>
-        
-        <!-- 단계 표시 (0:표제어 ➔ 1:기본 ➔ 2:영영 ➔ 3:속뜻) -->
-        <div class="flex items-center gap-1 font-bold">
-          <span id="step-badge-0" class="px-1.5 py-0.5 rounded bg-rose-600 text-white">0</span>
-          <span class="text-slate-600">➔</span>
-          <span id="step-badge-1" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">1</span>
-          <span class="text-slate-600">➔</span>
-          <span id="step-badge-2" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">2</span>
-          <span class="text-slate-600">➔</span>
-          <span id="step-badge-3" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">3</span>
+      <!-- Card Header: Target Word & 3-Step Indicator -->
+      <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div class="flex items-center gap-2">
+          <span id="card-word-badge" class="font-mono text-base sm:text-lg font-black text-amber-300 px-2.5 py-0.5 bg-amber-500/10 rounded-lg border border-amber-500/30">
+            exist
+          </span>
+          <span id="card-step-badge" class="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+            1단계: 기본 예문
+          </span>
         </div>
 
-        <span id="card-progress" class="font-mono text-slate-400 text-[11px] shrink-0">1 / 49</span>
-      </div>
-
-      <!-- Core Word Header -->
-      <div class="my-2.5 text-center space-y-1">
-        <div class="flex items-center justify-center gap-1.5">
-          <span id="card-last-failure" class="text-[9px] font-black uppercase text-slate-500 tracking-wider">
-            TARGET WORD
-          </span>
-          <button onclick="speakWord()" class="text-slate-400 hover:text-rose-400 p-1" title="발음 듣기">
+        <div class="flex items-center gap-1 text-[11px] font-mono text-slate-400">
+          <span id="card-progress">1 / 20</span>
+          <button onclick="speakCurrentSentence()" class="text-slate-400 hover:text-amber-400 p-1 ml-1" title="문장 듣기">
             <i class="ph-bold ph-speaker-high text-sm"></i>
           </button>
         </div>
-        
-        <h2 id="card-target-word" class="text-2xl sm:text-3xl font-black text-white tracking-tight break-words px-2 leading-tight">
-          attitude
-        </h2>
-
-        <!-- Step Guide Pill -->
-        <div class="pt-1 flex items-center justify-center">
-          <p id="card-step-guide" class="text-[10px] sm:text-xs font-bold text-slate-300 bg-slate-800 px-2.5 py-0.5 rounded-full border border-slate-700">
-            [터치 / Space] 1차 기본 뜻 떠올리고 오픈
-          </p>
-        </div>
       </div>
 
-      <!-- Interactive Box (터치/클릭 영역) -->
-      <div id="voca-display-box" onclick="nextStage()" class="cursor-pointer bg-slate-950/70 hover:bg-slate-950/90 border border-dashed border-slate-700/80 active:border-rose-500 rounded-xl p-3.5 sm:p-5 transition my-1 flex flex-col justify-center items-center min-h-[190px]">
+      <!-- INTERACTIVE STAGE CONTAINER (터치 / 클릭으로 전환) -->
+      <div id="interactive-area" onclick="handleStageClick()" class="my-auto py-3 cursor-pointer">
         
-        <!-- STEP 0 VIEW: 완전 블라인드 -->
-        <div id="view-step-0" class="space-y-3 text-center w-full py-4">
-          <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-slate-800 text-rose-400 mb-1">
-            <i class="ph-bold ph-eye-slash text-xl"></i>
-          </div>
-          <div class="text-sm sm:text-base font-extrabold text-slate-300">
-            기본 사전 뜻과 뉘앙스를 먼저 머릿속으로 떠올려보세요!
-          </div>
-          <p class="text-[11px] text-rose-400/90 font-semibold flex items-center justify-center gap-1">
-            <i class="ph-bold ph-hand-tap text-xs"></i> 터치 시 1차 기본 뜻 오픈 (기본 뜻 모르면 즉시 [기본뜻 모름])
-          </p>
-        </div>
-
-        <!-- STEP 1 VIEW: 기본 1차 의미 -->
-        <div id="view-step-1" class="hidden space-y-2 text-center w-full">
-          <div class="text-slate-400 text-[11px] font-medium">사전적 1차 뜻 (기본)</div>
-          <div id="card-basic-meaning" class="text-lg sm:text-xl font-black text-slate-100 px-2">
-            태도, 입장
-          </div>
-          <p class="text-[10px] sm:text-[11px] text-amber-400 font-semibold flex items-center justify-center gap-1 pt-1">
-            <i class="ph-bold ph-hand-tap text-xs"></i> 터치하면 영영사전 코어 뉘앙스가 열립니다
-          </p>
-        </div>
-
-        <!-- STEP 2 VIEW: 영영사전 정의 -->
-        <div id="view-step-2" class="hidden space-y-2.5 w-full text-center">
-          <div class="text-amber-400 text-[10px] font-bold uppercase tracking-wider flex items-center justify-center gap-1">
-            <i class="ph-bold ph-book-open"></i> English Definition
-          </div>
-          <div id="card-en-def" class="text-xs sm:text-sm font-medium text-slate-100 italic bg-slate-900/90 p-3 rounded-lg border border-slate-800 leading-relaxed text-left sm:text-center">
-            "A settled way of thinking or feeling about someone or something."
-          </div>
-          <p class="text-[10px] sm:text-[11px] text-indigo-400 font-bold flex items-center justify-center gap-1">
-            <i class="ph-bold ph-lightbulb text-xs"></i> 터치 ➔ 실전 독해 속뜻(V-Sense) & 대립쌍 오픈
-          </p>
-        </div>
-
-        <!-- STEP 3 VIEW: 김지영 V-Sense (실전 속뜻 & 혼동어 대조 & 대립쌍) -->
-        <div id="view-step-3" class="hidden space-y-2.5 w-full text-left">
-          
-          <!-- 카드 유형 배지 및 즉석 퀴즈 링크 -->
-          <div class="flex items-center justify-between gap-1 flex-wrap">
-            <span id="card-type-badge" class="px-2 py-0.5 rounded text-[10px] font-black bg-rose-500/20 text-rose-300 border border-rose-500/40">
-              🚨 형태 낚시 혼동어휘
+        <!-- ==================== STEP 1: 기본 예문 (사전 1차 뜻 워밍업) ==================== -->
+        <div id="view-step-1" class="space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <i class="ph-bold ph-book-bookmark text-rose-400"></i> STEP 1: 사전적 1차 기본 뜻 예문
             </span>
-            <button id="card-instant-quiz-btn" onclick="startInstantConfusionQuiz(event)" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50 flex items-center gap-1 transition">
-              <i class="ph-bold ph-lightning"></i> 이 혼동어 지금 시험보기
-            </button>
+            <span class="text-[10px] text-slate-500 font-bold">[터치/Space] 해석 열기</span>
           </div>
 
-          <!-- 실전 독해 속뜻 -->
-          <div class="bg-rose-950/30 border border-rose-500/40 rounded-lg p-3 space-y-1">
-            <span class="text-[10px] font-black uppercase text-rose-400 tracking-wider flex items-center gap-1">
-              <i class="ph-bold ph-crosshair"></i> 실전 독해 속뜻 (V-Sense)
+          <!-- 영어 문장 -->
+          <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800/90 shadow-inner">
+            <p id="s1-english" class="text-base sm:text-lg font-medium text-slate-100 leading-relaxed">
+              Ideally there should <span class="font-bold text-amber-300 underline decoration-amber-500/50 underline-offset-4">exist</span> ancient cultures for modern consumers to gaze at.
+            </p>
+          </div>
+
+          <!-- 한국어 해석 (처음엔 블라인드) -->
+          <div id="s1-korean-box" class="p-3.5 rounded-xl border border-dashed border-slate-700/80 bg-slate-900/50 flex flex-col items-center justify-center min-h-[60px] transition">
+            <div id="s1-korean-blind" class="text-xs font-bold text-slate-400 flex items-center gap-1.5">
+              <i class="ph-bold ph-eye-slash text-rose-400"></i>
+              <span>눈으로 직독직해 후 터치하면 해석이 열립니다</span>
+            </div>
+            <div id="s1-korean-text" class="hidden text-xs sm:text-sm font-semibold text-rose-200 text-center leading-snug">
+              이상적으로 말하면 현대 소비자들이 쳐다볼 수 있는 고대 문화가 <strong class="text-white underline">존재해야</strong> 한다.
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== STEP 2: 킬러 속뜻 예문 (평가원 실전 대조) ==================== -->
+        <div id="view-step-2" class="hidden space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-black text-indigo-400 uppercase tracking-wider flex items-center gap-1">
+              <i class="ph-bold ph-lightning text-indigo-400"></i> STEP 2: 평가원 킬러 속뜻 (V-Sense) 대조
             </span>
-            <div id="card-real-meaning" class="text-sm sm:text-base font-black text-rose-200 leading-snug">
-              지문 속 필자의 관점·가치관·입장
-            </div>
-            <p id="card-core-logic" class="text-[11px] text-slate-300 leading-relaxed pt-0.5">
-              단순 몸짓이 아니라 사안을 바라보는 '정신적 입장'. 형태 혼동 선지 주의!
-            </p>
+            <span class="text-[10px] text-slate-500 font-bold">[터치/Space] V속뜻 & 해석 열기</span>
           </div>
 
-          <!-- 형태 낚시 / 혼동어휘 전용 대조 상자 (있을 때만 표시) -->
-          <div id="card-confusion-box" class="bg-indigo-950/40 border border-indigo-500/50 rounded-lg p-2.5 text-[11px] space-y-1">
-            <div class="text-indigo-300 font-bold text-[10px] uppercase flex items-center gap-1 justify-between">
-              <span class="flex items-center gap-1">
-                <i class="ph-bold ph-warning-octagon text-indigo-400"></i> 혼동 어휘 & 파생어 정밀 대조:
-              </span>
-              <span class="text-[9px] text-indigo-300/80">아래 퀴즈 모드로 1초 테스트 가능</span>
-            </div>
-            <pre id="card-confusion-text" class="text-slate-200 font-mono text-[10px] sm:text-[11px] whitespace-pre-wrap leading-relaxed"></pre>
-          </div>
-
-          <!-- 문맥 대립쌍 -->
-          <div id="card-binary-box" class="bg-amber-950/30 border border-amber-600/40 rounded-lg p-2 text-[11px]">
-            <div class="text-amber-400 font-bold text-[10px] uppercase mb-0.5">문맥 대립쌍 / 평가원 공식:</div>
-            <div id="card-contrast" class="text-amber-200 font-medium leading-tight">
-              attitude (태도/입장) ↔ objective fact (객관적 사실)
+          <!-- V속뜻 키워드 배너 -->
+          <div class="flex items-center gap-2 p-2.5 rounded-xl bg-indigo-950/40 border border-indigo-500/40">
+            <span class="w-6 h-6 rounded-md bg-indigo-600/40 text-indigo-300 flex items-center justify-center shrink-0 text-xs font-black">
+              V
+            </span>
+            <div class="text-xs">
+              <span id="s2-vsense-title" class="font-black text-indigo-200">existing A = 기존의 구태의연한 A</span>
+              <p id="s2-vsense-desc" class="text-[10px] text-slate-400">새로운 혁신이나 패러다임과 대립되는 기존 체제</p>
             </div>
           </div>
 
-          <!-- 실전 예문 -->
-          <div class="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800 space-y-1">
-            <p id="card-example-en" class="text-[11px] sm:text-xs text-slate-200 font-medium leading-snug">
-              "The author maintains a critical attitude toward unexamined technological optimism."
-            </p>
-            <p id="card-example-ko" class="text-[10px] sm:text-[11px] text-slate-400 leading-snug">
-              "필자는 무비판적인 기술 낙관주의에 대해 비판적인 태도(입장)를 견지한다."
+          <!-- 실전 영어 문장 -->
+          <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800/90 shadow-inner">
+            <p id="s2-english" class="text-base sm:text-lg font-medium text-slate-100 leading-relaxed">
+              difficulty in drawing novel theories from <span class="font-bold text-indigo-300 underline decoration-indigo-400 underline-offset-4">existing</span> paradigms
             </p>
           </div>
 
+          <!-- 한국어 대조 해석 (처음엔 블라인드) -->
+          <div id="s2-korean-box" class="p-3.5 rounded-xl border border-dashed border-slate-700/80 bg-slate-900/50 flex flex-col items-center justify-center min-h-[60px] transition">
+            <div id="s2-korean-blind" class="text-xs font-bold text-slate-400 flex items-center gap-1.5">
+              <i class="ph-bold ph-eye-slash text-indigo-400"></i>
+              <span>새로운 속뜻을 대입해 해석해 본 뒤 터치하세요</span>
+            </div>
+            <div id="s2-korean-text" class="hidden text-xs sm:text-sm font-semibold text-indigo-200 text-center leading-snug">
+              <strong class="text-amber-300">새로운(novel)</strong> 이론을 <strong class="text-indigo-300 underline">기존의(existing)</strong> 패러다임으로부터 이끌어내는 것의 어려움
+            </div>
+          </div>
+        </div>
+
+        <!-- ==================== STEP 3: 0.5초 실전 빈칸 펀치 퀴즈 ==================== -->
+        <div id="view-step-3" class="hidden space-y-3.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-black text-amber-400 uppercase tracking-wider flex items-center gap-1">
+              <i class="ph-bold ph-target text-amber-400"></i> STEP 3: 0.5초 실전 빈칸 펀치!
+            </span>
+            <span id="s3-status-badge" class="text-[10px] font-mono text-slate-400 font-bold">1, 2, 3번 선택</span>
+          </div>
+
+          <!-- 빈칸이 뚫린 문장 -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-amber-500/40 shadow-inner">
+            <p id="s3-cloze-sentence" class="text-base sm:text-lg font-bold text-slate-100 leading-relaxed">
+              difficulty in drawing novel theories from <span class="cloze-blank">[ _________ ]</span> paradigms
+            </p>
+            <p id="s3-cloze-korean" class="text-xs text-slate-400 pt-2 border-t border-slate-800 mt-2 font-medium">
+              새로운 이론을 <span class="text-amber-300 font-bold">[기존의]</span> 패러다임으로부터 이끌어내는 것의 어려움
+            </p>
+          </div>
+
+          <!-- 3지선다 버튼 컨테이너 (타이핑 없이 0.5초 탭) -->
+          <div id="s3-options-grid" class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1" onclick="event.stopPropagation()">
+            <!-- JS 동적 생성 -->
+          </div>
+
+          <!-- 피드백 배너 -->
+          <div id="s3-feedback-box" class="hidden p-3 rounded-xl border text-xs space-y-1">
+            <div id="s3-fb-title" class="font-black flex items-center gap-1.5"></div>
+            <p id="s3-fb-desc" class="text-slate-300 text-[11px]"></p>
+          </div>
         </div>
 
       </div>
 
-      <!-- Action Buttons -->
+      <!-- FOOTER: Step Navigator & Recirculation Status -->
       <div class="pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
-        <div class="text-[11px] text-slate-400 flex flex-col">
-          <span id="card-streak" class="font-bold">연속 정답: 0회</span>
-          <span id="card-next-review-info" class="text-[10px] text-slate-500">다음 복습: 즉시</span>
+        <div class="flex items-center gap-1.5">
+          <span id="pill-step-1" class="w-2.5 h-2.5 rounded-full bg-rose-600"></span>
+          <span id="pill-step-2" class="w-2.5 h-2.5 rounded-full bg-slate-800"></span>
+          <span id="pill-step-3" class="w-2.5 h-2.5 rounded-full bg-slate-800"></span>
+          <span id="recirc-note" class="text-[10px] text-slate-400 ml-1">틀리면 2문장 뒤 즉시 재등판</span>
         </div>
 
-        <div class="flex items-center gap-2">
-          <!-- 헷갈림 버튼: 현재 멈춘 단계를 감지해 해당 서랍으로 분류 -->
-          <button onclick="markResult(false)" class="px-3.5 py-2.5 bg-rose-950/40 hover:bg-rose-900/60 active:bg-rose-900 text-rose-300 border border-rose-800/60 rounded-xl font-bold text-xs flex items-center gap-1 transition shadow-sm">
-            <i class="ph-bold ph-x-circle text-base"></i>
-            <span id="btn-label-doubt">기본뜻 모름</span>
-          </button>
-          
-          <button onclick="markResult(true)" class="px-4.5 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-1.5 transition shadow-md">
-            <i class="ph-bold ph-check-circle text-base"></i>
-            <span>알겠음</span>
+        <div class="flex items-center gap-1.5">
+          <button id="step-next-action-btn" onclick="handleStageClick()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white rounded-xl font-black text-xs flex items-center gap-1 transition shadow-md">
+            <span id="step-next-btn-text">해석 열기</span>
+            <i class="ph-bold ph-arrow-right"></i>
           </button>
         </div>
-      </div>
-
-    </div>
-
-    <!-- ==================== SPEED DRILL: 혼동어 1초 킬러 매칭 퀴즈 뷰 ==================== -->
-    <div id="quiz-card-view" class="hidden bg-slate-900 border border-amber-500/40 rounded-2xl p-4 sm:p-6 shadow-2xl flex flex-col justify-between min-h-[470px] sm:min-h-[510px]">
-      
-      <!-- Quiz Header -->
-      <div class="flex items-center justify-between pb-2.5 border-b border-slate-800 text-[11px]">
-        <span class="px-2 py-0.5 rounded-md bg-amber-500/20 text-amber-300 font-black border border-amber-500/40 flex items-center gap-1">
-          <i class="ph-bold ph-lightning"></i> 혼동어휘 1초 킬러 매칭
-        </span>
-        <span id="quiz-progress" class="font-mono text-slate-400 text-xs">1 / 10</span>
-        <button onclick="toggleQuizMode(false)" class="text-slate-400 hover:text-white text-xs font-bold px-2 py-0.5 rounded bg-slate-800">
-          일반 인출로 복귀
-        </button>
-      </div>
-
-      <!-- Quiz Question Area -->
-      <div class="my-3 space-y-2 text-center">
-        <span id="quiz-badge-target" class="text-[10px] font-bold text-indigo-300 bg-indigo-950/60 border border-indigo-500/40 px-2 py-0.5 rounded-full inline-block">
-          형태 낚시 식별 훈련
-        </span>
-        <p class="text-xs text-slate-400 font-medium">다음 한국어 뜻에 일치하는 정확한 단어를 0.5초 만에 고르세요:</p>
-        <div id="quiz-question-meaning" class="text-xl sm:text-2xl font-black text-amber-300 py-2 px-3 bg-slate-950/60 rounded-xl border border-slate-800">
-          위도 (또는 행동의 자유재량)
-        </div>
-      </div>
-
-      <!-- Options (4지선다 버튼) -->
-      <div id="quiz-options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2 my-2">
-        <!-- JS로 동적 생성 -->
-      </div>
-
-      <!-- Feedback Banner (정답/오답 후 노출) -->
-      <div id="quiz-feedback-box" class="hidden p-3 rounded-xl border text-xs space-y-1 transition-all">
-        <div id="quiz-feedback-title" class="font-black text-sm flex items-center gap-1.5"></div>
-        <p id="quiz-feedback-desc" class="text-slate-300 text-[11px] leading-relaxed"></p>
-      </div>
-
-      <!-- Quiz Bottom Actions -->
-      <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
-        <span id="quiz-score-indicator" class="text-[11px] font-mono text-slate-400">정답률: 0/0 (0%)</span>
-        <button id="quiz-next-btn" onclick="nextQuizQuestion()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-black text-xs flex items-center gap-1 transition shadow">
-          <span>다음 혼동어</span>
-          <i class="ph-bold ph-arrow-right"></i>
-        </button>
       </div>
 
     </div>
 
   </main>
 
-  <!-- ==================== MODAL: JSON 붙여넣기 ==================== -->
-  <div id="paste-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center hidden p-3">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-4 sm:p-5 shadow-2xl space-y-3">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-        <h3 class="font-bold text-white text-xs sm:text-sm flex items-center gap-1.5">
-          <i class="ph-bold ph-lightning text-rose-400"></i> V단어 덱 등록
-        </h3>
-        <button onclick="closePasteModal()" class="text-slate-400 hover:text-white p-1">
-          <i class="ph-bold ph-x text-base"></i>
-        </button>
-      </div>
-
-      <div class="space-y-1.5">
-        <p class="text-[11px] text-slate-400 leading-snug">
-          V단어 JSON 데이터를 붙여넣으세요. 에빙하우스 간격 반복 스케줄러가 자동 적용됩니다.
-        </p>
-        <textarea id="paste-textarea" rows="7" placeholder='[
-  {
-    "word": "attitude",
-    "basic": "태도, 입장",
-    "enDef": "A settled way of thinking or feeling about someone.",
-    "realSense": "필자의 관점·가치관·입장",
-    "coreLogic": "사안을 바라보는 정신적 입장",
-    "contrast": "attitude ↔ fact",
-    "exampleEn": "The author maintains a critical attitude.",
-    "exampleKo": "필자는 비판적인 태도를 견지한다."
-  }
-]' class="w-full p-2.5 font-mono text-[10px] sm:text-xs bg-slate-950 border border-slate-800 rounded-lg text-slate-200 focus:border-rose-500 focus:outline-none"></textarea>
-      </div>
-
-      <div class="flex items-center justify-end gap-1.5 pt-1">
-        <button onclick="closePasteModal()" class="px-3 py-1.5 bg-slate-800 text-slate-300 text-xs font-bold rounded-lg hover:bg-slate-700 transition">취소</button>
-        <button onclick="applyPastedData('append')" class="px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-500 transition">추가</button>
-        <button onclick="applyPastedData('overwrite')" class="px-3 py-1.5 bg-rose-600 text-white text-xs font-bold rounded-lg hover:bg-rose-500 transition">전체 교체</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast -->
+  <!-- Toast 알림 -->
   <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-slate-800 border border-slate-700 text-white px-3.5 py-2 rounded-xl shadow-lg text-[11px] font-bold transition-all transform translate-y-10 opacity-0 pointer-events-none flex items-center gap-1.5 whitespace-nowrap">
     <i class="ph-bold ph-check text-rose-400"></i>
     <span id="toast-message">알림</span>
   </div>
 
   <script>
-    const STORAGE_KEY = 'VVOCA_DB_V2_SPACED';
-    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+    const STORAGE_KEY = 'VSENTENCE_DRILL_DB_V1';
 
-    // 001번부터 최신 049번까지 완벽 탑재된 내장 기본 덱 (SEED_WORDS)
-    const SEED_WORDS = [
+    // 김지영 V단어 기출 예문 정밀 데이터베이스
+    const RAW_SENTENCE_DATA = [
       {
-        "id": "v_001_attitude",
-        "word": "attitude",
-        "cardType": "🚨 형태 낚시 혼동어휘",
-        "basic": "태도, 입장",
-        "enDef": "A settled way of thinking or feeling about someone or something.",
-        "realSense": "지문 속 필자의 가치관·입장·관점",
-        "confusion": "• altitude: 고도, 높이 (alt = high)\n• latitude: 위도 (lat = broad), (행동의) 자유재량\n• longitude: 경도 (long = 길다)\n• gratitude: 감사, 고마움 (grat = 은혜)\n• aptitude: 적성, 소질 (apt = 적합한)",
-        "coreLogic": "평가원 킬러 보기 낚시 1순위! 형태가 비슷한 altitude(고도), latitude(위도), aptitude(적성)를 선지에서 바꿔치기하므로 스펠링 식별 필수!",
-        "contrast": "author's attitude (필자의 주관적 태도/입장) ↔ objective fact (객관적 사실)",
-        "exampleEn": "The author maintains a critical attitude toward unexamined technological optimism.",
-        "exampleKo": "필자는 무비판적인 기술 낙관주의에 대해 비판적인 태도(입장)를 견지한다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
+        id: "vs_040_exist",
+        targetWord: "existing",
+        rootWord: "exist",
+        step1: {
+          en: "Ideally there should exist ancient cultures for modern consumers to gaze at.",
+          ko: "이상적으로 말하면 현대 소비자들이 쳐다볼 수 있는 고대 문화가 [존재해야] 한다."
+        },
+        step2: {
+          vsenseTitle: "existing A = 기존의 구태의연한 A",
+          vsenseDesc: "novel(새로운 것)과 대립되는 '기존 체제·패러다임' 시그널!",
+          en: "difficulty in drawing novel theories from existing paradigms",
+          ko: "새로운(novel) 이론을 [기존의] 패러다임으로부터 이끌어내는 것의 어려움",
+          contrast: "novel (새로운) ↔ existing (기존의)"
+        },
+        step3: {
+          clozeEn: "difficulty in drawing novel theories from [ _________ ] paradigms",
+          clozeKo: "새로운 이론을 [기존의] 패러다임으로부터 이끌어내는 것의 어려움",
+          correct: "existing",
+          distractors: ["demanding", "emerging"]
+        },
+        streak: 0,
+        isMastered: false
       },
       {
-        "id": "v_002_affect",
-        "word": "affect",
-        "cardType": "💡 영영 코어 뉘앙스 & 다의어",
-        "basic": "영향을 미치다",
-        "enDef": "To produce an effect on; (Psychology) an emotion or feeling state.",
-        "realSense": "1) [명사] 감정, 정서 (= emotion)  2) [동사] 감정을 유발하다",
-        "confusion": "• affection: 애정, 애착\n• affectionate: 다정한, 애정 어린\n• affective: 정서적인, 감정의 (affective filter = 정의적 여과막)",
-        "coreLogic": "심리학·인문 지문에서 affect가 명사로 쓰이면 100% '정서/감정'을 뜻함! '영향을 미치다'로만 해석하면 지문 전체가 붕괴됨!",
-        "contrast": "affect / emotion (정서, 감정) ↔ cognition / reason (인지, 이성)",
-        "exampleEn": "Cognitive evaluation and emotional affect operate through interconnected neural pathways.",
-        "exampleKo": "인지적 평가와 정서적 감정(affect)은 상호 연결된 신경 경로를 통해 작동한다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
+        id: "vs_041_irony",
+        targetWord: "Ironically",
+        rootWord: "irony",
+        step1: {
+          en: "The irony is that when he finally got the job, he discovered he didn't like it.",
+          ko: "역설적인(아이러니한) 점은 그가 마침내 취직을 했을 때 그 직장이 마음에 안 든다는 것을 알게 되었다는 점이다."
+        },
+        step2: {
+          vsenseTitle: "평가원 공식: (+) ➔ (-) 인과 반전 모순",
+          vsenseDesc: "편리함(+)이 오히려 인간의 창의성을 억제(-)하는 모순적 결과!",
+          en: "Ironically, the convenience of downloading digital creations restrains people's creativity.",
+          ko: "역설적이게도(Ironically), 디지털 창작물을 다운로드하는 편리함(+)이 사람들의 창의성을 억제(-)한다.",
+          contrast: "convenience (+) ➔ restrains creativity (-)"
+        },
+        step3: {
+          clozeEn: "[ _________ ], the convenience of downloading digital creations restrains people's creativity.",
+          clozeKo: "[역설적이게도], 디지털 창작물을 다운로드하는 편리함이 사람들의 창의성을 억제한다.",
+          correct: "Ironically",
+          distractors: ["Simultaneously", "Exclusively"]
+        },
+        streak: 0,
+        isMastered: false
       },
       {
-        "id": "v_003_priceless",
-        "word": "priceless",
-        "cardType": "💡 접미사 반전 뉘앙스",
-        "basic": "값을 매길 수 없는, 대단히 귀중한",
-        "enDef": "So precious that its value cannot be determined; invaluable.",
-        "realSense": "극도로 귀중한 (= invaluable)",
-        "confusion": "• priceless = invaluable: 값을 감히 매길 수 없을 정도로 귀한 (+)\n• valueless = worthless: 가치 없는, 쓸모없는 (-)",
-        "coreLogic": "-less가 붙었다고 '값어치가 없다'로 오독하면 100% 낚임! 가격표를 감히 붙일 수 없을 정도로 소중하다는 극찬(+)의 표현!",
-        "contrast": "priceless / invaluable (가격을 매길 수 없이 귀한: +) ↔ valueless / worthless (가치 없는, 하찮은: -)",
-        "exampleEn": "Historical manuscripts preserved in the archive are priceless cultural treasures.",
-        "exampleKo": "기록관에 보존된 역사적 필사본들은 값을 매길 수 없이 귀중한 문화적 보물이다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
+        id: "vs_042_paradox",
+        targetWord: "paradox",
+        rootWord: "paradox",
+        step1: {
+          en: "There is a paradox surrounding our food choice habits.",
+          ko: "우리의 음식 선택 습관을 둘러싼 역설(패러독스)이 존재한다."
+        },
+        step2: {
+          vsenseTitle: "논리적 양립 모순: (+) ➔ (-) 공존",
+          vsenseDesc: "자유 시간을 늘려주어야 할 기술 가속이 선택의 과부하를 가져오는 역설!",
+          en: "The paradox of modern life is that while acceleration should provide more free time, those inventions increase our options.",
+          ko: "현대 삶의 [역설]은 가속이 더 많은 자유 시간을 주어야 함에도 불구하고 선택할 수 있는 것을 늘린다는 것이다.",
+          contrast: "more free time 기대 ↔ increase options (부담 증가)"
+        },
+        step3: {
+          clozeEn: "The [ _________ ] of modern life is that while acceleration should provide free time, it increases options.",
+          clozeKo: "현대 삶의 [역설]은 가속이 자유 시간을 주어야 함에도 불구하고 선택지를 늘린다는 점이다.",
+          correct: "paradox",
+          distractors: ["certainty", "consensus"]
+        },
+        streak: 0,
+        isMastered: false
       },
       {
-        "id": "v_004_appliance",
-        "word": "appliance",
-        "cardType": "💡 단·복수 독해 문맥 전환",
-        "basic": "(가정용) 기기, 장치",
-        "enDef": "The action of putting something to practical use; an instrument designed for a task.",
-        "realSense": "[단수형/학술] (이론의) 적용, 응용 (A is the appliance of B = A는 B를 적용한 것)",
-        "confusion": "• 단수일 때: (이론·법칙의) 적용, 응용 (= application)\n• 복수일 때 (appliances): 가전제품 (home appliances)",
-        "coreLogic": "지문에서 'A is the appliance of B'가 나오면 가전제품이 아니라 'A는 B를 현실에 적용한 결과물(B ➔ A)'이라는 인과관계 도식!",
-        "contrast": "abstract theory (추상적 이론) ↔ practical appliance (실제적 적용/응용)",
-        "exampleEn": "Modern engineering is fundamentally the practical appliance of physical laws.",
-        "exampleKo": "현대 공학은 근본적으로 물리 법칙들의 실제적인 적용(appliance)이다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
+        id: "vs_043_assume",
+        targetWord: "assumed",
+        rootWord: "assume",
+        step1: {
+          en: "Restoration assumes that one can recreate an artist's original intent.",
+          ko: "복원은 예술가의 원래 의도와 작품을 재창조할 수 있다고 [가정/추정]한다."
+        },
+        step2: {
+          vsenseTitle: "주어 assume ➔ 사실이 아닐 가능성 높음(wrongly)",
+          vsenseDesc: "뒤에 반전(However)이 따라붙는 평가원 시그니처 통념 시그널!",
+          en: "It may be assumed that meta-algorithmics is a human creation. However, this is not necessarily true.",
+          ko: "메타 알고리즘의 창조도 인간의 창조물이라고 [가정]할 수도 있다. 하지만 이것이 반드시 사실은 아니다.",
+          contrast: "unexamined assumption (섣부른 가정) ↔ However (반전 진실)"
+        },
+        step3: {
+          clozeEn: "It may be [ _________ ] that meta-algorithmics is a human creation. However, this is not necessarily true.",
+          clozeKo: "알고리즘 창조도 인간의 것이라고 [가정]될 수 있다. 하지만 이것이 반드시 사실은 아니다.",
+          correct: "assumed",
+          distractors: ["confirmed", "prescribed"]
+        },
+        streak: 0,
+        isMastered: false
       },
       {
-        "id": "v_005_intelligent",
-        "word": "intelligent",
-        "cardType": "🚨 형태 낚시 혼동어휘",
-        "basic": "지적인, 똑똑한, 지능이 있는",
-        "enDef": "Intelligent: having good mental capacity. Intelligible: clear enough to be understood.",
-        "realSense": "intelligent는 '머리 좋은 주체', intelligible은 '이해하기 쉬운 글/말'",
-        "confusion": "• intelligent: 지적인, 똑똑한 (주체: 사람, AI, 동물)\n• intelligible: (의미가) 쉽게 이해될 수 있는, 명확한 (주체: 설명, 언어, 텍스트)\n• unintelligible: 난해하여 도저히 이해할 수 없는",
-        "coreLogic": "인공지능(AI)은 intelligent(지능적)하지만, 그 판단 과정의 설명은 unintelligible(이해불가)할 수 있다는 대비로 출제!",
-        "contrast": "intelligible explanation (이해하기 쉬운 설명) ↔ unintelligible jargon (이해 불가한 전문용어)",
-        "exampleEn": "His philosophical argument was barely intelligible to the general audience.",
-        "exampleKo": "그의 철학적 논증은 일반 청중이 거의 이해할 수 없었다(barely intelligible).",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
+        id: "vs_044_compromise",
+        targetWord: "compromise",
+        rootWord: "compromise",
+        step1: {
+          en: "Each of us is willing to compromise as we consider different perspectives.",
+          ko: "우리 각자는 서로 다른 관점을 고려하면서 기꺼이 [타협/절충]하고자 한다."
+        },
+        step2: {
+          vsenseTitle: "(-) 부정적 의미: 본질 훼손, 손상시키다",
+          vsenseDesc: "negotiate(대등한 협상)와 다름! 자기 정체성을 깎아먹고 진리를 훼손시키는 마이너스(-) 의미!",
+          en: "The loss philosophy fears is a loss of meaning, the compromising of a truth.",
+          ko: "철학이 두려워하는 손실은 의미의 손실, 즉 진리의 [훼손(compromising)]이다.",
+          contrast: "preserve integrity (온전한 보존) ↔ compromise a truth (진리를 훼손함)"
+        },
+        step3: {
+          clozeEn: "They both [ _________ ] their identity; gray is not black and it is not white.",
+          clozeKo: "그 색들은 둘 다 자기 정체성을 [훼손/상실]한다. 회색은 검은색도 아니고 흰색도 아니다.",
+          correct: "compromise",
+          distractors: ["negotiate", "strengthen"]
+        },
+        streak: 0,
+        isMastered: false
       },
       {
-        "id": "v_006_lie",
-        "word": "lie",
-        "cardType": "🚨 자/타동사 문법 & 독해 뼈대",
-        "basic": "거짓말하다 / 누워 있다, 놓여 있다",
-        "enDef": "Lie (lay-lain): to rest in a flat position; to exist. Lay (laid-laid): to put something down.",
-        "realSense": "The solution lies in ~ = 해결책은 ~에 놓여있다 (본질 제시)",
-        "confusion": "• lie - lay - lain (자동사): 눕다, 놓여 있다, 존재하다 (목적어 X)\n• lay - laid - laid (타동사): ~을 놓다, 두다, (알을) 낳다 (목적어 O)\n• lie - lied - lied: 거짓말하다",
-        "coreLogic": "독해에서 'The true cause lies in ~' 구문은 필자가 사건의 핵심 원인이나 본질을 선언하는 주제문 시그널!",
-        "contrast": "lie in (핵심이 ~에 있다) ↔ irrelevant to (~와 무관하다)",
-        "exampleEn": "The fundamental flaw of the current hypothesis lies in its oversimplified assumptions.",
-        "exampleKo": "현재 가설의 근본적인 결함은 그것의 지나치게 단순화된 가정에 놓여 있다(존재한다).",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
+        id: "vs_045_biology",
+        targetWord: "biology",
+        rootWord: "biology",
+        step1: {
+          en: "Our beliefs about food affect not only our choices, but also our biology.",
+          ko: "음식에 대한 우리의 믿음은 선택뿐만 아니라 우리의 [생명 활동/생물학]에도 영향을 미친다."
+        },
+        step2: {
+          vsenseTitle: "평가원 7대 선천성 패밀리 (타고남, 유전적)",
+          vsenseDesc: "biology, infant, inborn, innate, gene, DNA, hardwire = 선천적 ↔ 후천적 학습 대립!",
+          en: "To some degree, biology is destiny when it comes to communication style.",
+          ko: "어느 정도는 의사소통 스타일에 관한 한 [생물학(선천적 타고남)]이 숙명이다.",
+          contrast: "biology / genetic (선천적 본성) ↔ learned / cultural (후천적 학습)"
+        },
+        step3: {
+          clozeEn: "To some degree, [ _________ ] is destiny when it comes to communication style.",
+          clozeKo: "어느 정도는 의사소통 스타일에 관한 한 [생물학(타고난 본성)]이 숙명이다.",
+          correct: "biology",
+          distractors: ["pedagogy", "ideology"]
+        },
+        streak: 0,
+        isMastered: false
       },
       {
-        "id": "v_007_causal",
-        "word": "causal",
-        "cardType": "🚨 형태 낚시 혼동어휘",
-        "basic": "인과관계의",
-        "enDef": "Causal: relating to cause and effect. Casual: unconcerned, informal, by chance.",
-        "realSense": "causal(원인-결과 인과율의) vs casual(대충의, 우연한, 무심한)",
-        "confusion": "• causal: 인과관계의 (cause에서 파생)\n• causally: 인과적으로\n• casual: 무심한, 건성의, 격식 없는, 우연한\n• casually: 가볍게, 우연히",
-        "coreLogic": "철자 u와 s 위치 하나로 180도 바뀜! 과학·사회 지문에서 단순 상관관계(correlation/casual)와 필연적 인과관계(causal link)를 구별하는 킬러 선지!",
-        "contrast": "causal relationship (필연적 인과관계) ↔ casual coincidence (우연의 일치)",
-        "exampleEn": "Researchers failed to establish a direct causal link between the two variables.",
-        "exampleKo": "연구원들은 두 변수 사이의 직접적인 인과적 연결고리(causal link)를 입증하지 못했다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
+        id: "vs_046_exclusive",
+        targetWord: "exclusively",
+        rootWord: "exclusive",
+        step1: {
+          en: "The two negotiators' claims on the oranges were assumed to be mutually exclusive.",
+          ko: "오렌지에 대한 두 협상가의 요구는 상호 [배타적인] 것으로 가정되었다."
+        },
+        step2: {
+          vsenseTitle: "exclusively = ONLY (오로지, 오직, 전적으로)",
+          vsenseDesc: "'배타적으로'가 아니라 '오로지 ~만'으로 0.1초 만에 치환해야 문맥 관통!",
+          en: "Science on planet Earth could be found almost exclusively in the Islamic world.",
+          ko: "지구상의 과학은 거의 [오로지(almost exclusively = only)] 이슬람 세계에서만 발견될 수 있었다.",
+          contrast: "widely spread (널리 퍼진) ↔ exclusively (오로지 특정 영역에만)"
+        },
+        step3: {
+          clozeEn: "Science on planet Earth could be found almost [ _________ ] in the Islamic world.",
+          clozeKo: "지구상의 과학은 거의 [오로지(only)] 이슬람 세계에서만 발견될 수 있었다.",
+          correct: "exclusively",
+          distractors: ["alternatively", "casually"]
+        },
+        streak: 0,
+        isMastered: false
       },
       {
-        "id": "v_008_reap",
-        "word": "reap",
-        "cardType": "🚨 형태 낚시 혼동어휘",
-        "basic": "(성과·이익 등을) 거두다, 수확하다",
-        "enDef": "To receive something as a consequence of one's own or other people's actions.",
-        "realSense": "노력이나 행동에 따른 결과를 회수하다 (You reap what you sow)",
-        "confusion": "• reap: 거두다, 수확하다\n• rip: 찢다\n• rib: 갈비뼈\n• ripe: 익은 (과일 등)\n• leap: 뛰다, 도약하다\n• lip: 입술",
-        "coreLogic": "비슷하게 생긴 단편 철자들에 시각적으로 낚이지 말 것! sow(씨 뿌리다/투자하다) ↔ reap(수확하다/성과를 회수하다) 대립 구도!",
-        "contrast": "sow seed / invest effort (씨 뿌리고 투자하다) ↔ reap benefits (성과를 수확하다)",
-        "exampleEn": "Developing nations rarely reap the full economic rewards of globalized trade.",
-        "exampleKo": "개발도상국들은 세계화된 무역의 온전한 경제적 보상을 거두는(reap) 경우가 드물다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
+        id: "vs_047_prescribe",
+        targetWord: "prescribed",
+        rootWord: "prescribe",
+        step1: {
+          en: "Physicians rarely prescribe a potent painkiller without prior clinical tests.",
+          ko: "의사들은 사전 임상 검사 없이 환자에게 강력한 진통제를 [처방하지] 않는다."
+        },
+        step2: {
+          vsenseTitle: "독해 킬러 뜻: 규정하다, 지시하다, 명령하다",
+          vsenseDesc: "약 처방이 아니면 99% 사회가 행동 양식을 '딱 정해두다(규정하다)'로 출제!",
+          en: "People may be more willing to step outside the culturally prescribed behaviors.",
+          ko: "사람들은 문화적으로 [규정된(prescribed)] 행동 밖으로 더 기꺼이 발을 디디려 할 수도 있다.",
+          contrast: "freely improvised (자유로운 즉흥 행동) ↔ culturally prescribed (문화적으로 규정된 행동)"
+        },
+        step3: {
+          clozeEn: "People may be willing to step outside the culturally [ _________ ] behaviors.",
+          clozeKo: "사람들은 문화적으로 [규정된/정해진] 행동 양식 밖으로 기꺼이 발을 딛는다.",
+          correct: "prescribed",
+          distractors: ["manipulated", "subscribed"]
+        },
+        streak: 0,
+        isMastered: false
       },
       {
-        "id": "v_009_terrible",
-        "word": "terrible",
-        "cardType": "⚖️ 대립쌍 & 방향성 (+/-)",
-        "basic": "무서운, 끔찍한 (-)",
-        "enDef": "Terrible: extremely bad or unpleasant. Terrific: extraordinarily good; great (+).",
-        "realSense": "terrible은 극단적 부정(-), terrific은 극찬과 찬사의 긍정(+)",
-        "confusion": "• terrible: 끔찍한, 형편없는 (-)\n• terrific: 아주 좋은, 멋진, 훌륭한, 굉장한 (+)",
-        "coreLogic": "둘 다 terror(전율)에서 유래했으나 현대 영어에서 terrific은 '대단히 멋진(marvelous)'이라는 극찬(+)으로 쓰임!",
-        "contrast": "terrible setback (끔찍한 좌절: -) ↔ terrific achievement (눈부신 성취: +)",
-        "exampleEn": "The innovative digital repository produced terrific efficiency gains for scholars.",
-        "exampleKo": "혁신적인 디지털 저장소는 학자들에게 대단히 훌륭한(terrific) 효율성 증대를 가져왔다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
+        id: "vs_048_presume",
+        targetWord: "presume",
+        rootWord: "presume",
+        step1: {
+          en: "I presume they are not coming, since they haven't replied to the invitation.",
+          ko: "그들이 초대에 답장을 하지 않은 것으로 보아 오지 않을 것으로 [추정/짐작]한다."
+        },
+        step2: {
+          vsenseTitle: "presume = assume (확실한 물증 없이 지레짐작하다)",
+          vsenseDesc: "although you are not certain! 편견이나 선입견에 기대어 섣불리 단정 짓는 뉘앙스!",
+          en: "Based on biases in Western culture, we generally presume that all actions have an antecedent cause.",
+          ko: "서양 문화의 편견에 근거하여 우리는 일반적으로 모든 행위에 선행 원인이 있다고 [지레짐작한다].",
+          contrast: "empirical proof (실증적 증명) ↔ generally presume (편견에 기댄 지레짐작)"
+        },
+        step3: {
+          clozeEn: "Based on our cultural biases, we generally [ _________ ] that all actions have an antecedent cause.",
+          clozeKo: "문화적 편견에 근거하여 우리는 모든 행위에 원인이 있다고 [지레짐작(추정)]한다.",
+          correct: "presume",
+          distractors: ["scrutinize", "confirm"]
+        },
+        streak: 0,
+        isMastered: false
       },
       {
-        "id": "v_010_access",
-        "word": "access",
-        "cardType": "🚨 형태 낚시 혼동어휘",
-        "basic": "접근(권), 접속하다",
-        "enDef": "Access: means of entering or using. Assess: to evaluate the quality or value.",
-        "realSense": "access(접근·이용 기회) vs assess(평가·사정하다)",
-        "confusion": "• access: 입장, 접근권, 접속하다\n• assess: 특성·자질을 재다, 평가하다, 가늠하다\n• assessment: 평가, 사정",
-        "coreLogic": "형태 유사어! 지문에서 'access the data(데이터에 접근하다)'와 'assess the risk(위험을 평가하다)'를 교차 오독하지 않도록 주의!",
-        "contrast": "unrestricted access (제한 없는 접근) ↔ rigorous assessment (엄격한 평가)",
-        "exampleEn": "Committees must rigorously assess the environmental impact before granting public access.",
-        "exampleKo": "위원회는 공공 접근(access)을 허용하기 전에 환경적 영향을 엄격히 평가(assess)해야 한다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
+        id: "vs_049_mere",
+        targetWord: "mere",
+        rootWord: "mere",
+        step1: {
+          en: "It took her a mere 20 minutes to solve the complex mathematical puzzle.",
+          ko: "그녀가 그 복잡한 수학 퍼즐을 푸는 데는 [겨우/단지] 20분밖에 걸리지 않았다."
+        },
+        step2: {
+          vsenseTitle: "뉘앙스 반전: '그 사소한 것 하나만으로도 큰 역할'",
+          vsenseDesc: "무시하는 느낌에서 ➔ 역으로 '단지 그 존재만으로도 엄청난 파급력'으로 강조!",
+          en: "His mere presence made her feel deeply afraid in the silent room.",
+          ko: "단지 그가 거기 있다는 [그 사소한 사실 하나만으로도(His mere presence)] 그녀는 깊은 두려움을 느꼈다.",
+          contrast: "overt action (노골적인 행동) ↔ mere presence (단지 거기 있다는 사소한 존재 자체)"
+        },
+        step3: {
+          clozeEn: "His [ _________ ] presence made her feel deeply afraid in the silent room.",
+          clozeKo: "단지 그가 거기 있다는 [사소한 사실 하나만으로도] 그녀는 깊은 공포를 느꼈다.",
+          correct: "mere",
+          distractors: ["severe", "intense"]
+        },
+        streak: 0,
+        isMastered: false
       },
       {
-        "id": "v_011_public",
-        "word": "public",
-        "cardType": "💡 다의어 및 파생어 확장",
-        "basic": "일반인, 대중의, 공공의",
-        "enDef": "Concerning people in general; publicity: notice or attention given by media.",
-        "realSense": "publicity = 매스컴·언론의 스포트라이트/주목/홍보",
-        "confusion": "• publication: 출판, 발행, 출판물\n• publicity: 매스컴(언론)의 관심/주목, 홍보(광고)\n• publicize: 대중에게 널리 알리다, 홍보하다\n• public relation(PR): 홍보 활동\n• public health: 공중 보건",
-        "coreLogic": "publicity를 '공공성'으로 해석하면 오독! 연예인이나 사건이 '언론의 집중 조명(publicity)'을 받았다는 뜻으로 출제!",
-        "contrast": "private secrecy (사적 은폐) ↔ widespread publicity (언론의 대대적 공개/주목)",
-        "exampleEn": "The archaeological discovery received immense publicity in the national press.",
-        "exampleKo": "그 고고학적 발견은 전국 언론에서 엄청난 관심과 주목(publicity)을 받았다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
+        id: "vs_001_attitude",
+        targetWord: "attitude",
+        rootWord: "attitude",
+        step1: {
+          en: "Spectators observed the performers with a deeply respectful attitude.",
+          ko: "관객들은 깊이 존중하는 [태도]로 공연자들을 지켜보았다."
+        },
+        step2: {
+          vsenseTitle: "독해 속뜻: 사안을 대하는 필자의 가치관·입장",
+          vsenseDesc: "형태 낚시 선지 주의! altitude(고도), latitude(위도/자유재량)와 철저히 구별!",
+          en: "The author maintains a critical attitude toward unexamined technological optimism.",
+          ko: "필자는 검증되지 않은 기술 낙관주의에 대해 비판적인 [태도/입장]을 견지한다.",
+          contrast: "author's attitude (주관적 관점/입장) ↔ objective fact (객관적 사실)"
+        },
+        step3: {
+          clozeEn: "The author maintains a critical [ _________ ] toward unexamined technological optimism.",
+          clozeKo: "필자는 무비판적인 기술 낙관주의에 대해 비판적인 [태도/입장]을 견지한다.",
+          correct: "attitude",
+          distractors: ["altitude", "latitude"]
+        },
+        streak: 0,
+        isMastered: false
       },
       {
-        "id": "v_012_alter",
-        "word": "alter",
-        "cardType": "🚨 형태 낚시 & 평가원 대안 논리",
-        "basic": "변하다, 바꾸다",
-        "enDef": "Alter: make different. Alternate: occur by turns. Alternative: another possibility.",
-        "realSense": "alternative = 기존의 통념을 뒤엎는 새로운 대안",
-        "confusion": "• alter: 변하다, 바꾸다 (= change, modify)\n• alternate: 번갈아 발생하는; 번갈아 발생하다\n• alternative: 대안; 대안의, 기존 체제를 대체하는 새로운\n• alternatively: 그 대신에 (둘째 대안을 제시할 때)",
-        "coreLogic": "독해에서 alternative는 단순한 선택지가 아니라 '기존의 구태의연한 방식을 갈아치우는 혁신적 대안'이라는 긍정적 뉘앙스!",
-        "contrast": "conventional paradigm (기존 방식) ↔ alternative approach (대안적 새 접근법)",
-        "exampleEn": "Digital technologies alter traditional reading habits by providing alternative formats.",
-        "exampleKo": "디지털 기술은 대안적인(alternative) 형식을 제공함으로써 전통적인 독서 습관을 변화시킨다(alter).",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
+        id: "vs_002_affect",
+        targetWord: "affect",
+        rootWord: "affect",
+        step1: {
+          en: "Climatic shifts directly affect agricultural productivity across the continent.",
+          ko: "기후 변화는 대륙 전역의 농업 생산성에 직접적으로 [영향을 미친다]."
+        },
+        step2: {
+          vsenseTitle: "[명사/심리학] 정서, 감정 (= emotion)",
+          vsenseDesc: "영향 미치다가 아님! 인지(cognition)와 상호작용하는 '정서/감정' 그 자체!",
+          en: "Cognitive evaluation and emotional affect operate through interconnected neural pathways.",
+          ko: "인지적 평가와 정서적 [감정(affect)]은 상호 연결된 신경 경로를 통해 작동한다.",
+          contrast: "affect / emotion (정서/감정) ↔ cognition (이성/인지)"
+        },
+        step3: {
+          clozeEn: "Cognitive evaluation and emotional [ _________ ] operate through interconnected neural pathways.",
+          clozeKo: "인지적 평가와 정서적 [감정(affect)]은 상호 연결된 신경 경로를 통해 작동한다.",
+          correct: "affect",
+          distractors: ["effect", "appliance"]
+        },
+        streak: 0,
+        isMastered: false
       },
       {
-        "id": "v_013_root",
-        "word": "root",
-        "cardType": "🚨 발음/형태 혼동어휘",
-        "basic": "뿌리, 근원",
-        "enDef": "Root: basic cause or origin. Route: course or way taken to get to a destination.",
-        "realSense": "root cause = 겉으로 드러나지 않은 본질적 근본 원인",
-        "confusion": "• root: 뿌리, 근원, 기원 (root cause = 근본 원인)\n• route: 길, 노선, 경로 (trade route = 무역로)",
-        "coreLogic": "발음 유사 혼동어! 사건의 표면적 증상(symptom)을 넘어 밑바닥 깊은 '뿌리(root cause)'를 파헤칠 때 등장!",
-        "contrast": "surface symptom (표면적 현상) ↔ root cause (근본적인 뿌리 원인)",
-        "exampleEn": "Historians traced the ancient trade route to uncover the root causes of the migration.",
-        "exampleKo": "역사가들은 이주의 근본 원인(root cause)을 밝혀내기 위해 고대 무역 경로(route)를 추적했다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
+        id: "vs_003_priceless",
+        targetWord: "priceless",
+        rootWord: "priceless",
+        step1: {
+          en: "The museum preserved ancient manuscripts as priceless historical treasures.",
+          ko: "박물관은 고대 필사본들을 값을 매길 수 없이 [대단히 귀중한] 역사적 보물로 보존했다."
+        },
+        step2: {
+          vsenseTitle: "-less 반전: 극도로 소중한 (+)",
+          vsenseDesc: "가치 없는(valueless, worthless)이 아님! 가격표를 감히 못 붙일 정도의 극찬(+)!",
+          en: "Freedom of inquiry is a priceless intellectual asset that democratic institutions must protect.",
+          ko: "탐구의 자유는 민주적 제도가 수호해야 할 [값을 매길 수 없이 귀중한] 지적 자산이다.",
+          contrast: "priceless / invaluable (귀중한: +) ↔ valueless / worthless (하찮은: -)"
+        },
+        step3: {
+          clozeEn: "Freedom of inquiry is a [ _________ ] intellectual asset that institutions must protect.",
+          clozeKo: "탐구의 자유는 민주 제도가 수호해야 할 [가격을 매길 수 없이 소중한] 지적 자산이다.",
+          correct: "priceless",
+          distractors: ["valueless", "worthless"]
+        },
+        streak: 0,
+        isMastered: false
       },
       {
-        "id": "v_014_stationary",
-        "word": "stationary",
-        "cardType": "🚨 한 끗 차이 철자 낚시",
-        "basic": "움직이지 않는, 정지된, 변하지 않는",
-        "enDef": "Stationary (-ary): not moving. Stationery (-ery): writing and office materials.",
-        "realSense": "비유동적인, 고정된 (stationary state = 정체 상태)",
-        "confusion": "• stationary (-ary): 움직이지 않는, 정지된, 비유동적인 (stationary bicycle = 실내 자전거)\n• stationery (-ery): 문구류, 문방구",
-        "coreLogic": "철자 a vs e의 차이! stationary는 인구나 경제 지표가 오르내리지 않고 딱 멈춰 서 있는 '정체/고정 상태'를 지칭!",
-        "contrast": "stationary condition (정지·고정된 상태) ↔ mobile / dynamic flux (유동적이고 역동적인 흐름)",
-        "exampleEn": "Prices remained stationary for months before experiencing a sharp macroeconomic spike.",
-        "exampleKo": "물가는 급격한 거시경제적 급등을 겪기 전까지 수개월 동안 변동 없이 정지해(stationary) 있었다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
+        id: "vs_007_causal",
+        targetWord: "causal",
+        rootWord: "causal",
+        step1: {
+          en: "Scientists investigated the causal factors that triggered the seismic event.",
+          ko: "과학자들은 지진 사건을 촉발한 [원인이 되는(인과적인)] 요인들을 조사했다."
+        },
+        step2: {
+          vsenseTitle: "causal (필연적 인과율) vs casual (우연한, 대충의)",
+          vsenseDesc: "철자 u와 s 위치 차이! 단순 상관관계(correlation)와 필연적 인과율 구별 선지!",
+          en: "Researchers failed to establish a direct causal link between the two economic variables.",
+          ko: "연구원들은 두 경제 변수 사이의 직접적인 [인과적(causal)] 연결고리를 입증하지 못했다.",
+          contrast: "causal link (필연적 인과관계) ↔ casual coincidence (우연한 일치)"
+        },
+        step3: {
+          clozeEn: "Researchers failed to establish a direct [ _________ ] link between the two variables.",
+          clozeKo: "연구원들은 두 변수 사이의 직접적인 [인과적(원인-결과)] 연결고리를 입증하지 못했다.",
+          correct: "causal",
+          distractors: ["casual", "curved"]
+        },
+        streak: 0,
+        isMastered: false
       },
       {
-        "id": "v_015_spontaneously",
-        "word": "spontaneously",
-        "cardType": "🚨 형태 낚시 & 자발성 논리",
-        "basic": "자발적으로, 자연스럽게",
-        "enDef": "Spontaneously: arising naturally from within. Simultaneously: at the same time.",
-        "realSense": "외부 강제 없이 안에서 스스로 우러나와 즉흥적으로",
-        "confusion": "• spontaneously: 자발적으로, 자연히 일어나는, 즉흥적으로\n• simultaneously: 동시에 (simul = same)",
-        "coreLogic": "simultaneously는 시간의 동시성, spontaneously는 행위의 '자발성/내재성'. 지문에서 외부 강제 규제(coercion)와 대립!",
-        "contrast": "forced by regulation (강제로 규제된) ↔ emerging spontaneously (자발적으로 생겨나는)",
-        "exampleEn": "Civil solidarity emerged spontaneously in response to the administrative crisis.",
-        "exampleKo": "행정적 위기에 대응하여 시민적 연대가 자발적으로(spontaneously) 터져 나왔다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
+        id: "vs_021_vacuum",
+        targetWord: "vacuum",
+        rootWord: "vacuum",
+        step1: {
+          en: "The experimental apparatus created an artificial vacuum inside the glass chamber.",
+          ko: "실험 장치는 유리 챔버 내부에 인공적인 [진공 상태]를 만들어냈다."
+        },
+        step2: {
+          vsenseTitle: "독해 속뜻: 외부와 완전히 단절된 고립 상태",
+          vsenseDesc: "김지영 쌤 극찬 빈출! '어떤 문화/과학도 진공(고립) 속에서 홀로 발전하지 않는다!'",
+          en: "Scientific theories do not emerge in a vacuum; they reflect existing cultural assumptions.",
+          ko: "과학 이론은 [고립된 진공 상태에서(in a vacuum)] 생겨나지 않으며 기존 문화적 가정을 반영한다.",
+          contrast: "isolated vacuum (고립 상태) ↔ interconnected context (상호작용 맥락)"
+        },
+        step3: {
+          clozeEn: "Scientific theories do not emerge in a [ _________ ]; they reflect cultural assumptions.",
+          clozeKo: "과학 이론은 [고립된 진공 상태에서] 생겨나지 않으며 기존의 가정을 반영한다.",
+          correct: "vacuum",
+          distractors: ["vocation", "paradox"]
+        },
+        streak: 0,
+        isMastered: false
       },
       {
-        "id": "v_016_comprehensive",
-        "word": "comprehensive",
-        "cardType": "🚨 형태 낚시 혼동어휘",
-        "basic": "포괄적인, 종합적인",
-        "enDef": "Comprehensive: including everything. Comprehensible: able to be understood.",
-        "realSense": "comprehensive = 모든 것을 빠짐없이 총망라한 방대한",
-        "confusion": "• comprehensive: 포괄적인, 종합적인 (범위가 넓음)\n• comprehensible: 이해할 수 있는 (머리에 이해됨)\n• incomprehensible: 이해할 수 없는",
-        "coreLogic": "둘 다 comprehend에서 출발했으나 방향이 다름! comprehensive review(총체적 검토) vs comprehensible text(쉬운 글).",
-        "contrast": "narrow / selective (협소하고 부분적인) ↔ comprehensive (포괄적이고 총체적인)",
-        "exampleEn": "The ministry published a comprehensive report addressing climate vulnerability.",
-        "exampleKo": "그 부처는 기후 취약성을 다룬 포괄적이고 종합적인(comprehensive) 보고서를 발간했다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_017_curve",
-        "word": "curve",
-        "cardType": "🚨 형태 낚시 & 동사 억제 논리",
-        "basic": "곡선, 곡선으로 나아가다",
-        "enDef": "Curve: bend smoothly. Curb: restrain or keep in check. Carve: cut a hard material.",
-        "realSense": "curb = 나쁜 흐름이나 욕망을 억누르다, 제한하다",
-        "confusion": "• curve: 곡선, 곡선으로 나아가다\n• curb: 억제하다, 제한하다 (= restrain, control)\n• carve: 조각하다, 새기다",
-        "coreLogic": "독해에서 curb는 인도 턱이 아니라 99% 동사 '억제하다'로 출제! curb inflation(인플레 억제), curb desire(욕망 억제).",
-        "contrast": "fuel / accelerate (부추기고 가속하다) ↔ curb / suppress (억누르고 억제하다)",
-        "exampleEn": "Central banks raised interest rates to curb runaway inflation.",
-        "exampleKo": "중앙은행들은 걷잡을 수 없는 인플레이션을 억제하기(curb) 위해 금리를 인상했다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_018_mix",
-        "word": "mixed",
-        "cardType": "💡 평가원 양면성(Ambivalence) 시그널",
-        "basic": "섞인, 혼합된",
-        "enDef": "Consisting of different qualities; showing both positive and negative feelings.",
-        "realSense": "의견이 엇갈리는, 찬반 논란이 팽팽한 (양면적인)",
-        "confusion": "• mix: 섞다, 섞이다\n• mixed: (좋고 나쁜 것이) 뒤섞인, (의견·생각 등이) 엇갈리는",
-        "coreLogic": "'The policy met with mixed reactions' = 좋은 평가가 아니라 '찬반이 반반으로 갈려 논란이 많다'는 불확실성 시그널!",
-        "contrast": "unanimous consensus (만장일치 합의) ↔ mixed responses (찬반이 엇갈리는 반응)",
-        "exampleEn": "The new public transit reform met with mixed reactions from urban residents.",
-        "exampleKo": "새로운 대중교통 개혁안은 도시 주민들로부터 엇갈린(mixed) 반응에 부딪혔다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_019_occupy",
-        "word": "occupy",
-        "cardType": "💡 다의어 및 심리적 몰두",
-        "basic": "차지하다, 점유하다, 전념하다",
-        "enDef": "To fill space/time; to fill the mind of someone completely.",
-        "realSense": "preoccupation = 머릿속을 꽉 채운 생각, 집착, 몰두",
-        "confusion": "• be occupied with A: A에 사로잡히다, 열중해 있다\n• preoccupation: (어떤 생각·걱정에) 사로잡힘, 집착, 뇌리를 꽉 채운 생각",
-        "coreLogic": "영토 점령뿐 아니라 사람의 뇌와 정신을 꽉 채워 '몰두·사로잡히게 하다'는 뜻으로 심리/철학 지문 빈출!",
-        "contrast": "indifference / detachment (무관심, 거리두기) ↔ deep preoccupation (완전히 사로잡힌 집착/몰두)",
-        "exampleEn": "Scholars were entirely occupied with deciphering the newly discovered inscriptions.",
-        "exampleKo": "학자들은 새로 발견된 비문을 해독하는 데 완전히 몰두해 있었다(occupied with).",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_020_struggle",
-        "word": "struggle",
-        "cardType": "⚖️ 대립쌍 & 방향성 (+/-)",
-        "basic": "투쟁하다, 몸부림치다 (-)",
-        "enDef": "Struggle: forceful effort to get free from difficulty (-). Strive: try hard for a goal (+).",
-        "realSense": "struggle은 곤경 속 허우적거림(-), strive는 목표를 향한 전진(+)",
-        "confusion": "• struggle: 허우적거리다, 고투하다, 애쓰다 (-)\n• strive: 분투하다, 열망하며 노력하다 (+)",
-        "coreLogic": "struggle to survive (살아남으려 곤경 속에 사투하다: -) vs strive for perfection (완벽을 향해 정진하다: +).",
-        "contrast": "struggle with poverty (빈곤과 허덕이며 싸우다: -) ↔ strive toward innovation (혁신을 향해 분투하다: +)",
-        "exampleEn": "Small libraries struggle to maintain essential staffing amid relentless budget cutbacks.",
-        "exampleKo": "소규모 도서관들은 끊임없는 예산 삭감 속에서 필수 인력을 유지하기 위해 힘겹게 사투를 벌이고 있다(struggle).",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_021_vacuum",
-        "word": "vacuum",
-        "cardType": "💡 영영 코어 뉘앙스 (평가원 시그니처)",
-        "basic": "진공(상태), 공백",
-        "enDef": "A space entirely devoid of matter; a state of total isolation from outside influence.",
-        "realSense": "외부와 완전히 단절된 고립된 상태 (= isolated state)",
-        "confusion": "• vacuum: 진공(상태), 공백, 청소기로 청소하다\n• vacuum의 숨은 뜻: isolated 상태임",
-        "coreLogic": "김지영 쌤 극찬 빈출! 'No culture develops in a vacuum' = 고립되어 혼자 생겨나는 문화는 없고 반드시 상호작용한다!",
-        "contrast": "isolated vacuum (외부와 차단된 고립 상태) ↔ interconnected context (상호 연결된 맥락)",
-        "exampleEn": "Scientific theories do not emerge in a vacuum; they reflect existing cultural assumptions.",
-        "exampleKo": "과학 이론은 고립된 진공 상태에서 생겨나지 않으며(in a vacuum), 기존의 문화적 가정을 반영한다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_022_myth",
-        "word": "myth",
-        "cardType": "💡 영영 코어 뉘앙스 (통념 비판 공식)",
-        "basic": "신화",
-        "enDef": "A widely held but false belief or idea.",
-        "realSense": "많은 사람들이 근거 없이 믿고 있는 '사회적 통념, 허구'",
-        "confusion": "• myth의 1차 뜻: 신화 (그리스 로마 신화)\n• myth의 다른 뜻: (많은 사람들의) 근거 없는 믿음, 착각, 사회적 통념",
-        "coreLogic": "독해 첫 줄에 myth가 나오면 99% '일반인들의 잘못된 상식(통념)'이며, 필자는 뒤에서 'However, it is untrue'로 반박함!",
-        "contrast": "prevailing myth (널리 퍼진 잘못된 통념/허구) ↔ scientific reality (과학적 진실/실체)",
-        "exampleEn": "The popular myth that human memory acts like a video recorder has been debunked.",
-        "exampleKo": "인간의 기억이 비디오 녹화기처럼 작동한다는 대중적 통념(myth)은 거짓으로 밝혀졌다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_023_alien",
-        "word": "alien",
-        "cardType": "💡 영영 코어 뉘앙스 & 소외",
-        "basic": "외계인, 외국인",
-        "enDef": "Unfamiliar and disturbing; belonging to a completely different nature.",
-        "realSense": "이질적인, 낯선, 본성에 맞지 않는 (소외시키다)",
-        "confusion": "• alien의 다른 뜻: 이질적인, 낯선, 맞지 않는; 외국의\n• alienate: 소원하게[멀어지게] 만들다, 소외감을 느끼게 하다\n• alienation: 소외, 멀리함",
-        "coreLogic": "외계인이 아니라 '인간 본성에 배치되는 낯설고 이질적인 것(alien to human nature)'을 지칭!",
-        "contrast": "innate / familiar (친숙하고 고유한) ↔ completely alien (완전히 낯설고 이질적인)",
-        "exampleEn": "Such bureaucratic cruelty was fundamentally alien to her ethical convictions.",
-        "exampleKo": "그런 관료적 잔인함은 근본적으로 그녀의 윤리적 신념과 완전히 이질적인(alien) 것이었다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_024_weigh",
-        "word": "weigh",
-        "cardType": "💡 영영 코어 뉘앙스 & 심사숙고",
-        "basic": "무게가 나가다, 무게를 달다",
-        "enDef": "To assess the seriousness or importance of, especially in comparison with something else.",
-        "realSense": "1) 따져보다, 저울질하다 (= ponder)  2) 중요하다, 영향을 미치다",
-        "confusion": "• weigh의 다른 뜻: 따져 보다, 저울질하다, 심사숙고하다; 중요하다\n• weight: 무게, 중요성, 영향력",
-        "coreLogic": "물리적 저울에서 ➔ 머릿속 저울에 두 대안을 올려놓고 '신중하게 손익을 저울질하다(weigh options)'로 진화!",
-        "contrast": "act impulsively (충동적으로 행동하다) ↔ carefully weigh consequences (결과를 신중히 저울질하다)",
-        "exampleEn": "Policymakers must carefully weigh long-term benefits against immediate fiscal costs.",
-        "exampleKo": "정책 입안자들은 즉각적인 재정 비용과 장기적 이득을 신중하게 저울질해야(weigh) 한다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_025_inform",
-        "word": "inform",
-        "cardType": "💡 영영 코어 뉘앙스 & 정보통",
-        "basic": "알리다, 통지하다",
-        "enDef": "To give information to; informed: having or showing a lot of knowledge.",
-        "realSense": "informed = 상황을 훤히 잘 알고 있는, 지식에 근거한",
-        "confusion": "• inform: 알리다, 통지하다, 정보를 주다\n• informed + 명사: (특정 주제·상황에 대해) 잘 아는, 정보통인 (an informed choice = 현명한 선택)",
-        "coreLogic": "단순 보고가 아님! 'informed decision'은 뜬소문이 아니라 정확한 데이터와 지식에 근거한 '현명한 결정'!",
-        "contrast": "blind guess (눈먼 추측) ↔ well-informed decision (정보에 근거한 현명한 결정)",
-        "exampleEn": "Democratic participation requires an informed citizenry capable of critical reasoning.",
-        "exampleKo": "민주적 참여는 비판적 추론이 가능한 정보에 밝은(informed) 시민사회를 필요로 한다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_026_incident",
-        "word": "incident",
-        "cardType": "🚨 명사 vs 파생 형용사(부수적)",
-        "basic": "일어난 일, 사건, 사고",
-        "enDef": "Incident: an event. Incidental: happening as a minor accompaniment.",
-        "realSense": "incidental = 핵심이 아닌 곁다리의, 부수적인, 우연한",
-        "confusion": "• incident: 일어난 일, 사건, 사고; 부수적으로 발생하기 쉬운\n• incidental: 부수적인, 우연히 일어나는 (= secondary, subordinate)",
-        "coreLogic": "incident(사건)의 형용사 incidental은 '핵심 본질이 아니라 길 가다가 부수적으로 딸려오는 덜 중요한 것'!",
-        "contrast": "primary goal (핵심 목표) ↔ incidental byproduct (부수적인 부산물)",
-        "exampleEn": "Commercial profit was merely incidental to their primary scientific mission.",
-        "exampleKo": "상업적 이익은 그들의 주된 과학적 사명에 비하면 단지 부수적인(incidental) 것에 불과했다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_027_manipulate",
-        "word": "manipulate",
-        "cardType": "💡 방향성 (-) & 왜곡 조작",
-        "basic": "조종하다, 조작하다, 다루다 (-)",
-        "enDef": "To control or influence cleverly, unfairly, or unscrupulously (-).",
-        "realSense": "교묘하고 부정한 방식으로 제멋대로 조작하다 (-)",
-        "confusion": "• manipulate: 조종하다, 조작하다, 다루다 (-)\n• manipulation: 조종, 조작",
-        "coreLogic": "단순 기계 조작이 아니라 통계나 여론을 자기 입맛대로 '부정하게 왜곡하고 조종하는' 부정적(-) 뉘앙스!",
-        "contrast": "present raw facts (있는 그대로의 사실 전달) ↔ manipulate statistics (통계를 교묘히 조작하다)",
-        "exampleEn": "Authoritarian regimes deliberately manipulate historical narratives to justify rule.",
-        "exampleKo": "권위주의 정권은 통치를 정당화하기 위해 역사적 서사를 의도적으로 조작한다(manipulate).",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_028_option",
-        "word": "option",
-        "cardType": "💡 영영 코어 뉘앙스 (비필수/부차적)",
-        "basic": "선택, 선택 과목, 옵션",
-        "enDef": "Available to be chosen but not mandatory; non-essential.",
-        "realSense": "optional = 필수가 아닌, 해도 그만 안 해도 그만인, 부차적인",
-        "confusion": "• option: 선택, 옵션\n• optional: 필수가 아닌, 선택적인 (not mandatory, non-essential)",
-        "coreLogic": "선택할 수 있다는 말은 곧 '의무가 아니다(not compulsory)'이므로, 지문에서 덜 중요한 부차적 요소를 지칭!",
-        "contrast": "mandatory / essential (필수적인, 절대적인) ↔ optional / non-essential (선택적인, 비필수의)",
-        "exampleEn": "Attendance was purely optional, reflecting the workshop's supplementary nature.",
-        "exampleKo": "참석은 순전히 선택사항(optional, 필수가 아님)이었으며, 이는 워크숍의 부차적인 성격을 반영했다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_029_submit",
-        "word": "submit",
-        "cardType": "💡 전치사 연결에 따른 의미 급변",
-        "basic": "제출하다",
-        "enDef": "Submit A: present for consideration. Submit to A: yield to superior force/authority (-).",
-        "realSense": "submit to A = A에게 무릎 꿇고 굴복하다, 항복하다 (-)",
-        "confusion": "• submit A: A를 제출하다\n• submit to A: A에게 항복/굴복하다 (-)",
-        "coreLogic": "to가 붙는 순간 의미가 '항복하다(surrender)'로 돌변! 아래(sub)로 자신을 던져 넣고 고개 숙이는 이미지!",
-        "contrast": "resist / rebel (저항하다) ↔ submit to dominance (지배에 굴복하고 복종하다)",
-        "exampleEn": "Indigenous populations refused to submit to foreign colonial authority.",
-        "exampleKo": "원주민들은 외세의 식민지적 권력에 굴복하기를(submit to) 거부했다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_030_yield",
-        "word": "yield",
-        "cardType": "💡 전치사 연결에 따른 의미 급변",
-        "basic": "산출하다, 생산하다",
-        "enDef": "Yield A: produce or generate. Yield to A: give way to arguments, demands, or pressure.",
-        "realSense": "yield A(산출/수확) vs yield to A(양보/항복/굴복하다)",
-        "confusion": "• yield A: A를 산출/생산하다\n• yield to A: A에게 양보/항복/굴복하다",
-        "coreLogic": "submit과 쌍둥이! 목적어가 바로 오면 수확/생산, to가 붙으면 압력에 밀려 무릎 꿇는 '양보/굴복'!",
-        "contrast": "yield fruitful results (결과를 산출하다) vs yield to external pressure (외압에 굴복하다)",
-        "exampleEn": "Rigorous experimental verification yielded conclusive empirical results.",
-        "exampleKo": "엄격한 실험적 검증은 결정적인 실증적 결과를 산출해 냈다(yielded).",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_031_fascinate",
-        "word": "fascinate",
-        "cardType": "⚖️ 대립쌍 & 방향성 (+/-)",
-        "basic": "유혹하다, 매혹하다, 마음을 빼앗다 (+)",
-        "enDef": "Fascinate: attract powerfully by charm (+). Tempt: entice to do wrong or unwise (-).",
-        "realSense": "fascinate는 지적·예술적 매료(+), tempt는 나쁜 길로의 유혹(-)",
-        "confusion": "• fascinate: 매혹하다, 매료시키다 (+)\n• tempt: 유혹하다, (관심을) 끌다 (-)",
-        "coreLogic": "둘 다 '유혹하다'로 퉁치면 뉘앙스 붕괴! fascinated by philosophy (철학에 매료된: +) vs tempted to cheat (부정행위 유혹: -).",
-        "contrast": "fascinating discovery (매혹적인 발견: +) ↔ perilous temptation (위험한 유혹: -)",
-        "exampleEn": "The intricate structure of ancient grammar has long fascinated historical linguists.",
-        "exampleKo": "고대 문법의 정교한 구조는 오랫동안 역사 언어학자들을 매료시켜 왔다(fascinated).",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_032_develop",
-        "word": "develop",
-        "cardType": "💡 다의어 및 부정적 발현",
-        "basic": "개발하다, 발전하다",
-        "enDef": "To grow mature; (Medical/Negative) to start to exist or experience a problem/symptom.",
-        "realSense": "develop a disease / flaw = (질병·결함·나쁜 것이) 생겨나다, 발생하다",
-        "confusion": "• 사람, 생명체와 쓰일 때: 성장하다, 발달[발전]하다\n• 부정적인 것들과 쓰일 때: 발생하다, 생기다 (develop symptoms = 증상이 발현되다)\n• developed countries: 선진국\n• developing countries: 개발 도상국 (= poor countries)",
-        "coreLogic": "무조건 기술 개발만 생각하면 오독! 질병이나 구조적 결함이 체내/시스템 내에서 '싹터 자라나다'로 쓰임!",
-        "contrast": "cure / eradicate (치료하고 박멸하다) ↔ develop severe symptoms (심각한 증상이 생겨나다)",
-        "exampleEn": "Patients who develop severe complications require immediate intensive therapy.",
-        "exampleKo": "심각한 합병증이 생겨나는(develop) 환자들은 즉각적인 집중 치료를 필요로 한다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_033_suspect",
-        "word": "suspect",
-        "cardType": "⚖️ 대립쌍 & 방향성 (+/-)",
-        "basic": "(일거라) 의심하다 (+추정)",
-        "enDef": "Suspect: believe something is likely true. Doubt: feel uncertain or disbelieve something.",
-        "realSense": "suspect(~일 것 같다) vs doubt(~가 아닐 것 같다/불신하다)",
-        "confusion": "• suspect: (일거라) 의심하다 (그럴 가능성이 높다고 생각함)\n• doubt: (아닐거라) 의심하다 (안 그럴 거라고 불신함)",
-        "coreLogic": "김지영 쌤 전매특허 시그니처 킬러! 둘 다 '의심하다'지만 긍정/부정이 반대! I suspect guilt (유죄 같아!) vs I doubt guilt (유죄 아닐 걸?).",
-        "contrast": "suspect (진실일 것이라 추정) ↔ doubt (허위일 것이라 회의/불신)",
-        "exampleEn": "Investigators suspect that the statistical discrepancy was completely intentional.",
-        "exampleKo": "조사관들은 통계적 불일치가 전적으로 의도된 것일 거라고 의심(추정)하고 있다(suspect).",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_034_adopt",
-        "word": "adopt",
-        "cardType": "🚨 형태 낚시 & 획득 논리",
-        "basic": "입양하다, 채택하다",
-        "enDef": "To legally take another's child; to choose to take up or follow a method or idea.",
-        "realSense": "기존에 없던 새로운 것을 받아들여 자기 것으로 삼다",
-        "confusion": "• adopt: 입양하다, 쓰다[취하다], 채택하다\n• adopt의 숨은 뜻: 기존에 없었던 새로운 것을 갖게 되는 것\n• adapt: 맞추다, 적응하다, 각색하다",
-        "coreLogic": "남의 아이를 입양하듯, 기존에 나한테 없던 새로운 제도나 패러다임을 '새로 들여와 내 것으로 삼는' 이미지!",
-        "contrast": "discard existing methods (기존 방식을 버리다) ↔ adopt modern standards (현대적 기준을 새로 채택하다)",
-        "exampleEn": "The organization decided to adopt a rigorous peer-review evaluation protocol.",
-        "exampleKo": "그 조직은 엄격한 동료 평가 심사 프로토콜을 새롭게 채택하기로(adopt) 결정했다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_035_adapt",
-        "word": "adapt",
-        "cardType": "🚨 형태 낚시 & 다의어(각색)",
-        "basic": "맞추다[조정하다], 적응하다",
-        "enDef": "To adjust to new conditions; to modify a text or film for a new medium.",
-        "realSense": "1) 환경에 적응하다  2) 원작 소설을 영화로 각색하다",
-        "confusion": "• adapt A: A를 적응시키다\n• adapt to A: A로 적응하다\n• adapt의 다른 뜻: 각색하다\n• adaptation: 적응, 각색\n• adaptability: 적응성, 순응성, 융통성",
-        "coreLogic": "adopt(선택/채택) vs adapt(적응/각색)! 예술 지문에서는 원작의 형태를 새 환경에 맞춰 '각색하다(modify for screen)'로 출제!",
-        "contrast": "rigid / unbending (경직된) ↔ flexible and adaptable (유연하고 잘 적응하는)",
-        "exampleEn": "Organisms that fail to adapt to rapid environmental fluctuations face extinction.",
-        "exampleKo": "급격한 환경 변동에 적응하지(adapt to) 못하는 유기체들은 멸종에 직면한다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_036_adjust",
-        "word": "adjust",
-        "cardType": "💡 미세 조정 & calibration",
-        "basic": "조정[조절]하다, 적응하다",
-        "enDef": "To alter slightly in order to achieve the desired fit, appearance, or result.",
-        "realSense": "오차나 기준을 미세하게 손봐서 딱 맞추다 (= calibrate)",
-        "confusion": "• adjust = adapt: 조정하다, 적응하다\n• adjustment: 조정, 적응",
-        "coreLogic": "adapt가 거대한 환경 변화에 몸을 맞추는 것이라면, adjust는 나사나 렌즈를 돌려 미세한 오차를 바로잡는 뉘앙스!",
-        "contrast": "leave uncalibrated (조정하지 않고 두다) ↔ carefully adjust parameters (수치를 정밀하게 조정하다)",
-        "exampleEn": "The central agency adjusted inflation projections following unexpected energy price surges.",
-        "exampleKo": "중앙 기관은 예상치 못한 에너지 가격 급등 이후 인플레이션 전망치를 조정했다(adjusted).",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_037_faith",
-        "word": "faithful",
-        "cardType": "💡 영영 코어 뉘앙스 (사실대로의 원본 재현)",
-        "basic": "충실한, 신의 있는",
-        "enDef": "Remaining loyal; strictly true to an original, fact, or standard.",
-        "realSense": "원본을 왜곡하지 않고 있는 그대로 사실대로 재현한 (= accurate, exact)",
-        "confusion": "• faith: 믿음[신뢰], 신념\n• faithful: 충실한, 충직한, 신의 있는; 사실대로의, 원본에 충실한 (있는 그대로의)",
-        "coreLogic": "단순 종교적 믿음이 아님! 'a faithful translation / reproduction'은 한 치의 왜곡 없이 '원본에 완벽히 충실한 정확한'이란 뜻!",
-        "contrast": "distorted / altered reproduction (왜곡된 복제품) ↔ faithful reproduction (원본에 철저히 충실한 재현)",
-        "exampleEn": "The restored document is an extraordinarily faithful replica of the original manuscript.",
-        "exampleKo": "복원된 문서는 원래의 필사본을 대단히 충실하게(faithful) 재현한 복제품이다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_038_bother",
-        "word": "bother",
-        "cardType": "💡 부정문·의문문 관용 속뜻",
-        "basic": "괴롭히다, 귀찮게 하다",
-        "enDef": "To take the trouble and effort to do something; to annoy.",
-        "realSense": "[부정문/의문문] 굳이 애써 신경 쓰다, 수고를 들이다",
-        "confusion": "• bother: 괴롭히다, 귀찮게 하다\n• bother의 다른 뜻: (흔히 부정문이나 의문문에 쓰여) 신경 쓰다, 애를 쓰다",
-        "coreLogic": "지문에서 'Don't bother to ask'라고 나오면 괴롭히지 말라는 게 아니라 '굳이 애써 물어보려고 신경 쓸 필요도 없다'는 뜻!",
-        "contrast": "expend deliberate effort (일부러 공을 들이다) ↔ hardly bother to inspect (확인하려는 수고조차 안 하다)",
-        "exampleEn": "Critics rarely bother to inspect the underlying statistical empirical evidence.",
-        "exampleKo": "비평가들은 그 밑에 깔린 실증적 통계 증거를 굳이 애써 확인하려 들지 않는다(rarely bother to inspect).",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_039_tolerate",
-        "word": "tolerate",
-        "cardType": "💡 다의어 및 의학적 내성",
-        "basic": "참다, 용인하다",
-        "enDef": "To allow without interference; (Medical) to be able to bear drug/toxin without harm.",
-        "realSense": "1) 마음에 안 들지만 마지못해 용인하다  2) 의학: 약물·독성을 견뎌내다",
-        "confusion": "• tolerance: 용인, 관용, 아량; (의학) 내성\n• intolerance: 불관용, 과민증, 알레르기\n• tolerant: 관대한, 잘 견디는\n• intolerant: 너그럽지 못한, 편협한; 못 먹는(과민증이 있는)",
-        "coreLogic": "적극적 찬성이 아님! 불편하지만 충돌을 피하기 위해 '마지못해 참아 넘기는' 소극적 수용이며, 의학에서는 '내성'으로 출제!",
-        "contrast": "actively celebrate (열렬히 찬양하다) ↔ barely tolerate (마지못해 용인하다/참다)",
-        "exampleEn": "A genuinely democratic culture must tolerate conflicting ideological perspectives.",
-        "exampleKo": "진정으로 민주적인 문화는 상충하는 이념적 관점들을 용인하고 참아내야(tolerate) 한다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_040_exist",
-        "word": "exist",
-        "cardType": "💡 평가원 기존 패러다임 시그널",
-        "basic": "존재하다",
-        "enDef": "To have objective reality; existing: currently present or in operation.",
-        "realSense": "existing A = 새로운 혁신 이전의 '기존의 구태의연한 A'",
-        "confusion": "• exist: 존재하다\n• existing A: 기존의 A (conventional, traditional)",
-        "coreLogic": "철학적 존재가 아니라 대립쌍 키워드! 'existing paradigms' = 새로운 혁신에 저항하는 '기존의 구태의연한 틀'!",
-        "contrast": "existing frameworks (현재의 기존 체제) ↔ novel / emerging innovations (새롭게 태동하는 혁신)",
-        "exampleEn": "The proposed legislative reform fundamentally challenges the existing institutional status quo.",
-        "exampleKo": "제안된 입법 개혁은 기존의(existing) 제도적 현상 유지를 근본적으로 위협한다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_041_irony",
-        "word": "irony",
-        "cardType": "💡 인과 반전 모순 [(+) ➔ (-) / (-) ➔ (+)]",
-        "basic": "아이러니, 역설적인 점, 반어법",
-        "enDef": "A state of affairs or an event that seems deliberately contrary to what one expects (involves a contrast).",
-        "realSense": "예상과 완전히 정반대의 결과가 벌어지는 모순적 상황 [(+) ➔ (-) 또는 (-) ➔ (+)]",
-        "confusion": "• irony: 아이러니, 역설적인 점[상황], 반어법\n• 평가원 공식: (+) ➔ (-) or (-) ➔ (+)",
-        "coreLogic": "김지영 쌤 평가원 논리 공식! 편리함(+)이 창의성을 억제(-)하는 것처럼, 원인(+)과 결과(-)가 모순으로 충돌하는 지점!",
-        "contrast": "predictable linear outcome (예측 가능한 순리) ↔ tragic irony (기대와 정반대로 뒤틀린 아이러니)",
-        "exampleEn": "Ironically, the convenience of downloading digital creations restrains people's creativity.",
-        "exampleKo": "역설적이게도(Ironically), 디지털 창작물을 다운로드하는 편리함이 사람들의 창의성을 억제한다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_042_paradox",
-        "word": "paradox",
-        "cardType": "💡 논리적 양립 모순 [(+) ➔ (-) / (-) ➔ (+)]",
-        "basic": "역설, 패러독스",
-        "enDef": "A situation when it involves two or more facts or qualities which seem to contradict each other.",
-        "realSense": "겉보기엔 말도 안 되는 모순 같지만, 깊이 파고들면 둘 다 참인 양립 모순",
-        "confusion": "• paradox: 역설적인 사람[것/상황], 역설, 패러독스\n• 평가원 공식: (+) ➔ (-) or (-) ➔ (+)",
-        "coreLogic": "irony는 '상황의 얄궂은 엇갈림'이고, paradox는 '문장 자체가 양립할 수 없어 보이는데 둘 다 참인 논리적 모순'을 뜻함!",
-        "contrast": "simplistic consistency (단순한 일관성) ↔ profound paradox (심오한 역설적 진실)",
-        "exampleEn": "The paradox of modern life is that while technological acceleration should provide more free time, those inventions increase our options.",
-        "exampleKo": "현대 삶의 역설(paradox)은 기술적 가속이 더 많은 자유 시간을 제공해야 함에도 불구하고, 그 발명품들이 우리가 선택할 수 있는 것을 늘린다는 것이다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_043_assume",
-        "word": "assume",
-        "cardType": "💡 평가원 통념/반전 시그널 & 다의어",
-        "basic": "가정하다, 추정하다",
-        "enDef": "If you assume that something is true, you imagine that it is true, sometimes wrongly; to begin to have that quality.",
-        "realSense": "1) 사실이 아닐 수도 있는 것을 지레짐작하다 (반전 예고)  2) assume + 명사: ~을 취하다, (책임을) 맡다",
-        "confusion": "• assume + that S+V: (사실이 아닐 수도 있는 것을) 가정하다 ➔ 뒤에 반전(However) 기대!\n• assume + 명사: ~을 취하다, 가지다 (assume responsibility = 책임을 맡다)\n• assumption: 가정, 가설; (책임의) 인수",
-        "coreLogic": "김지영 쌤 빨간펜 필기! '주어 assume' 나오면 십중팔구 '사실이 아닐 가능성 높음(wrongly)'이며, 필자는 뒤에서 'However'로 반박함!",
-        "contrast": "empirically proven fact (실증된 사실) ↔ unexamined assumption (검증되지 않은 섣부른 가정)",
-        "exampleEn": "It may be assumed that meta-algorithmics is a human creation. However, this is not necessarily true.",
-        "exampleKo": "메타 알고리즘의 창조도 인간의 창조물이라고 가정할 수도 있다. 하지만 이것이 반드시 사실은 아니다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_044_compromise",
-        "word": "compromise",
-        "cardType": "⚖️ 방향성 (-) & 손상 훼손",
-        "basic": "타협하다, 타협[절충]",
-        "enDef": "To accept something slightly different from what they really want; to do something which damages their beliefs/reputation.",
-        "realSense": "부정적 의미: 굽히다, 양보하다, 훼손시키다, 위태롭게 하다 (-)",
-        "confusion": "• negotiate: 대등하게 협상[교섭]하다, 합의하다 (중립/긍정)\n• compromise: (-) 부정적 의미를 담고 있음! 심지어 굽히다[양보하다], 훼손시키다, 위태롭게 하다",
-        "coreLogic": "김지영 쌤 극찬 빈출! negotiate와 다르게 compromise는 자기 정체성이나 진리를 깎아먹고 훼손(damage)시킨다는 마이너스(-) 의미!",
-        "contrast": "preserve core integrity (본질을 온전히 지키다) ↔ compromise their identity (정체성을 훼손하고 타협하다)",
-        "exampleEn": "The loss philosophy fears is a loss of meaning, the compromising of a truth.",
-        "exampleKo": "철학이 두려워하는 손실은 의미의 손실, 즉 진리의 훼손(compromising)이다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_045_biology",
-        "word": "biology",
-        "cardType": "💡 평가원 선천성 7대 패밀리 시그널",
-        "basic": "생물학, 생명 작용[활동]",
-        "enDef": "The scientific study of life; (Symbolic) innate, inborn, genetic qualities.",
-        "realSense": "상징적 의미: 타고남, 내재됨, 유전적 특질 (= inborn, innate)",
-        "confusion": "• biology 7대 선천성 패밀리: biology, infant, inborn, innate, gene(genetic), DNA, hardwire\n• infant: 아기 ➔ 평가원에서는 '사회화 이전의 모든 인간의 순수 본성'",
-        "coreLogic": "김지영 쌤 빨간펜 강조! 'biology는 타고남, 유전적을 상징! biology, infant, inborn, innate, gene, DNA, hardwire는 단 하나도 모르면 안 된다!'",
-        "contrast": "acquired / learned / cultural (후천적 학습/환경) ↔ biology / innate / genetic (선천적/타고남)",
-        "exampleEn": "To some degree, biology is destiny when it comes to communication style.",
-        "exampleKo": "어느 정도는, 의사소통 스타일에 관한 한 생물학(biology=유전적 본성)이 숙명이다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_046_exclusive",
-        "word": "exclusive",
-        "cardType": "💡 영영 코어 뉘앙스 & ONLY 시그널",
-        "basic": "배타적인, 독점적인",
-        "enDef": "Used or owned by only one person/group; exclusively: involving only the thing mentioned and nothing else.",
-        "realSense": "exclusively = only (오로지, 오직, 전적으로)",
-        "confusion": "• I exclusively love you: 나는 너를 배타적으로 사랑한다(X) ➔ 너만 사랑해(O)\n• exclusive report: 독점 보도\n• exclusively: 배타적으로, 독점적으로 ➔ 실전 독해에서는 '오로지(only)'",
-        "coreLogic": "어려운 한자어 '배타적'에 갇히면 독해 붕괴! exclusively가 나오면 0.1초 만에 'only(오직 ~만)'로 바꿔 읽어야 필자의 단독 강조점이 보임!",
-        "contrast": "widely shared / inclusive (두루 공유하는) ↔ exclusive / only (오로지 하나만을 위한 독점적인)",
-        "exampleEn": "Science on planet Earth could be found almost exclusively in the Islamic world.",
-        "exampleKo": "지구상의 과학은 거의 오로지(almost exclusively = only) 이슬람 세계에서만 발견될 수 있었다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_047_prescribe",
-        "word": "prescribe",
-        "cardType": "💡 다의어 및 평가원 규정 시그널",
-        "basic": "처방을 내리다, 처방하다",
-        "enDef": "To advise or authorize the use of medicine; (Formal) to state that an action or duty must be carried out.",
-        "realSense": "규정하다, 지시하다, 명령하다 (= dictate, stipulate)",
-        "confusion": "• 1차 뜻: 약을 처방하다 (prescribe medicine)\n• 독해 킬러 뜻: 규정하다, 지시하다, 명령하다 (prescribe behaviors = 행동을 규정하다)",
-        "coreLogic": "김지영 쌤 빨간펜 필기! '우선순위 규정하다!' 지문에서 약사 이야기가 아니면 99% '사회가 규칙이나 규범을 딱 정해두다(규정하다)'로 출제!",
-        "contrast": "freely improvised (자유롭게 즉흥적으로 한) ↔ in a prescribed manner (정해진 규정대로의)",
-        "exampleEn": "People may be more willing to step outside the culturally prescribed behaviors.",
-        "exampleKo": "사람들은 문화적으로 규정된(prescribed) 행동 밖으로 더 기꺼이 발을 디디려 할 수도 있다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_048_presume",
-        "word": "presume",
-        "cardType": "💡 영영 코어 뉘앙스 & assume 쌍둥이",
-        "basic": "추정하다, 여기다, 생각하다",
-        "enDef": "If you presume that something is the case, you think that it is the case, although you are not certain.",
-        "realSense": "실질적인 증거는 없지만 사실일 것이라고 지레짐작하다 (= assume)",
-        "confusion": "• presume = assume과 동일한 숨은 뜻!\n• although you are not certain (확실하지도 않으면서)",
-        "coreLogic": "단순 추측이 아님! '확실한 물증도 없으면서 자기 편견에 기대어 지레짐작하다'는 뉘앙스이므로 뒤이어 반박 논리가 따라붙기 쉬움!",
-        "contrast": "conclusive proof (결정적 증거) ↔ generally presumed bias (일반적으로 지레짐작하는 편견)",
-        "exampleEn": "Based on our biases in Western culture, we generally presume that all actions have an antecedent cause.",
-        "exampleKo": "서양 문화 속에서 우리가 갖고 있는 편견에 근거하여, 우리는 일반적으로 모든 행위에는 선행하는 원인이 있다고 지레짐작한다(presume).",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
-      },
-      {
-        "id": "v_049_mere",
-        "word": "mere",
-        "cardType": "💡 뉘앙스 반전 & 극대화 시그널",
-        "basic": "그저, 겨우 ~의, 단지 ~에 불과한",
-        "enDef": "To emphasize how small or unimportant something is; (Reversal) to indicate that an unimportant action has a very strong effect.",
-        "realSense": "1) 얕보고 무시(겨우, 고작)  2) 역으로 '그 사소한 것 하나만으로도 큰 역할'로 전환",
-        "confusion": "• mere / merely: 한낱, 그저, 단지 (무시하고 깔보는 뉘앙스)\n• 문맥 속 반전: His mere presence made her afraid ➔ 단지 그가 있었다는 사실만으로도 두려웠다 (역으로 큰 영향!)",
-        "coreLogic": "단순 '겨우'가 아님! 김지영 쌤 포인트: 얕보는 뉘앙스로 쓰이다가도, '그 사소한 것 하나만으로도 엄청난 파급력을 낳았다'는 강조로 급변함!",
-        "contrast": "substantial / monumental (거대하고 중요한) ↔ mere / negligible (사소하고 미미한)",
-        "exampleEn": "His mere presence made her feel afraid.",
-        "exampleKo": "단지 그가 거기 있다는 사소한 사실만으로도(His mere presence) 그녀는 두려웠다.",
-        "streak": 0,
-        "memoryLevel": 0,
-        "nextReviewDate": 0,
-        "failedStage": null
+        id: "vs_022_myth",
+        targetWord: "myth",
+        rootWord: "myth",
+        step1: {
+          en: "Ancient myth served to explain celestial phenomena before astronomical science.",
+          ko: "고대 [신화]는 천문 과학 이전의 천체 현상을 설명하는 역할을 했다."
+        },
+        step2: {
+          vsenseTitle: "독해 속뜻: 많은 사람들의 잘못된 상식, 사회적 통념",
+          vsenseDesc: "첫 줄에 myth가 나오면 99% 일반인 통념 비판! 뒤에서 반박(However, false)!",
+          en: "The popular myth that human memory acts like a video recorder has been debunked.",
+          ko: "인간 기억이 비디오 녹화기처럼 작동한다는 대중적 [통념/허구(myth)]는 거짓으로 밝혀졌다.",
+          contrast: "prevailing myth (잘못된 사회적 통념) ↔ scientific reality (과학적 진실)"
+        },
+        step3: {
+          clozeEn: "The popular [ _________ ] that human memory acts like a video recorder has been debunked.",
+          clozeKo: "인간 기억이 녹화기처럼 작동한다는 대중적 [통념/허구]는 거짓으로 입증되었다.",
+          correct: "myth",
+          distractors: ["appliance", "manuscript"]
+        },
+        streak: 0,
+        isMastered: false
       }
     ];
 
-    let words = [];
+    let sentences = [];
     let queue = [];
     let currentIndex = 0;
-    let currentStage = 0; // 0: 블라인드, 1: 기본뜻, 2: 영영, 3: V-속뜻
-    let currentMode = 'all';
-
-    // ==================== 혼동어 퀴즈 모드 상태 ====================
-    let isQuizMode = false;
-    let quizBank = [];
-    let currentQuizIndex = 0;
-    let quizScore = { total: 0, correct: 0 };
+    let subStep = 0; // 0: Step1 영문만, 1: Step1 해석오픈, 2: Step2 영문만, 3: Step2 해석오픈, 4: Step3 빈칸문제
+    let currentMode = 'all'; // 'all', 'trouble', 'mastered'
     let quizAnswered = false;
 
-    function loadDatabase() {
+    function initDatabase() {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
         try {
-          words = JSON.parse(stored);
+          sentences = JSON.parse(stored);
         } catch (e) {
-          words = [...SEED_WORDS];
+          sentences = [...RAW_SENTENCE_DATA];
         }
       } else {
-        words = [...SEED_WORDS];
-        saveDatabase();
-      }
-      
-      // 최신 043~049가 누락되어 있다면 자동 동기화
-      if (words.length < SEED_WORDS.length) {
-        words = [...SEED_WORDS];
+        sentences = [...RAW_SENTENCE_DATA];
         saveDatabase();
       }
 
-      // 마이그레이션 방어 코드
-      words.forEach(w => {
-        if (typeof w.memoryLevel === 'undefined') w.memoryLevel = 0;
-        if (typeof w.nextReviewDate === 'undefined') w.nextReviewDate = 0;
-        if (typeof w.failedStage === 'undefined') w.failedStage = null;
-        if (typeof w.confMistakes === 'undefined') w.confMistakes = 0;
-      });
-      updateCounts();
+      // 동기화 확인
+      if (sentences.length < RAW_SENTENCE_DATA.length) {
+        sentences = [...RAW_SENTENCE_DATA];
+        saveDatabase();
+      }
+
+      updateCounters();
       buildQueue();
       renderCard();
     }
 
     function saveDatabase() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(words));
-      updateCounts();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sentences));
+      updateCounters();
     }
 
-    function resetToSeedData() {
-      words = [...SEED_WORDS];
+    function resetData() {
+      sentences = RAW_SENTENCE_DATA.map(s => ({ ...s, streak: 0, isMastered: false }));
       saveDatabase();
-      buildQueue();
-      renderCard();
-      showToast('001~049 최신 V단어 덱으로 초기화되었습니다.');
+      setMode('all');
+      showToast('초기 기출 예문 데이터로 리셋되었습니다.');
     }
 
-    function updateCounts() {
-      const now = Date.now();
-      document.getElementById('count-all').innerText = words.length;
-      
-      // 오늘 복습 대상 (습득 완료되었으나 복습 기한 도래)
-      const todayDue = words.filter(w => w.memoryLevel > 0 && w.nextReviewDate <= now).length;
-      document.getElementById('count-today').innerText = todayDue;
-
-      // 기억 승급 (Level 3 도달 완료)
-      document.getElementById('count-mastered').innerText = words.filter(w => w.memoryLevel >= 3).length;
-
-      // 단계별 실패 서랍 카운트
-      document.getElementById('count-fail0').innerText = words.filter(w => w.failedStage === 'step0').length;
-      document.getElementById('count-fail12').innerText = words.filter(w => w.failedStage === 'step12').length;
-      document.getElementById('count-fail3').innerText = words.filter(w => w.failedStage === 'step3').length;
-      document.getElementById('count-failconf').innerText = words.filter(w => w.failedStage === 'conf' || (w.confMistakes && w.confMistakes > 0)).length;
+    function updateCounters() {
+      document.getElementById('count-all').innerText = sentences.length;
+      document.getElementById('count-trouble').innerText = sentences.filter(s => !s.isMastered && s.streak < 2).length;
+      document.getElementById('count-mastered').innerText = sentences.filter(s => s.isMastered).length;
     }
 
     function setMode(mode) {
-      if (isQuizMode) toggleQuizMode(false);
       currentMode = mode;
-      
-      const buttons = [
-        'filter-btn-all', 'filter-btn-today', 'filter-btn-mastered',
-        'filter-btn-fail0', 'filter-btn-fail12', 'filter-btn-fail3', 'filter-btn-failconf'
-      ];
+      const allBtn = document.getElementById('mode-all-btn');
+      const troubleBtn = document.getElementById('mode-trouble-btn');
+      const masteredBtn = document.getElementById('mode-mastered-btn');
 
-      buttons.forEach(id => {
-        const btn = document.getElementById(id);
-        if (btn) {
-          btn.classList.remove('bg-rose-600', 'bg-amber-600', 'bg-emerald-600', 'bg-indigo-600', 'text-white', 'border-rose-500', 'border-amber-500', 'border-indigo-500');
-        }
-      });
+      allBtn.className = "px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 shrink-0";
+      troubleBtn.className = "px-2.5 py-1 rounded-lg bg-rose-950/60 text-rose-300 hover:bg-rose-900/60 border border-rose-500/50 shrink-0 flex items-center gap-1 transition";
+      masteredBtn.className = "px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 shrink-0";
 
-      const activeBtn = document.getElementById(`filter-btn-${mode.replace('_review', '').replace('step', '').replace('_', '')}`);
-      if (activeBtn) {
-        activeBtn.classList.add('bg-rose-600', 'text-white');
+      if (mode === 'all') {
+        allBtn.className = "px-2.5 py-1 rounded-lg bg-rose-600 text-white shrink-0 shadow-sm";
+      } else if (mode === 'trouble') {
+        troubleBtn.className = "px-2.5 py-1 rounded-lg bg-rose-600 text-white shrink-0 shadow-sm flex items-center gap-1";
+      } else if (mode === 'mastered') {
+        masteredBtn.className = "px-2.5 py-1 rounded-lg bg-emerald-600 text-white shrink-0 shadow-sm";
       }
 
       buildQueue();
@@ -1320,25 +714,22 @@
     }
 
     function buildQueue() {
-      const now = Date.now();
-
       if (currentMode === 'all') {
-        queue = words.filter(w => w.memoryLevel < 3);
-        if (queue.length === 0) queue = [...words];
-      } else if (currentMode === 'today_review') {
-        queue = words.filter(w => w.memoryLevel > 0 && w.nextReviewDate <= now);
+        queue = sentences.filter(s => !s.isMastered);
+        if (queue.length === 0) queue = [...sentences];
+      } else if (currentMode === 'trouble') {
+        queue = sentences.filter(s => !s.isMastered && s.streak < 2);
+        if (queue.length === 0) {
+          showToast('미해결 오답이 전멸했습니다! 전체 큐로 전환합니다.');
+          queue = [...sentences];
+        }
       } else if (currentMode === 'mastered') {
-        queue = words.filter(w => w.memoryLevel >= 3);
-      } else if (currentMode === 'fail_step0') {
-        queue = words.filter(w => w.failedStage === 'step0');
-      } else if (currentMode === 'fail_step12') {
-        queue = words.filter(w => w.failedStage === 'step12');
-      } else if (currentMode === 'fail_step3') {
-        queue = words.filter(w => w.failedStage === 'step3');
-      } else if (currentMode === 'fail_conf') {
-        queue = words.filter(w => w.failedStage === 'conf' || (w.confMistakes && w.confMistakes > 0));
+        queue = sentences.filter(s => s.isMastered);
+        if (queue.length === 0) {
+          showToast('아직 체화 완료된 문장이 없습니다.');
+          queue = [...sentences];
+        }
       }
-
       currentIndex = 0;
     }
 
@@ -1349,431 +740,146 @@
       }
       currentIndex = 0;
       renderCard();
-      showToast('단어 순서를 섞었습니다.');
+      showToast('예문 순서를 섞었습니다.');
     }
 
     function renderCard() {
-      if (queue.length === 0) {
-        document.getElementById('card-target-word').innerText = "보관함 비어있음";
-        document.getElementById('card-basic-meaning').innerText = "해당 조건의 단어가 없습니다.";
-        document.getElementById('card-step-guide').innerText = "학습 완료 또는 다른 서랍 선택";
-        document.getElementById('card-progress').innerText = "0 / 0";
-        document.getElementById('card-memory-badge').innerText = "대기중";
-        document.getElementById('card-streak').innerText = "연속 정답: 0회";
-        document.getElementById('card-next-review-info').innerText = "";
-        updateStageUI(0);
-        return;
-      }
-
+      if (queue.length === 0) return;
       const item = queue[currentIndex];
-      currentStage = 0; // 항상 0단계 블라인드로 시작
-      updateStageUI(currentStage);
+      subStep = 0; // 항상 1단계 영문부터 시작
 
       document.getElementById('card-progress').innerText = `${currentIndex + 1} / ${queue.length}`;
-      document.getElementById('card-target-word').innerText = item.word;
-      document.getElementById('card-basic-meaning').innerText = item.basic;
-      document.getElementById('card-en-def').innerText = `"${item.enDef}"`;
-      document.getElementById('card-real-meaning').innerText = item.realSense;
-      document.getElementById('card-coreLogic').innerText = item.coreLogic ? `👉 ${item.coreLogic}` : '';
-      
-      const contrastBox = document.getElementById('card-binary-box');
-      if (item.contrast) {
-        contrastBox.classList.remove('hidden');
-        document.getElementById('card-contrast').innerText = item.contrast;
-      } else {
-        contrastBox.classList.add('hidden');
-      }
+      document.getElementById('card-word-badge').innerText = item.rootWord;
+      document.getElementById('streak-indicator').innerText = `연속 정답: ${item.streak || 0} / 2`;
 
-      // 혼동 어휘 대조 박스 렌더링
-      const confBox = document.getElementById('card-confusion-box');
-      const confText = document.getElementById('card-confusion-text');
-      const instantQuizBtn = document.getElementById('card-instant-quiz-btn');
+      // Step 1 데이터 바인딩
+      document.getElementById('s1-english').innerHTML = highlightTarget(item.step1.en, item.rootWord);
+      document.getElementById('s1-korean-text').innerHTML = item.step1.ko;
 
-      if (item.confusion) {
-        confBox.classList.remove('hidden');
-        confText.innerText = item.confusion;
-        instantQuizBtn.classList.remove('hidden');
-      } else {
-        confBox.classList.add('hidden');
-        instantQuizBtn.classList.add('hidden');
-      }
+      // Step 2 데이터 바인딩
+      document.getElementById('s2-vsense-title').innerText = item.step2.vsenseTitle;
+      document.getElementById('s2-vsense-desc').innerText = item.step2.vsenseDesc;
+      document.getElementById('s2-english').innerHTML = highlightTarget(item.step2.en, item.targetWord);
+      document.getElementById('s2-korean-text').innerHTML = item.step2.ko;
 
-      // 유형 배지 렌더링
-      const typeBadge = document.getElementById('card-type-badge');
-      if (item.cardType) {
-        typeBadge.innerText = item.cardType;
-        typeBadge.classList.remove('hidden');
-      } else {
-        typeBadge.classList.add('hidden');
-      }
+      // Step 3 빈칸 데이터 바인딩
+      document.getElementById('s3-cloze-sentence').innerHTML = item.step3.clozeEn.replace('[ _________ ]', '<span class="cloze-blank">[ _________ ]</span>');
+      document.getElementById('s3-cloze-korean').innerHTML = item.step3.clozeKo;
 
-      document.getElementById('card-example-en').innerText = `"${item.exampleEn || ''}"`;
-      document.getElementById('card-example-ko').innerText = `"${item.exampleKo || ''}"`;
-
-      // 에빙하우스 기억 레벨 배지 UI
-      const badge = document.getElementById('card-memory-badge');
-      const lvl = item.memoryLevel || 0;
-      if (lvl === 0) {
-        badge.innerHTML = `<i class="ph-bold ph-hourglass"></i> 습득중 (0단계)`;
-        badge.className = "px-2 py-0.5 rounded-md bg-slate-800 text-rose-300 font-extrabold border border-slate-700 text-[10px]";
-      } else if (lvl === 1) {
-        badge.innerHTML = `<i class="ph-bold ph-calendar-check"></i> 3일 간격 기억`;
-        badge.className = "px-2 py-0.5 rounded-md bg-amber-950/60 text-amber-300 font-extrabold border border-amber-600/40 text-[10px]";
-      } else if (lvl === 2) {
-        badge.innerHTML = `<i class="ph-bold ph-seal-check"></i> 7일 간격 기억`;
-        badge.className = "px-2 py-0.5 rounded-md bg-indigo-950/60 text-indigo-300 font-extrabold border border-indigo-600/40 text-[10px]";
-      } else if (lvl >= 3) {
-        badge.innerHTML = `<i class="ph-bold ph-crown"></i> 30일 영구 기억 승급`;
-        badge.className = "px-2 py-0.5 rounded-md bg-emerald-950/60 text-emerald-300 font-extrabold border border-emerald-600/40 text-[10px]";
-      }
-
-      // 이전 실패 이력 안내
-      const lastFailEl = document.getElementById('card-last-failure');
-      if (item.failedStage === 'step0') {
-        lastFailEl.innerText = "🚨 지난번 [0단계: 기본뜻]에서 헷갈렸던 단어";
-        lastFailEl.className = "text-[9px] font-black text-rose-400 tracking-wider";
-      } else if (item.failedStage === 'step12') {
-        lastFailEl.innerText = "💡 지난번 [영영 뉘앙스]에서 헷갈렸던 단어";
-        lastFailEl.className = "text-[9px] font-black text-amber-400 tracking-wider";
-      } else if (item.failedStage === 'step3') {
-        lastFailEl.innerText = "🎯 지난번 [V-속뜻/대립쌍]에서 헷갈렸던 단어";
-        lastFailEl.className = "text-[9px] font-black text-indigo-400 tracking-wider";
-      } else if (item.failedStage === 'conf' || (item.confMistakes && item.confMistakes > 0)) {
-        lastFailEl.innerText = "⚡ 혼동어 퀴즈에서 오답이 났던 짝꿍 단어";
-        lastFailEl.className = "text-[9px] font-black text-fuchsia-400 tracking-wider";
-      } else {
-        lastFailEl.innerText = "TARGET WORD";
-        lastFailEl.className = "text-[9px] font-black uppercase text-slate-500 tracking-wider";
-      }
-
-      document.getElementById('card-streak').innerText = `현재 연속 인출: ${item.streak || 0}회`;
-      
-      const nextDate = item.nextReviewDate ? new Date(item.nextReviewDate).toLocaleDateString('ko-KR') : '즉시';
-      document.getElementById('card-next-review-info').innerText = lvl > 0 ? `복습 예정일: ${nextDate}` : '다음 복습: 즉시 인출';
+      updateSubStepUI();
     }
 
-    function nextStage() {
-      if (queue.length === 0) return;
-      currentStage = currentStage >= 3 ? 0 : currentStage + 1;
-      updateStageUI(currentStage);
+    function highlightTarget(sentence, target) {
+      const reg = new RegExp(`(${target})`, 'gi');
+      return sentence.replace(reg, '<span class="font-bold text-amber-300 underline decoration-amber-500/50 underline-offset-4">$1</span>');
     }
 
-    function updateStageUI(stage) {
-      const v0 = document.getElementById('view-step-0');
+    function updateSubStepUI() {
       const v1 = document.getElementById('view-step-1');
       const v2 = document.getElementById('view-step-2');
       const v3 = document.getElementById('view-step-3');
 
-      const b0 = document.getElementById('step-badge-0');
-      const b1 = document.getElementById('step-badge-1');
-      const b2 = document.getElementById('step-badge-2');
-      const b3 = document.getElementById('step-badge-3');
-      const guide = document.getElementById('card-step-guide');
-      const doubtLabel = document.getElementById('btn-label-doubt');
+      const s1Blind = document.getElementById('s1-korean-blind');
+      const s1Text = document.getElementById('s1-korean-text');
+      const s2Blind = document.getElementById('s2-korean-blind');
+      const s2Text = document.getElementById('s2-korean-text');
 
-      v0.classList.add('hidden');
+      const badge = document.getElementById('card-step-badge');
+      const btnText = document.getElementById('step-next-btn-text');
+      const p1 = document.getElementById('pill-step-1');
+      const p2 = document.getElementById('pill-step-2');
+      const p3 = document.getElementById('pill-step-3');
+
       v1.classList.add('hidden');
       v2.classList.add('hidden');
       v3.classList.add('hidden');
 
-      const idle = 'px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 font-bold';
-      b0.className = idle;
-      b1.className = idle;
-      b2.className = idle;
-      b3.className = idle;
+      const idlePill = "w-2.5 h-2.5 rounded-full bg-slate-800";
+      p1.className = idlePill;
+      p2.className = idlePill;
+      p3.className = idlePill;
 
-      if (stage === 0) {
-        v0.classList.remove('hidden');
-        b0.className = 'px-1.5 py-0.5 rounded bg-rose-600 text-white font-bold';
-        guide.innerText = "[터치 / Space] 1차 기본 뜻 떠올리고 오픈";
-        doubtLabel.innerText = "기본뜻 모름";
-      } else if (stage === 1) {
+      if (subStep === 0) {
+        // Step 1 영문만
         v1.classList.remove('hidden');
-        b1.className = 'px-1.5 py-0.5 rounded bg-amber-600 text-white font-bold';
-        guide.innerText = "[터치 / Space] 영영사전 코어 뉘앙스 오픈";
-        doubtLabel.innerText = "뉘앙스 애매";
-      } else if (stage === 2) {
+        s1Blind.classList.remove('hidden');
+        s1Text.classList.add('hidden');
+        badge.innerText = "1단계: 기본 예문 (직독직해)";
+        badge.className = "text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-rose-950 text-rose-300 border border-rose-600/40";
+        btnText.innerText = "해석 열기";
+        p1.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
+      } else if (subStep === 1) {
+        // Step 1 해석 오픈
+        v1.classList.remove('hidden');
+        s1Blind.classList.add('hidden');
+        s1Text.classList.remove('hidden');
+        badge.innerText = "1단계: 기본 해석 확인 ➔ 2단계로";
+        btnText.innerText = "2단계 속뜻 예문으로";
+        p1.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
+      } else if (subStep === 2) {
+        // Step 2 킬러 예문 영문만
         v2.classList.remove('hidden');
-        b2.className = 'px-1.5 py-0.5 rounded bg-indigo-600 text-white font-bold';
-        guide.innerText = "[터치 / Space] 실전 독해 속뜻(V-Sense) 오픈";
-        doubtLabel.innerText = "뉘앙스 애매";
-      } else if (stage === 3) {
+        s2Blind.classList.remove('hidden');
+        s2Text.classList.add('hidden');
+        badge.innerText = "2단계: 킬러 속뜻 예문 (문맥 유추)";
+        badge.className = "text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-indigo-950 text-indigo-300 border border-indigo-600/40";
+        btnText.innerText = "속뜻 해석 열기";
+        p2.className = "w-2.5 h-2.5 rounded-full bg-indigo-500";
+      } else if (subStep === 3) {
+        // Step 2 해석 오픈
+        v2.classList.remove('hidden');
+        s2Blind.classList.add('hidden');
+        s2Text.classList.remove('hidden');
+        badge.innerText = "2단계: 속뜻 체화 ➔ 3단계 빈칸 펀치로";
+        btnText.innerText = "3단계 빈칸 퀴즈로";
+        p2.className = "w-2.5 h-2.5 rounded-full bg-indigo-500";
+      } else if (subStep === 4) {
+        // Step 3 실전 빈칸 펀치 퀴즈
         v3.classList.remove('hidden');
-        b3.className = 'px-1.5 py-0.5 rounded bg-emerald-600 text-white font-bold';
-        guide.innerText = "뉘앙스 확인 완료! [헷갈림] 또는 [알겠음] 선택";
-        doubtLabel.innerText = "V속뜻 헷갈림";
+        badge.innerText = "3단계: 0.5초 실전 빈칸 펀치!";
+        badge.className = "text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-600/40";
+        btnText.innerText = "정답 선택 대기중";
+        p3.className = "w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse";
+        renderClozeOptions();
       }
     }
 
-    // 결과 판정 (에빙하우스 알고리즘 & 실패 단계 스마트 기록)
-    function markResult(isCorrect) {
-      if (queue.length === 0) return;
-      const item = queue[currentIndex];
-      const now = Date.now();
-
-      if (isCorrect) {
-        item.streak = (item.streak || 0) + 1;
-        item.failedStage = null; // 오답 이력 클리어
-
-        // 에빙하우스 간격 반복 단계 승급 (Level 0 ➔ 1(+3일) ➔ 2(+7일) ➔ 3(+30일))
-        if (item.streak >= 2) {
-          if (!item.memoryLevel || item.memoryLevel === 0) {
-            item.memoryLevel = 1;
-            item.nextReviewDate = now + (3 * ONE_DAY_MS); // 3일 뒤 복습
-            showToast(`🌱 "${item.word}" 체화! [3일 뒤 복습] 예약`);
-          } else if (item.memoryLevel === 1) {
-            item.memoryLevel = 2;
-            item.nextReviewDate = now + (7 * ONE_DAY_MS); // 7일 뒤 복습
-            showToast(`🌿 3일 복습 성공! [7일 뒤 복습] 승급`);
-          } else if (item.memoryLevel === 2) {
-            item.memoryLevel = 3;
-            item.nextReviewDate = now + (30 * ONE_DAY_MS); // 30일 뒤 복습
-            showToast(`🏆 7일 복습 성공! [30일 영구 기억] 승급!`);
-          }
+    function handleStageClick() {
+      if (subStep < 4) {
+        subStep++;
+        updateSubStepUI();
+      } else {
+        // 4단계에서는 선택지를 탭해야 넘어감
+        if (quizAnswered) {
+          nextCard();
         } else {
-          showToast(`👏 정답! 한 번 더 맞히면 간격 반복 덱으로 승급 (1/2)`);
-        }
-      } else {
-        // 실패 시: 현재 화면이 멈춘 단계를 감지해 세부 약점 서랍으로 태깅!
-        if (currentStage === 0) {
-          item.failedStage = 'step0'; // 기본 뜻 자체를 모름
-          showToast(`🚨 [기본뜻 미흡 서랍]에 보관되었습니다.`);
-        } else if (currentStage === 1 || currentStage === 2) {
-          item.failedStage = 'step12'; // 영영 뉘앙스 단계에서 막힘
-          showToast(`💡 [영영 뉘앙스 서랍]에 보관되었습니다.`);
-        } else {
-          item.failedStage = 'step3'; // V-속뜻/대립쌍 단계에서 막힘
-          showToast(`🎯 [V-속뜻/대립쌍 서랍]에 보관되었습니다.`);
-        }
-
-        item.streak = 0;
-        item.memoryLevel = 0; // 망각 발생 시 초기 습득 레벨로 강등
-        item.nextReviewDate = 0; // 즉시 복습 대상
-      }
-
-      // 원본 동기화 및 저장
-      const original = words.find(w => w.id === item.id);
-      if (original) {
-        original.streak = item.streak;
-        original.memoryLevel = item.memoryLevel;
-        original.nextReviewDate = item.nextReviewDate;
-        original.failedStage = item.failedStage;
-      }
-      saveDatabase();
-
-      // 조건 충족 시 현재 큐에서 제거
-      if (isCorrect && item.streak >= 2 && currentMode !== 'all') {
-        queue.splice(currentIndex, 1);
-        if (currentIndex >= queue.length) currentIndex = 0;
-        renderCard();
-      } else {
-        nextCard();
-      }
-    }
-
-    function nextCard() {
-      if (queue.length === 0) return;
-      currentIndex = (currentIndex + 1) % queue.length;
-      renderCard();
-    }
-
-    function prevCard() {
-      if (queue.length === 0) return;
-      currentIndex = (currentIndex - 1 + queue.length) % queue.length;
-      renderCard();
-    }
-
-    function speakWord(customWord) {
-      let text = customWord;
-      if (!text) {
-        if (isQuizMode && quizBank[currentQuizIndex]) {
-          text = quizBank[currentQuizIndex].targetWord;
-        } else if (queue.length > 0) {
-          text = queue[currentIndex].word;
+          showToast('아래 3개 보기 중 하나를 선택하세요!');
         }
       }
-      if (!text) return;
-
-      if ('speechSynthesis' in window) {
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = 'en-US';
-        u.rate = 0.9;
-        window.speechSynthesis.cancel();
-        window.speechSynthesis.speak(u);
-      }
     }
 
-    // ========================================================
-    // ⚡ 혼동어휘 1초 킬러 매칭 퀴즈 엔진 (Speed Drill Quiz)
-    // ========================================================
-
-    // confusion 텍스트를 파싱하여 개별 단어/의미 아이템 추출
-    function parseConfusionItems(rawConfusion) {
-      if (!rawConfusion) return [];
-      const lines = rawConfusion.split('\n');
-      const items = [];
-
-      lines.forEach(line => {
-        const trimmed = line.replace(/^[•\-\*]\s*/, '').trim();
-        if (!trimmed) return;
-        const match = trimmed.match(/^([a-zA-Z\s\(\)\/\-]+):\s*(.+)$/);
-        if (match) {
-          const wordPart = match[1].replace(/\(.*\)/, '').trim().split('/')[0].trim();
-          const meaningPart = match[2].trim();
-          if (wordPart && meaningPart) {
-            items.push({ word: wordPart, meaning: meaningPart, raw: trimmed });
-          }
-        }
-      });
-      return items;
-    }
-
-    // 전체 DB에서 퀴즈 문제 생성
-    function buildQuizBank(filterWordId = null) {
-      quizBank = [];
-      const targetWords = filterWordId 
-        ? words.filter(w => w.id === filterWordId && w.confusion)
-        : words.filter(w => w.confusion);
-
-      targetWords.forEach(w => {
-        const parsed = parseConfusionItems(w.confusion);
-        if (parsed.length === 0) return;
-
-        // 원본 표제어도 혼동어 풀에 함께 투입!
-        const fullPool = [
-          { word: w.word, meaning: w.basic, raw: `${w.word}: ${w.basic}` },
-          ...parsed
-        ];
-
-        // 각 혼동 항목을 정답으로 하는 문제 생성
-        fullPool.forEach(correctItem => {
-          // 오답 보기 후보군 추출
-          let distractors = fullPool.filter(p => p.word.toLowerCase() !== correctItem.word.toLowerCase());
-          
-          // 풀이 4개 미만이면 전체 words에서 무작위 단어 보충
-          if (distractors.length < 3) {
-            const others = words.filter(ow => ow.word.toLowerCase() !== correctItem.word.toLowerCase());
-            for (let i = 0; i < 3 - distractors.length && i < others.length; i++) {
-              distractors.push({ word: others[i].word, meaning: others[i].basic, raw: `${others[i].word}: ${others[i].basic}` });
-            }
-          }
-
-          // 보기 4개 섞기
-          const options = [correctItem.word, ...distractors.slice(0, 3).map(d => d.word)];
-          for (let i = options.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [options[i], options[j]] = [options[j], options[i]];
-          }
-
-          quizBank.push({
-            parentWordId: w.id,
-            targetWord: correctItem.word,
-            questionMeaning: correctItem.meaning,
-            fullInfo: correctItem.raw,
-            options: options,
-            parentWord: w.word
-          });
-        });
-      });
-
-      // 퀴즈 문제 셔플
-      for (let i = quizBank.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [quizBank[i], quizBank[j]] = [quizBank[j], quizBank[i]];
-      }
-
-      currentQuizIndex = 0;
-      quizScore = { total: 0, correct: 0 };
-    }
-
-    function toggleQuizMode(forceState) {
-      isQuizMode = typeof forceState === 'boolean' ? forceState : !isQuizMode;
-
-      const stdView = document.getElementById('standard-card-view');
-      const quizView = document.getElementById('quiz-card-view');
-      const filterBar = document.getElementById('standard-filter-bar');
-      const toggleBtn = document.getElementById('toggle-quiz-mode-btn');
-      const toggleLabel = document.getElementById('quiz-toggle-label');
-
-      if (isQuizMode) {
-        buildQuizBank();
-        if (quizBank.length === 0) {
-          showToast('혼동어휘가 등록된 카드가 없습니다. 덱을 확인하세요.');
-          isQuizMode = false;
-          return;
-        }
-        stdView.classList.add('hidden');
-        filterBar.classList.add('hidden');
-        quizView.classList.remove('hidden');
-
-        toggleBtn.className = "flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-rose-600 text-white font-black text-[11px] border border-rose-500 transition shadow";
-        toggleLabel.innerText = "일반 인출 복귀";
-        renderQuizQuestion();
-      } else {
-        quizView.classList.add('hidden');
-        stdView.classList.remove('hidden');
-        filterBar.classList.remove('hidden');
-
-        toggleBtn.className = "flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 font-black text-[11px] border border-amber-500/40 transition shadow-sm";
-        toggleLabel.innerText = "혼동어 테스트";
-        buildQueue();
-        renderCard();
-      }
-    }
-
-    // 3단계 카드에서 [이 혼동어 지금 시험보기] 클릭 시 호출
-    function startInstantConfusionQuiz(event) {
-      if (event) event.stopPropagation();
-      if (queue.length === 0) return;
-      const currentItem = queue[currentIndex];
-      
-      buildQuizBank(currentItem.id);
-      if (quizBank.length === 0) {
-        showToast('이 단어에는 등록된 혼동어 대조군이 없습니다.');
-        return;
-      }
-
-      isQuizMode = true;
-      document.getElementById('standard-card-view').classList.add('hidden');
-      document.getElementById('standard-filter-bar').classList.add('hidden');
-      document.getElementById('quiz-card-view').classList.remove('hidden');
-
-      const toggleBtn = document.getElementById('toggle-quiz-mode-btn');
-      toggleBtn.className = "flex items-center space-x-1 px-2.5 py-1.5 rounded-lg bg-rose-600 text-white font-black text-[11px] border border-rose-500 transition shadow";
-      document.getElementById('quiz-toggle-label').innerText = "일반 인출 복귀";
-
-      renderQuizQuestion();
-      showToast(`⚡ "${currentItem.word}" 연관 혼동어 즉석 테스트 시작!`);
-    }
-
-    function renderQuizQuestion() {
-      if (quizBank.length === 0 || currentQuizIndex >= quizBank.length) {
-        showToast('혼동어 퀴즈 세트를 완료했습니다!');
-        toggleQuizMode(false);
-        return;
-      }
-
+    function renderClozeOptions() {
       quizAnswered = false;
-      const q = quizBank[currentQuizIndex];
-
-      document.getElementById('quiz-progress').innerText = `${currentQuizIndex + 1} / ${quizBank.length}`;
-      document.getElementById('quiz-badge-target').innerText = `🚨 [${q.parentWord}] 계열 형태 낚시 분별`;
-      document.getElementById('quiz-question-meaning').innerText = q.questionMeaning;
-
-      // 피드백 상자 숨김 초기화
-      const fbBox = document.getElementById('quiz-feedback-box');
-      fbBox.classList.add('hidden');
-
-      // 선택지 4개 렌더링
-      const container = document.getElementById('quiz-options-container');
+      const item = queue[currentIndex];
+      const container = document.getElementById('s3-options-grid');
       container.innerHTML = '';
 
-      q.options.forEach((optWord, idx) => {
+      const fbBox = document.getElementById('s3-feedback-box');
+      fbBox.classList.add('hidden');
+
+      // 3지선다 셔플
+      const options = [item.step3.correct, ...item.step3.distractors];
+      for (let i = options.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [options[i], options[j]] = [options[j], options[i]];
+      }
+
+      options.forEach((optWord, idx) => {
         const btn = document.createElement('button');
-        btn.id = `quiz-opt-btn-${idx}`;
-        btn.className = "w-full text-left p-3 rounded-xl bg-slate-950/80 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/60 font-mono text-sm sm:text-base font-bold text-slate-100 flex items-center justify-between transition group shadow-sm active:scale-[0.98]";
+        btn.id = `cloze-btn-${idx}`;
+        btn.className = "p-3 rounded-xl bg-slate-950/90 hover:bg-slate-800 border border-slate-800 hover:border-amber-500/60 font-mono text-sm sm:text-base font-bold text-slate-100 flex items-center justify-between transition group shadow-sm active:scale-95";
         btn.innerHTML = `
-          <div class="flex items-center gap-2.5">
+          <div class="flex items-center gap-2">
             <span class="w-6 h-6 rounded-lg bg-slate-800 text-amber-300 text-xs font-black flex items-center justify-center shrink-0 border border-slate-700">
               ${idx + 1}
             </span>
@@ -1781,159 +887,117 @@
           </div>
           <i class="ph-bold ph-caret-right text-slate-600 group-hover:text-amber-400"></i>
         `;
-        btn.onclick = () => handleQuizSelect(optWord, idx);
+        btn.onclick = () => handleClozeSelect(optWord, idx, options);
         container.appendChild(btn);
       });
-
-      // 점수 업데이트
-      updateQuizScoreDisplay();
     }
 
-    function handleQuizSelect(selectedWord, selectedIdx) {
+    function handleClozeSelect(selectedWord, selectedIdx, allOptions) {
       if (quizAnswered) return;
       quizAnswered = true;
 
-      const q = quizBank[currentQuizIndex];
-      const isCorrect = selectedWord.toLowerCase() === q.targetWord.toLowerCase();
-      quizScore.total++;
-      if (isCorrect) quizScore.correct++;
+      const item = queue[currentIndex];
+      const isCorrect = selectedWord.toLowerCase() === item.step3.correct.toLowerCase();
 
-      // UI 피드백 표시
-      const fbBox = document.getElementById('quiz-feedback-box');
-      const fbTitle = document.getElementById('quiz-feedback-title');
-      const fbDesc = document.getElementById('quiz-feedback-desc');
+      const fbBox = document.getElementById('s3-feedback-box');
+      const fbTitle = document.getElementById('s3-fb-title');
+      const fbDesc = document.getElementById('s3-fb-desc');
+      const btnText = document.getElementById('step-next-btn-text');
 
       fbBox.classList.remove('hidden');
 
-      // 원본 데이터에 혼동어 오답 기록 & 서랍 태깅
-      const original = words.find(w => w.id === q.parentWordId);
-
       if (isCorrect) {
+        item.streak = (item.streak || 0) + 1;
         fbBox.className = "p-3 rounded-xl border border-emerald-500/50 bg-emerald-950/40 text-xs space-y-1";
         fbTitle.className = "font-black text-sm text-emerald-300 flex items-center gap-1.5";
-        fbTitle.innerHTML = `<i class="ph-bold ph-check-circle text-base"></i> 0.5초 킬러 정답! 정확히 식별했습니다.`;
-        fbDesc.innerHTML = `<span class="font-mono font-bold text-emerald-200">${q.targetWord}</span> ➔ ${q.questionMeaning}`;
-        
-        // 정답 버튼 초록색 강조
-        const correctBtn = document.getElementById(`quiz-opt-btn-${selectedIdx}`);
-        if (correctBtn) {
-          correctBtn.classList.add('border-emerald-500', 'bg-emerald-950/70', 'text-emerald-200');
+        fbTitle.innerHTML = `<i class="ph-bold ph-check-circle text-base"></i> 0.5초 킬러 정답! 정확히 짚었습니다.`;
+        fbDesc.innerHTML = `<span class="font-bold text-emerald-200">${item.step3.correct}</span> ➔ ${item.step2.vsenseTitle}`;
+
+        const selBtn = document.getElementById(`cloze-btn-${selectedIdx}`);
+        if (selBtn) selBtn.classList.add('border-emerald-500', 'bg-emerald-950/70', 'text-emerald-200');
+
+        if (item.streak >= 2) {
+          item.isMastered = true;
+          showToast(`🏆 "${item.targetWord}" 2회 연속 정답! 체화 완료`);
+          syncOriginal(item);
+          saveDatabase();
+
+          // 큐에서 제거
+          queue.splice(currentIndex, 1);
+          btnText.innerText = "다음 예문 (Space)";
+          return;
+        } else {
+          showToast(`👏 1회 정답! 2문장 뒤에 한 번 더 맞히면 졸업 (1/2)`);
+          syncOriginal(item);
+          saveDatabase();
+          btnText.innerText = "다음 예문 (Space)";
         }
       } else {
+        // 오답 시: 스트릭 리셋 & 2문장 뒤 강제 재삽입 (Short-term Recirculation)
+        item.streak = 0;
+        item.isMastered = false;
+        syncOriginal(item);
+        saveDatabase();
+
         fbBox.className = "p-3 rounded-xl border border-rose-500/50 bg-rose-950/40 text-xs space-y-1";
         fbTitle.className = "font-black text-sm text-rose-300 flex items-center gap-1.5";
-        fbTitle.innerHTML = `<i class="ph-bold ph-x-circle text-base"></i> 오답! 철자 낚시에 걸렸습니다.`;
-        fbDesc.innerHTML = `정답은 <strong class="font-mono text-amber-300 text-sm underline">${q.targetWord}</strong> (${q.questionMeaning}) 입니다.<br><span class="text-slate-400">내가 선택한 단어: <span class="font-mono text-rose-300">${selectedWord}</span></span>`;
+        fbTitle.innerHTML = `<i class="ph-bold ph-x-circle text-base"></i> 오답! 문맥 대립쌍을 다시 확인하세요.`;
+        fbDesc.innerHTML = `정답은 <strong class="font-mono text-amber-300 underline">${item.step3.correct}</strong> 입니다.<br><span class="text-slate-400">대립쌍: ${item.step2.contrast || ''}</span>`;
 
-        // 오답 기록 및 [혼동어 오답] 서랍으로 격리!
-        if (original) {
-          original.failedStage = 'conf';
-          original.confMistakes = (original.confMistakes || 0) + 1;
-          saveDatabase();
-        }
+        const selBtn = document.getElementById(`cloze-btn-${selectedIdx}`);
+        if (selBtn) selBtn.classList.add('border-rose-500', 'bg-rose-950/70', 'text-rose-200');
 
-        // 선택한 버튼 붉은색, 진짜 정답 버튼 초록색 강조
-        const wrongBtn = document.getElementById(`quiz-opt-btn-${selectedIdx}`);
-        if (wrongBtn) {
-          wrongBtn.classList.add('border-rose-500', 'bg-rose-950/70', 'text-rose-200');
-        }
-        // 정답 버튼 인덱스 찾아서 점등
-        q.options.forEach((opt, idx) => {
-          if (opt.toLowerCase() === q.targetWord.toLowerCase()) {
-            const rightBtn = document.getElementById(`quiz-opt-btn-${idx}`);
-            if (rightBtn) rightBtn.classList.add('border-emerald-500', 'bg-emerald-950/70', 'text-emerald-200');
+        allOptions.forEach((opt, idx) => {
+          if (opt.toLowerCase() === item.step3.correct.toLowerCase()) {
+            const correctBtn = document.getElementById(`cloze-btn-${idx}`);
+            if (correctBtn) correctBtn.classList.add('border-emerald-500', 'bg-emerald-950/70', 'text-emerald-200');
           }
         });
+
+        showToast(`⚡ 틀렸습니다! 2문장 뒤에 다시 빈칸으로 튀어나옵니다!`);
+
+        // ★ 현재 카드를 큐에서 빼서 딱 2문장 뒤에 재삽입!
+        const failedItem = queue.splice(currentIndex, 1)[0];
+        const reinsertIndex = Math.min(currentIndex + 2, queue.length);
+        queue.splice(reinsertIndex, 0, failedItem);
+        btnText.innerText = "다음 예문 (Space)";
       }
 
-      speakWord(q.targetWord);
-      updateQuizScoreDisplay();
+      speakWord(item.targetWord);
     }
 
-    function updateQuizScoreDisplay() {
-      const rate = quizScore.total > 0 ? Math.round((quizScore.correct / quizScore.total) * 100) : 0;
-      document.getElementById('quiz-score-indicator').innerText = `적중률: ${quizScore.correct}/${quizScore.total} (${rate}%)`;
+    function syncOriginal(item) {
+      const orig = sentences.find(s => s.id === item.id);
+      if (orig) {
+        orig.streak = item.streak;
+        orig.isMastered = item.isMastered;
+      }
     }
 
-    function nextQuizQuestion() {
-      currentQuizIndex++;
-      if (currentQuizIndex >= quizBank.length) {
-        showToast(`🎉 혼동어 퀴즈 완료! 최종 적중률: ${Math.round((quizScore.correct / quizScore.total) * 100)}%`);
-        toggleQuizMode(false);
+    function nextCard() {
+      if (queue.length === 0) {
+        showToast('모든 예문을 마스터했습니다!');
+        buildQueue();
       } else {
-        renderQuizQuestion();
+        currentIndex = currentIndex % queue.length;
       }
+      renderCard();
     }
 
-    function openPasteModal() {
-      document.getElementById('paste-modal').classList.remove('hidden');
-      document.getElementById('paste-textarea').focus();
+    function speakCurrentSentence() {
+      if (queue.length === 0) return;
+      const item = queue[currentIndex];
+      let text = subStep <= 1 ? item.step1.en : (subStep <= 3 ? item.step2.en : item.targetWord);
+      speakWord(text);
     }
 
-    function closePasteModal() {
-      document.getElementById('paste-modal').classList.add('hidden');
-    }
-
-    function applyPastedData(mode = 'append') {
-      const rawInput = document.getElementById('paste-textarea').value.trim();
-      if (!rawInput) return;
-
-      try {
-        let cleaned = rawInput;
-        
-        cleaned = cleaned.replace(/^```[a-zA-Z0-9_\-:]*\s*\n?/i, '')
-                         .replace(/\n?```(eof)?\s*$/i, '')
-                         .replace(/^\\\[\s*/, '[')
-                         .replace(/\s*\\\]$/, ']')
-                         .replace(/^\$\$\s*/, '')
-                         .replace(/\s*\$\$$/, '')
-                         .trim();
-
-        if (cleaned.startsWith('{') && cleaned.endsWith('}')) {
-          cleaned = `[${cleaned}]`;
-        }
-
-        cleaned = cleaned.replace(/,\s*([\]}])/g, '$1');
-
-        const parsed = JSON.parse(cleaned);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          const normalized = parsed.map(p => ({
-            id: p.id || 'vword_' + Date.now().toString() + Math.random().toString(36).substr(2, 4),
-            word: p.word || '',
-            cardType: p.cardType || '',
-            basic: p.basic || '',
-            enDef: p.enDef || '',
-            realSense: p.realSense || '',
-            confusion: p.confusion || '',
-            coreLogic: p.coreLogic || '',
-            contrast: p.contrast || '',
-            exampleEn: p.exampleEn || '',
-            exampleKo: p.exampleKo || '',
-            streak: 0,
-            memoryLevel: 0,
-            nextReviewDate: 0,
-            failedStage: null,
-            confMistakes: 0
-          }));
-
-          if (mode === 'overwrite') {
-            words = normalized;
-            showToast(`총 ${words.length}개 V단어로 교체되었습니다.`);
-          } else {
-            words.unshift(...normalized);
-            showToast(`${normalized.length}개 V단어가 추가되었습니다.`);
-          }
-
-          saveDatabase();
-          buildQueue();
-          renderCard();
-          closePasteModal();
-        } else {
-          showToast('JSON 데이터가 올바른 배열 형태가 아닙니다.');
-        }
-      } catch (err) {
-        console.error(err);
-        showToast('JSON 형식 오류입니다. 괄호나 쉼표를 확인해주세요.');
+    function speakWord(text) {
+      if ('speechSynthesis' in window && text) {
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-US';
+        u.rate = 0.95;
+        window.speechSynthesis.cancel();
+        window.speechSynthesis.speak(u);
       }
     }
 
@@ -1947,44 +1011,24 @@
       }, 1900);
     }
 
-    // 키보드 컨트롤 (혼동어 퀴즈 모드 1,2,3,4 숫자키 및 Space 지원)
+    // 키보드 컨트롤 (Space: 단계 넘기기, 1/2/3: 3단계 객관식 선택)
     window.addEventListener('keydown', (e) => {
-      const isModalOpen = !document.getElementById('paste-modal').classList.contains('hidden');
-      if (isModalOpen) return;
       if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
 
-      if (isQuizMode) {
-        if (['1', '2', '3', '4'].includes(e.key)) {
-          const idx = parseInt(e.key, 10) - 1;
-          const btn = document.getElementById(`quiz-opt-btn-${idx}`);
-          if (btn) btn.click();
-        } else if (e.key === ' ' || e.code === 'Space' || e.key === 'Enter') {
-          e.preventDefault();
-          if (quizAnswered) {
-            nextQuizQuestion();
-          }
-        }
-        return;
-      }
-
-      if (e.key === ' ' || e.code === 'Space') {
+      if (e.key === ' ' || e.code === 'Space' || e.key === 'Enter') {
         e.preventDefault();
-        nextStage();
-      } else if (e.key === '1') {
-        markResult(false);
-      } else if (e.key === '2' || e.key === 'Enter') {
-        markResult(true);
-      } else if (e.key === 'ArrowRight') {
-        nextCard();
-      } else if (e.key === 'ArrowLeft') {
-        prevCard();
+        handleStageClick();
+      } else if (subStep === 4 && ['1', '2', '3'].includes(e.key)) {
+        const idx = parseInt(e.key, 10) - 1;
+        const btn = document.getElementById(`cloze-btn-${idx}`);
+        if (btn) btn.click();
       } else if (e.key.toLowerCase() === 's') {
-        speakWord();
+        speakCurrentSentence();
       }
     });
 
     window.onload = function() {
-      loadDatabase();
+      initDatabase();
     };
   </script>
 </body>
