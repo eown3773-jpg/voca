@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>V-Voca - 김지영 V단어식 영영 뉘앙스 & 실전 독해 인출기</title>
+  <title>V-Voca - 에빙하우스 간격 반복 & 단계별 인출기</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Pretendard Webfont -->
@@ -22,7 +22,6 @@
       word-break: keep-all;
       overflow-wrap: break-word;
     }
-    /* 모바일 스크롤바 미려하게 처리 */
     ::-webkit-scrollbar {
       width: 4px;
       height: 4px;
@@ -42,16 +41,16 @@
       <!-- Logo & Title -->
       <div class="flex items-center space-x-2 min-w-0">
         <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-rose-600 via-amber-500 to-indigo-600 flex items-center justify-center text-white shrink-0 shadow-md">
-          <i class="ph-bold ph-lightning text-base"></i>
+          <i class="ph-bold ph-brain text-base"></i>
         </div>
         <div class="min-w-0">
           <div class="flex items-center gap-1.5 flex-wrap">
             <span class="text-sm font-black text-white tracking-tight">V-Voca</span>
-            <span class="text-[9px] px-1.5 py-0.2 bg-rose-500/20 text-rose-300 font-extrabold rounded border border-rose-500/30">
-              김지영 V단어
+            <span class="text-[9px] px-1.5 py-0.2 bg-indigo-500/20 text-indigo-300 font-extrabold rounded border border-indigo-500/30">
+              에빙하우스 3·7·30
             </span>
           </div>
-          <p class="text-[10px] text-slate-400 truncate">1차 뜻 ➔ 영영 뉘앙스 ➔ 실전 독해 속뜻</p>
+          <p class="text-[10px] text-slate-400 truncate">틀린 단계별 분리 보관 & 간격 반복 시스템</p>
         </div>
       </div>
 
@@ -71,49 +70,72 @@
   <!-- ==================== MAIN CONTENT ==================== -->
   <main class="flex-1 max-w-2xl w-full mx-auto p-2.5 sm:p-4 flex flex-col justify-start sm:justify-center">
     
-    <!-- Filter Bar -->
-    <div class="bg-slate-900 border border-slate-800 p-2 rounded-xl mb-2.5 flex items-center justify-between text-[11px] font-semibold gap-1">
-      <div class="flex items-center gap-1 overflow-x-auto py-0.5">
-        <button id="filter-btn-all" onclick="setMode('all')" class="px-2 py-0.5 rounded-md bg-rose-600 text-white font-bold shrink-0">
-          전체 (<span id="count-all">0</span>)
-        </button>
-        <button id="filter-btn-review" onclick="setMode('review')" class="px-2 py-0.5 rounded-md text-slate-300 hover:bg-slate-800 shrink-0">
-          복습 (<span id="count-review">0</span>)
-        </button>
-        <button id="filter-btn-mastered" onclick="setMode('mastered')" class="px-2 py-0.5 rounded-md text-slate-300 hover:bg-slate-800 shrink-0">
-          완료 (<span id="count-mastered">0</span>)
+    <!-- Filter Tabs (보관함 선택 바) -->
+    <div class="bg-slate-900 border border-slate-800 p-2 rounded-2xl mb-2.5 space-y-1.5 shadow-sm">
+      
+      <!-- 상단: 기본 학습 큐 -->
+      <div class="flex items-center justify-between text-[11px] font-semibold gap-1">
+        <div class="flex items-center gap-1 overflow-x-auto py-0.5 no-scrollbar">
+          <button id="filter-btn-all" onclick="setMode('all')" class="px-2.5 py-1 rounded-lg bg-rose-600 text-white font-bold shrink-0">
+            전체 (<span id="count-all">0</span>)
+          </button>
+          <button id="filter-btn-today" onclick="setMode('today_review')" class="px-2.5 py-1 rounded-lg text-amber-300 bg-amber-950/40 border border-amber-500/40 font-bold shrink-0 flex items-center gap-1">
+            <i class="ph-bold ph-alarm"></i> 오늘 복습 (<span id="count-today">0</span>)
+          </button>
+          <button id="filter-btn-mastered" onclick="setMode('mastered')" class="px-2.5 py-1 rounded-lg text-slate-300 hover:bg-slate-800 shrink-0">
+            기억 승급 (<span id="count-mastered">0</span>)
+          </button>
+        </div>
+        <button onclick="shuffleQueue()" class="text-slate-400 hover:text-white flex items-center gap-1 shrink-0 px-1 text-[10px]">
+          <i class="ph-bold ph-shuffle"></i> 섞기
         </button>
       </div>
-      <button onclick="shuffleQueue()" class="text-slate-400 hover:text-white flex items-center gap-1 shrink-0 px-1 text-[10px]">
-        <i class="ph-bold ph-shuffle"></i> 섞기
-      </button>
+
+      <!-- 하단: 틀린 단계별 세부 약점 보관함 -->
+      <div class="flex items-center gap-1 overflow-x-auto pt-1 border-t border-slate-800/80 text-[10px] font-medium text-slate-400">
+        <span class="text-slate-500 shrink-0 px-1 font-bold">약점 서랍:</span>
+        <button id="filter-btn-fail0" onclick="setMode('fail_step0')" class="px-2 py-0.5 rounded-md hover:bg-slate-800 shrink-0 text-rose-400 border border-transparent">
+          기본뜻 미흡 (<span id="count-fail0">0</span>)
+        </button>
+        <button id="filter-btn-fail12" onclick="setMode('fail_step12')" class="px-2 py-0.5 rounded-md hover:bg-slate-800 shrink-0 text-amber-400 border border-transparent">
+          영영 뉘앙스 (<span id="count-fail12">0</span>)
+        </button>
+        <button id="filter-btn-fail3" onclick="setMode('fail_step3')" class="px-2 py-0.5 rounded-md hover:bg-slate-800 shrink-0 text-indigo-400 border border-transparent">
+          V-속뜻/대립쌍 (<span id="count-fail3">0</span>)
+        </button>
+      </div>
+
     </div>
 
     <!-- MAIN CARD -->
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-lg flex flex-col justify-between min-h-[460px] sm:min-h-[500px]">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-6 shadow-xl flex flex-col justify-between min-h-[470px] sm:min-h-[510px]">
       
-      <!-- Card Top: Step Indicator & Progress -->
+      <!-- Card Top: Step Indicator & Spaced Repetition Level -->
       <div class="flex items-center justify-between text-[10px] sm:text-xs text-slate-400 pb-2.5 border-b border-slate-800 gap-1">
-        <span id="card-tag" class="px-2 py-0.5 rounded bg-slate-800 text-rose-300 font-bold border border-slate-700 truncate max-w-[80px] sm:max-w-none">
-          V-Lecture
+        
+        <!-- 에빙하우스 기억 레벨 배지 -->
+        <span id="card-memory-badge" class="px-2 py-0.5 rounded-md bg-slate-800 text-rose-300 font-extrabold border border-slate-700 flex items-center gap-1">
+          <i class="ph-bold ph-hourglass"></i> 습득중 (0단계)
         </span>
         
-        <!-- Step Indicator (모바일 최적화: 1/2/3 칩) -->
+        <!-- 단계 표시 (0:표제어 ➔ 1:기본 ➔ 2:영영 ➔ 3:속뜻) -->
         <div class="flex items-center gap-1 font-bold">
-          <span id="step-badge-1" class="px-2 py-0.5 rounded bg-rose-600 text-white">1: 기본뜻</span>
+          <span id="step-badge-0" class="px-1.5 py-0.5 rounded bg-rose-600 text-white">0</span>
           <span class="text-slate-600">➔</span>
-          <span id="step-badge-2" class="px-2 py-0.5 rounded bg-slate-800 text-slate-400">2: 영영정의</span>
+          <span id="step-badge-1" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">1</span>
           <span class="text-slate-600">➔</span>
-          <span id="step-badge-3" class="px-2 py-0.5 rounded bg-slate-800 text-slate-400">3: V-속뜻</span>
+          <span id="step-badge-2" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">2</span>
+          <span class="text-slate-600">➔</span>
+          <span id="step-badge-3" class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">3</span>
         </div>
 
         <span id="card-progress" class="font-mono text-slate-400 text-[11px] shrink-0">1 / 42</span>
       </div>
 
       <!-- Core Word Header -->
-      <div class="my-3 text-center space-y-1">
+      <div class="my-2.5 text-center space-y-1">
         <div class="flex items-center justify-center gap-1.5">
-          <span class="text-[9px] font-black uppercase text-rose-400 tracking-wider">
+          <span id="card-last-failure" class="text-[9px] font-black uppercase text-slate-500 tracking-wider">
             TARGET WORD
           </span>
           <button onclick="speakWord()" class="text-slate-400 hover:text-rose-400 p-1" title="발음 듣기">
@@ -121,29 +143,41 @@
           </button>
         </div>
         
-        <!-- 표제어 (모바일에서도 줄바꿈 안 깨지게) -->
         <h2 id="card-target-word" class="text-2xl sm:text-3xl font-black text-white tracking-tight break-words px-2 leading-tight">
           attitude
         </h2>
 
         <!-- Step Guide Pill -->
         <div class="pt-1 flex items-center justify-center">
-          <p id="card-step-guide" class="text-[10px] sm:text-xs font-bold text-amber-300 bg-amber-950/40 px-2.5 py-0.5 rounded-full border border-amber-600/40">
-            [터치 / Space] 영영사전 코어 뉘앙스 오픈
+          <p id="card-step-guide" class="text-[10px] sm:text-xs font-bold text-slate-300 bg-slate-800 px-2.5 py-0.5 rounded-full border border-slate-700">
+            [터치 / Space] 1차 기본 뜻 떠올리고 오픈
           </p>
         </div>
       </div>
 
-      <!-- Interactive 3-Stage Box (터치 영역) -->
+      <!-- Interactive Box (터치/클릭 영역) -->
       <div id="voca-display-box" onclick="nextStage()" class="cursor-pointer bg-slate-950/70 hover:bg-slate-950/90 border border-dashed border-slate-700/80 active:border-rose-500 rounded-xl p-3.5 sm:p-5 transition my-1 flex flex-col justify-center items-center min-h-[190px]">
         
+        <!-- STEP 0 VIEW: 완전 블라인드 -->
+        <div id="view-step-0" class="space-y-3 text-center w-full py-4">
+          <div class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-slate-800 text-rose-400 mb-1">
+            <i class="ph-bold ph-eye-slash text-xl"></i>
+          </div>
+          <div class="text-sm sm:text-base font-extrabold text-slate-300">
+            기본 사전 뜻과 뉘앙스를 먼저 머릿속으로 떠올려보세요!
+          </div>
+          <p class="text-[11px] text-rose-400/90 font-semibold flex items-center justify-center gap-1">
+            <i class="ph-bold ph-hand-tap text-xs"></i> 터치 시 1차 기본 뜻 오픈 (기본 뜻 모르면 즉시 [헷갈림])
+          </p>
+        </div>
+
         <!-- STEP 1 VIEW: 기본 1차 의미 -->
-        <div id="view-step-1" class="space-y-2 text-center w-full">
+        <div id="view-step-1" class="hidden space-y-2 text-center w-full">
           <div class="text-slate-400 text-[11px] font-medium">사전적 1차 뜻 (기본)</div>
           <div id="card-basic-meaning" class="text-lg sm:text-xl font-black text-slate-100 px-2">
             태도, 입장
           </div>
-          <p class="text-[10px] sm:text-[11px] text-slate-500 font-semibold flex items-center justify-center gap-1 pt-1">
+          <p class="text-[10px] sm:text-[11px] text-amber-400 font-semibold flex items-center justify-center gap-1 pt-1">
             <i class="ph-bold ph-hand-tap text-xs"></i> 터치하면 영영사전 코어 뉘앙스가 열립니다
           </p>
         </div>
@@ -157,14 +191,13 @@
             "A settled way of thinking or feeling about someone or something."
           </div>
           <p class="text-[10px] sm:text-[11px] text-indigo-400 font-bold flex items-center justify-center gap-1">
-            <i class="ph-bold ph-lightbulb text-xs"></i> 한 번 더 터치 ➔ 실전 독해 속뜻(V-Sense) 오픈
+            <i class="ph-bold ph-lightbulb text-xs"></i> 터치 ➔ 실전 독해 속뜻(V-Sense) & 대립쌍 오픈
           </p>
         </div>
 
         <!-- STEP 3 VIEW: 김지영 V-Sense (실전 속뜻 & 대립쌍) -->
         <div id="view-step-3" class="hidden space-y-2.5 w-full text-left">
           
-          <!-- 실전 독해 속뜻 박스 -->
           <div class="bg-rose-950/30 border border-rose-500/40 rounded-lg p-3 space-y-1">
             <span class="text-[10px] font-black uppercase text-rose-400 tracking-wider flex items-center gap-1">
               <i class="ph-bold ph-crosshair"></i> 실전 독해 속뜻 (V-Sense)
@@ -177,7 +210,6 @@
             </p>
           </div>
 
-          <!-- 문맥 대립쌍 (Binary Opposites) -->
           <div id="card-binary-box" class="bg-amber-950/30 border border-amber-600/40 rounded-lg p-2 text-[11px]">
             <div class="text-amber-400 font-bold text-[10px] uppercase mb-0.5">문맥 대립쌍:</div>
             <div id="card-contrast" class="text-amber-200 font-medium leading-tight">
@@ -185,7 +217,6 @@
             </div>
           </div>
 
-          <!-- 실전 예문 & 시역 -->
           <div class="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800 space-y-1">
             <p id="card-example-en" class="text-[11px] sm:text-xs text-slate-200 font-medium leading-snug">
               "The author maintains a critical attitude toward unexamined technological optimism."
@@ -201,16 +232,21 @@
 
       <!-- Action Buttons -->
       <div class="pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
-        <span id="card-streak" class="text-[11px] font-bold text-slate-400 shrink-0">
-          인출: 0 / 2회
-        </span>
+        <div class="text-[11px] text-slate-400 flex flex-col">
+          <span id="card-streak" class="font-bold">연속 정답: 0회</span>
+          <span id="card-next-review-info" class="text-[10px] text-slate-500">다음 복습: 즉시</span>
+        </div>
 
         <div class="flex items-center gap-2">
-          <button onclick="markResult(false)" class="px-3.5 py-2 bg-rose-950/40 hover:bg-rose-900/60 active:bg-rose-900 text-rose-300 border border-rose-800/60 rounded-xl font-bold text-xs flex items-center gap-1 transition">
-            <i class="ph-bold ph-x-circle text-sm"></i> 헷갈림
+          <!-- 헷갈림 버튼: 현재 멈춘 단계를 감지해 해당 서랍으로 분류 -->
+          <button onclick="markResult(false)" class="px-3.5 py-2.5 bg-rose-950/40 hover:bg-rose-900/60 active:bg-rose-900 text-rose-300 border border-rose-800/60 rounded-xl font-bold text-xs flex items-center gap-1 transition shadow-sm">
+            <i class="ph-bold ph-x-circle text-base"></i>
+            <span id="btn-label-doubt">헷갈림</span>
           </button>
-          <button onclick="markResult(true)" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-1 transition shadow">
-            <i class="ph-bold ph-check-circle text-sm"></i> 알겠음
+          
+          <button onclick="markResult(true)" class="px-4.5 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl font-black text-xs flex items-center gap-1.5 transition shadow-md">
+            <i class="ph-bold ph-check-circle text-base"></i>
+            <span>알겠음</span>
           </button>
         </div>
       </div>
@@ -233,7 +269,7 @@
 
       <div class="space-y-1.5">
         <p class="text-[11px] text-slate-400 leading-snug">
-          채팅창에 생성된 <strong>V단어 JSON 코드</strong>를 복사해서 아래에 붙여넣으세요.
+          V단어 JSON 데이터를 붙여넣으세요. 에빙하우스 간격 반복 스케줄러가 자동 적용됩니다.
         </p>
         <textarea id="paste-textarea" rows="7" placeholder='[
   {
@@ -264,9 +300,10 @@
   </div>
 
   <script>
-    const STORAGE_KEY = 'VVOCA_DB_V1_NUANCE';
+    const STORAGE_KEY = 'VVOCA_DB_V2_SPACED';
+    const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
-    // 기본 시드 데이터 (001~008 핵심)
+    // 기본 시드 데이터
     const SEED_WORDS = [
       {
         "id": "v_001_attitude",
@@ -274,12 +311,14 @@
         "basic": "태도, 입장",
         "enDef": "A settled way of thinking or feeling about someone or something.",
         "realSense": "지문 속 필자의 관점·가치관·입장 (혼동: altitude/latitude/aptitude)",
-        "coreLogic": "단순 몸짓이 아니라 사안을 바라보는 '정신적 입장'. 형태가 비슷한 altitude(높이), latitude(위도), aptitude(적성) 선지 함정 빈출!",
+        "coreLogic": "단순 몸짓이 아니라 사안을 바라보는 '정신적 입장'. 형태 혼동 선지 주의!",
         "contrast": "attitude (태도/입장) ↔ objective fact (객관적 사실)",
         "exampleEn": "The author maintains a critical attitude toward unexamined technological optimism.",
         "exampleKo": "필자는 무비판적인 기술 낙관주의에 대해 비판적인 태도(입장)를 견지한다.",
         "streak": 0,
-        "isMastered": false
+        "memoryLevel": 0, // 0: 습득중, 1: 3일 복습예정, 2: 7일 복습예정, 3: 30일 영구기억
+        "nextReviewDate": 0,
+        "failedStage": null // 'step0', 'step12', 'step3'
       },
       {
         "id": "v_002_affect",
@@ -292,7 +331,9 @@
         "exampleEn": "Cognitive evaluation and emotional affect operate through interconnected neural pathways.",
         "exampleKo": "인지적 평가와 정서적 감정(affect)은 상호 연결된 신경 경로를 통해 작동한다.",
         "streak": 0,
-        "isMastered": false
+        "memoryLevel": 0,
+        "nextReviewDate": 0,
+        "failedStage": null
       },
       {
         "id": "v_003_priceless",
@@ -305,7 +346,9 @@
         "exampleEn": "Historical manuscripts preserved in the archive are priceless cultural treasures.",
         "exampleKo": "기록관에 보존된 역사적 필사본들은 값을 매길 수 없이 귀중한 문화적 보물이다.",
         "streak": 0,
-        "isMastered": false
+        "memoryLevel": 0,
+        "nextReviewDate": 0,
+        "failedStage": null
       },
       {
         "id": "v_021_vacuum",
@@ -318,7 +361,9 @@
         "exampleEn": "Scientific theories do not emerge in a vacuum; they reflect existing cultural assumptions.",
         "exampleKo": "과학 이론은 고립된 진공 상태에서 생겨나지 않으며, 기존의 문화적 가정을 반영한다.",
         "streak": 0,
-        "isMastered": false
+        "memoryLevel": 0,
+        "nextReviewDate": 0,
+        "failedStage": null
       },
       {
         "id": "v_022_myth",
@@ -331,14 +376,16 @@
         "exampleEn": "The popular myth that human memory acts like a video recorder has been debunked.",
         "exampleKo": "인간의 기억이 비디오 녹화기처럼 작동한다는 대중적 통념(myth)은 거짓으로 밝혀졌다.",
         "streak": 0,
-        "isMastered": false
+        "memoryLevel": 0,
+        "nextReviewDate": 0,
+        "failedStage": null
       }
     ];
 
     let words = [];
     let queue = [];
     let currentIndex = 0;
-    let currentStage = 1;
+    let currentStage = 0; // 0: 블라인드, 1: 기본뜻, 2: 영영, 3: V-속뜻
     let currentMode = 'all';
 
     function loadDatabase() {
@@ -353,6 +400,12 @@
         words = [...SEED_WORDS];
         saveDatabase();
       }
+      // 마이그레이션 방어 코드
+      words.forEach(w => {
+        if (typeof w.memoryLevel === 'undefined') w.memoryLevel = 0;
+        if (typeof w.nextReviewDate === 'undefined') w.nextReviewDate = 0;
+        if (typeof w.failedStage === 'undefined') w.failedStage = null;
+      });
       updateCounts();
       buildQueue();
       renderCard();
@@ -364,48 +417,72 @@
     }
 
     function resetToSeedData() {
-      if (!confirm('기본 V단어 덱으로 리셋하시겠습니까?')) return;
       words = [...SEED_WORDS];
       saveDatabase();
       buildQueue();
       renderCard();
-      showToast('기본 V단어 덱으로 리셋되었습니다.');
+      showToast('기본 덱으로 초기화되었습니다.');
     }
 
     function updateCounts() {
+      const now = Date.now();
       document.getElementById('count-all').innerText = words.length;
-      document.getElementById('count-review').innerText = words.filter(w => !w.isMastered && w.streak === 0).length;
-      document.getElementById('count-mastered').innerText = words.filter(w => w.isMastered).length;
+      
+      // 오늘 복습 대상 (습득 완료되었으나 복습 기한 도래)
+      const todayDue = words.filter(w => w.memoryLevel > 0 && w.nextReviewDate <= now).length;
+      document.getElementById('count-today').innerText = todayDue;
+
+      // 기억 승급 (Level 3 도달 완료)
+      document.getElementById('count-mastered').innerText = words.filter(w => w.memoryLevel >= 3).length;
+
+      // 단계별 실패 서랍 카운트
+      document.getElementById('count-fail0').innerText = words.filter(w => w.failedStage === 'step0').length;
+      document.getElementById('count-fail12').innerText = words.filter(w => w.failedStage === 'step12').length;
+      document.getElementById('count-fail3').innerText = words.filter(w => w.failedStage === 'step3').length;
     }
 
     function setMode(mode) {
       currentMode = mode;
-      const btnAll = document.getElementById('filter-btn-all');
-      const btnRev = document.getElementById('filter-btn-review');
-      const btnMas = document.getElementById('filter-btn-mastered');
+      
+      const buttons = [
+        'filter-btn-all', 'filter-btn-today', 'filter-btn-mastered',
+        'filter-btn-fail0', 'filter-btn-fail12', 'filter-btn-fail3'
+      ];
 
-      const idle = 'px-2 py-0.5 rounded-md text-slate-300 hover:bg-slate-800 shrink-0';
-      btnAll.className = idle;
-      btnRev.className = idle;
-      btnMas.className = idle;
+      buttons.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+          btn.classList.remove('bg-rose-600', 'bg-amber-600', 'bg-emerald-600', 'bg-indigo-600', 'text-white', 'border-rose-500', 'border-amber-500', 'border-indigo-500');
+        }
+      });
 
-      if (mode === 'all') btnAll.className = 'px-2 py-0.5 rounded-md bg-rose-600 text-white font-bold shrink-0';
-      if (mode === 'review') btnRev.className = 'px-2 py-0.5 rounded-md bg-amber-600 text-white font-bold shrink-0';
-      if (mode === 'mastered') btnMas.className = 'px-2 py-0.5 rounded-md bg-emerald-600 text-white font-bold shrink-0';
+      const activeBtn = document.getElementById(`filter-btn-${mode.replace('_review', '').replace('step', '')}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-rose-600', 'text-white');
+      }
 
       buildQueue();
       renderCard();
     }
 
     function buildQueue() {
+      const now = Date.now();
+
       if (currentMode === 'all') {
-        queue = words.filter(w => !w.isMastered);
+        queue = words.filter(w => w.memoryLevel < 3);
         if (queue.length === 0) queue = [...words];
-      } else if (currentMode === 'review') {
-        queue = words.filter(w => !w.isMastered && w.streak === 0);
+      } else if (currentMode === 'today_review') {
+        queue = words.filter(w => w.memoryLevel > 0 && w.nextReviewDate <= now);
       } else if (currentMode === 'mastered') {
-        queue = words.filter(w => w.isMastered);
+        queue = words.filter(w => w.memoryLevel >= 3);
+      } else if (currentMode === 'fail_step0') {
+        queue = words.filter(w => w.failedStage === 'step0');
+      } else if (currentMode === 'fail_step12') {
+        queue = words.filter(w => w.failedStage === 'step12');
+      } else if (currentMode === 'fail_step3') {
+        queue = words.filter(w => w.failedStage === 'step3');
       }
+
       currentIndex = 0;
     }
 
@@ -421,16 +498,19 @@
 
     function renderCard() {
       if (queue.length === 0) {
-        document.getElementById('card-target-word').innerText = "학습 완료!";
+        document.getElementById('card-target-word').innerText = "보관함 비어있음";
         document.getElementById('card-basic-meaning').innerText = "해당 조건의 단어가 없습니다.";
-        document.getElementById('card-step-guide').innerText = "모든 단어 인출 완료";
+        document.getElementById('card-step-guide').innerText = "학습 완료 또는 다른 서랍 선택";
         document.getElementById('card-progress').innerText = "0 / 0";
-        updateStageUI(1);
+        document.getElementById('card-memory-badge').innerText = "대기중";
+        document.getElementById('card-streak').innerText = "연속 정답: 0회";
+        document.getElementById('card-next-review-info').innerText = "";
+        updateStageUI(0);
         return;
       }
 
       const item = queue[currentIndex];
-      currentStage = 1;
+      currentStage = 0; // 항상 0단계 블라인드로 시작
       updateStageUI(currentStage);
 
       document.getElementById('card-progress').innerText = `${currentIndex + 1} / ${queue.length}`;
@@ -451,79 +531,156 @@
       document.getElementById('card-example-en').innerText = `"${item.exampleEn || ''}"`;
       document.getElementById('card-example-ko').innerText = `"${item.exampleKo || ''}"`;
 
-      document.getElementById('card-streak').innerText = `인출: ${item.streak || 0} / 2회`;
+      // 에빙하우스 기억 레벨 배지 UI
+      const badge = document.getElementById('card-memory-badge');
+      const lvl = item.memoryLevel || 0;
+      if (lvl === 0) {
+        badge.innerHTML = `<i class="ph-bold ph-hourglass"></i> 습득중 (0단계)`;
+        badge.className = "px-2 py-0.5 rounded-md bg-slate-800 text-rose-300 font-extrabold border border-slate-700 text-[10px]";
+      } else if (lvl === 1) {
+        badge.innerHTML = `<i class="ph-bold ph-calendar-check"></i> 3일 간격 기억`;
+        badge.className = "px-2 py-0.5 rounded-md bg-amber-950/60 text-amber-300 font-extrabold border border-amber-600/40 text-[10px]";
+      } else if (lvl === 2) {
+        badge.innerHTML = `<i class="ph-bold ph-seal-check"></i> 7일 간격 기억`;
+        badge.className = "px-2 py-0.5 rounded-md bg-indigo-950/60 text-indigo-300 font-extrabold border border-indigo-600/40 text-[10px]";
+      } else if (lvl >= 3) {
+        badge.innerHTML = `<i class="ph-bold ph-crown"></i> 30일 영구 기억 승급`;
+        badge.className = "px-2 py-0.5 rounded-md bg-emerald-950/60 text-emerald-300 font-extrabold border border-emerald-600/40 text-[10px]";
+      }
+
+      // 이전 실패 이력 안내
+      const lastFailEl = document.getElementById('card-last-failure');
+      if (item.failedStage === 'step0') {
+        lastFailEl.innerText = "🚨 지난번 [0단계: 기본뜻]에서 헷갈렸던 단어";
+        lastFailEl.className = "text-[9px] font-black text-rose-400 tracking-wider";
+      } else if (item.failedStage === 'step12') {
+        lastFailEl.innerText = "💡 지난번 [영영 뉘앙스]에서 헷갈렸던 단어";
+        lastFailEl.className = "text-[9px] font-black text-amber-400 tracking-wider";
+      } else if (item.failedStage === 'step3') {
+        lastFailEl.innerText = "🎯 지난번 [V-속뜻/대립쌍]에서 헷갈렸던 단어";
+        lastFailEl.className = "text-[9px] font-black text-indigo-400 tracking-wider";
+      } else {
+        lastFailEl.innerText = "TARGET WORD";
+        lastFailEl.className = "text-[9px] font-black uppercase text-slate-500 tracking-wider";
+      }
+
+      document.getElementById('card-streak').innerText = `현재 연속 인출: ${item.streak || 0}회`;
+      
+      const nextDate = item.nextReviewDate ? new Date(item.nextReviewDate).toLocaleDateString('ko-KR') : '즉시';
+      document.getElementById('card-next-review-info').innerText = lvl > 0 ? `복습 예정일: ${nextDate}` : '다음 복습: 즉시 인출';
     }
 
     function nextStage() {
       if (queue.length === 0) return;
-      currentStage = currentStage >= 3 ? 1 : currentStage + 1;
+      currentStage = currentStage >= 3 ? 0 : currentStage + 1;
       updateStageUI(currentStage);
     }
 
     function updateStageUI(stage) {
+      const v0 = document.getElementById('view-step-0');
       const v1 = document.getElementById('view-step-1');
       const v2 = document.getElementById('view-step-2');
       const v3 = document.getElementById('view-step-3');
 
+      const b0 = document.getElementById('step-badge-0');
       const b1 = document.getElementById('step-badge-1');
       const b2 = document.getElementById('step-badge-2');
       const b3 = document.getElementById('step-badge-3');
       const guide = document.getElementById('card-step-guide');
+      const doubtLabel = document.getElementById('btn-label-doubt');
 
+      v0.classList.add('hidden');
       v1.classList.add('hidden');
       v2.classList.add('hidden');
       v3.classList.add('hidden');
 
-      const activeBadge = 'px-2 py-0.5 rounded bg-rose-600 text-white font-bold';
-      const idleBadge = 'px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-bold';
-      b1.className = idleBadge;
-      b2.className = idleBadge;
-      b3.className = idleBadge;
+      const idle = 'px-1.5 py-0.5 rounded bg-slate-800 text-slate-500 font-bold';
+      b0.className = idle;
+      b1.className = idle;
+      b2.className = idle;
+      b3.className = idle;
 
-      if (stage === 1) {
+      if (stage === 0) {
+        v0.classList.remove('hidden');
+        b0.className = 'px-1.5 py-0.5 rounded bg-rose-600 text-white font-bold';
+        guide.innerText = "[터치 / Space] 1차 기본 뜻 떠올리고 오픈";
+        doubtLabel.innerText = "기본뜻 모름";
+      } else if (stage === 1) {
         v1.classList.remove('hidden');
-        b1.className = activeBadge;
+        b1.className = 'px-1.5 py-0.5 rounded bg-amber-600 text-white font-bold';
         guide.innerText = "[터치 / Space] 영영사전 코어 뉘앙스 오픈";
-        guide.className = "text-[10px] sm:text-xs font-bold text-amber-300 bg-amber-950/40 px-2.5 py-0.5 rounded-full border border-amber-600/40";
+        doubtLabel.innerText = "뉘앙스 애매";
       } else if (stage === 2) {
         v2.classList.remove('hidden');
-        b2.className = 'px-2 py-0.5 rounded bg-indigo-600 text-white font-bold';
+        b2.className = 'px-1.5 py-0.5 rounded bg-indigo-600 text-white font-bold';
         guide.innerText = "[터치 / Space] 실전 독해 속뜻(V-Sense) 오픈";
-        guide.className = "text-[10px] sm:text-xs font-bold text-indigo-300 bg-indigo-950/40 px-2.5 py-0.5 rounded-full border border-indigo-600/40";
+        doubtLabel.innerText = "뉘앙스 애매";
       } else if (stage === 3) {
         v3.classList.remove('hidden');
-        b3.className = 'px-2 py-0.5 rounded bg-emerald-600 text-white font-bold';
-        guide.innerText = "뉘앙스 체화! 하단 [헷갈림] 또는 [알겠음] 선택";
-        guide.className = "text-[10px] sm:text-xs font-bold text-emerald-300 bg-emerald-950/40 px-2.5 py-0.5 rounded-full border border-emerald-600/40";
+        b3.className = 'px-1.5 py-0.5 rounded bg-emerald-600 text-white font-bold';
+        guide.innerText = "뉘앙스 확인 완료! [헷갈림] 또는 [알겠음] 선택";
+        doubtLabel.innerText = "V속뜻 헷갈림";
       }
     }
 
+    // 결과 판정 (에빙하우스 알고리즘 & 실패 단계 스마트 기록)
     function markResult(isCorrect) {
       if (queue.length === 0) return;
       const item = queue[currentIndex];
+      const now = Date.now();
 
       if (isCorrect) {
         item.streak = (item.streak || 0) + 1;
+        item.failedStage = null; // 오답 이력 클리어
+
+        // 에빙하우스 간격 반복 단계 승급 (Level 0 ➔ 1(+3일) ➔ 2(+7일) ➔ 3(+30일))
         if (item.streak >= 2) {
-          item.isMastered = true;
-          showToast(`🎉 "${item.word}" 체화 완료!`);
+          if (!item.memoryLevel || item.memoryLevel === 0) {
+            item.memoryLevel = 1;
+            item.nextReviewDate = now + (3 * ONE_DAY_MS); // 3일 뒤 복습
+            showToast(`🌱 "${item.word}" 체화! [3일 뒤 복습] 예약`);
+          } else if (item.memoryLevel === 1) {
+            item.memoryLevel = 2;
+            item.nextReviewDate = now + (7 * ONE_DAY_MS); // 7일 뒤 복습
+            showToast(`🌿 3일 복습 성공! [7일 뒤 복습] 승급`);
+          } else if (item.memoryLevel === 2) {
+            item.memoryLevel = 3;
+            item.nextReviewDate = now + (30 * ONE_DAY_MS); // 30일 뒤 복습
+            showToast(`🏆 7일 복습 성공! [30일 영구 기억] 승급!`);
+          }
         } else {
-          showToast(`👏 정답! 한 번 더 맞히면 체화 완료됩니다 (1/2)`);
+          showToast(`👏 정답! 한 번 더 맞히면 간격 반복 덱으로 승급 (1/2)`);
         }
       } else {
+        // 실패 시: 현재 화면이 멈춘 단계를 감지해 세부 약점 서랍으로 태깅!
+        if (currentStage === 0) {
+          item.failedStage = 'step0'; // 기본 뜻 자체를 모름
+          showToast(`🚨 [기본뜻 미흡 서랍]에 보관되었습니다.`);
+        } else if (currentStage === 1 || currentStage === 2) {
+          item.failedStage = 'step12'; // 영영 뉘앙스 단계에서 막힘
+          showToast(`💡 [영영 뉘앙스 서랍]에 보관되었습니다.`);
+        } else {
+          item.failedStage = 'step3'; // V-속뜻/대립쌍 단계에서 막힘
+          showToast(`🎯 [V-속뜻/대립쌍 서랍]에 보관되었습니다.`);
+        }
+
         item.streak = 0;
-        item.isMastered = false;
-        showToast(`💡 복습 덱에 보관되었습니다.`);
+        item.memoryLevel = 0; // 망각 발생 시 초기 습득 레벨로 강등
+        item.nextReviewDate = 0; // 즉시 복습 대상
       }
 
+      // 원본 동기화 및 저장
       const original = words.find(w => w.id === item.id);
       if (original) {
         original.streak = item.streak;
-        original.isMastered = item.isMastered;
+        original.memoryLevel = item.memoryLevel;
+        original.nextReviewDate = item.nextReviewDate;
+        original.failedStage = item.failedStage;
       }
       saveDatabase();
 
-      if (isCorrect && item.isMastered && currentMode !== 'mastered') {
+      // 조건 충족 시 현재 큐에서 제거
+      if (isCorrect && item.streak >= 2 && currentMode !== 'all') {
         queue.splice(currentIndex, 1);
         if (currentIndex >= queue.length) currentIndex = 0;
         renderCard();
@@ -588,7 +745,9 @@
             exampleEn: p.exampleEn || '',
             exampleKo: p.exampleKo || '',
             streak: 0,
-            isMastered: false
+            memoryLevel: 0,
+            nextReviewDate: 0,
+            failedStage: null
           }));
 
           if (mode === 'overwrite') {
@@ -616,10 +775,10 @@
       toast.classList.remove('translate-y-10', 'opacity-0');
       setTimeout(() => {
         toast.classList.add('translate-y-10', 'opacity-0');
-      }, 1800);
+      }, 1900);
     }
 
-    // 키보드 지원 (PC/아이패드 외장 키보드용)
+    // 키보드 컨트롤
     window.addEventListener('keydown', (e) => {
       const isModalOpen = !document.getElementById('paste-modal').classList.contains('hidden');
       if (isModalOpen) return;
