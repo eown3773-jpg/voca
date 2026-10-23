@@ -1110,14 +1110,28 @@
     }
 
     function applyPastedData(mode = 'append') {
-      const raw = document.getElementById('paste-textarea').value.trim();
-      if (!raw) return;
+      const rawInput = document.getElementById('paste-textarea').value.trim();
+      if (!rawInput) return;
 
       try {
-        let cleaned = raw;
-        if (cleaned.startsWith('```')) {
-          cleaned = cleaned.replace(/^```[a-zA-Z0-9_\-:]*\n?/, '').replace(/```(eof)?$/, '').trim();
+        let cleaned = rawInput;
+        
+        // 1. 마크다운 코드 블록 및 LaTeX/특수 이스케이프 찌꺼기 제거
+        cleaned = cleaned.replace(/^```[a-zA-Z0-9_\-:]*\s*\n?/i, '')
+                         .replace(/\n?```(eof)?\s*$/i, '')
+                         .replace(/^\\\[\s*/, '[')
+                         .replace(/\s*\\\]$/, ']')
+                         .replace(/^\$\$\s*/, '')
+                         .replace(/\s*\$\$$/, '')
+                         .trim();
+
+        // 2. 혹시 앞뒤가 대괄호 [] 로 안 묶여 있고 단일 객체만 복사된 경우 대응
+        if (cleaned.startsWith('{') && cleaned.endsWith('}')) {
+          cleaned = `[${cleaned}]`;
         }
+
+        // 3. 배열 안 마지막 요소 뒤의 불필요한 쉼표(,]) 제거
+        cleaned = cleaned.replace(/,\s*([\]}])/g, '$1');
 
         const parsed = JSON.parse(cleaned);
         if (Array.isArray(parsed) && parsed.length > 0) {
@@ -1152,9 +1166,12 @@
           buildQueue();
           renderCard();
           closePasteModal();
+        } else {
+          showToast('JSON 데이터가 올바른 배열 형태가 아닙니다.');
         }
       } catch (err) {
-        showToast('JSON 형식 오류입니다.');
+        console.error(err);
+        showToast('JSON 형식 오류입니다. 괄호나 쉼표를 확인해주세요.');
       }
     }
 
