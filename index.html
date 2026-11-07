@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>V-Matrix (공무원·수능 실전 초고속 인출기)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -11,6 +11,8 @@
       word-break: keep-all;
       overflow-wrap: break-word;
       font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
     .step-reveal {
       animation: fadeIn 0.15s ease-out;
@@ -24,58 +26,58 @@
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-rose-500 selection:text-white">
 
   <!-- TOP HEADER -->
-  <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-30 px-3 py-2.5">
+  <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-30 px-3 py-2">
     <div class="max-w-xl mx-auto flex items-center justify-between gap-2">
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5">
         <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-rose-500/20 text-rose-400 border border-rose-500/30">
           V-Matrix
         </span>
-        <h1 class="text-xs sm:text-sm font-bold text-slate-200 truncate">V단어 0.5초 주관 인출기 (001~160 완전판)</h1>
+        <h1 class="text-xs sm:text-sm font-bold text-slate-200 truncate">V단어 0.5초 모바일 인출기</h1>
       </div>
 
       <div class="flex items-center gap-1.5">
-        <button onclick="togglePrisonOnly()" id="btn-prison-filter" class="px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-slate-800 text-slate-300 border border-slate-700 hover:border-rose-500/50">
+        <button onclick="event.stopPropagation(); togglePrisonOnly();" id="btn-prison-filter" class="px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-slate-800 text-slate-300 border border-slate-700">
           <i class="ph-bold ph-fire text-rose-400"></i>
-          <span>오답 감옥</span>
+          <span>오답</span>
           <span id="badge-prison-count" class="px-1.5 py-0.2 bg-rose-500 text-[10px] font-black text-white rounded-full">0</span>
         </button>
-        <button onclick="resetToInitialSeed()" title="전체 초기화" class="p-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 transition border border-slate-700">
+        <button onclick="event.stopPropagation(); resetToInitialSeed();" title="전체 초기화" class="p-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white bg-slate-800 transition border border-slate-700">
           <i class="ph-bold ph-arrows-clockwise text-sm"></i>
         </button>
       </div>
     </div>
 
     <!-- CHUNK FILTER BAR -->
-    <div class="max-w-xl mx-auto flex items-center gap-1 overflow-x-auto py-1 mt-1 scrollbar-none text-[11px]">
+    <div class="max-w-xl mx-auto flex items-center gap-1 overflow-x-auto py-1 mt-1 scrollbar-none text-[11px]" onclick="event.stopPropagation()">
       <button onclick="setChunkFilter('ALL')" id="tab-chunk-ALL" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-rose-500 text-white shadow-sm">
         전체 (<span id="count-all">0</span>)
       </button>
-      <button onclick="setChunkFilter('124-147')" id="tab-chunk-124-147" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300 hover:bg-slate-700">
+      <button onclick="setChunkFilter('124-147')" id="tab-chunk-124-147" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300">
         신규 124~147 ★
       </button>
-      <button onclick="setChunkFilter('148-160')" id="tab-chunk-148-160" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300 hover:bg-slate-700">
+      <button onclick="setChunkFilter('148-160')" id="tab-chunk-148-160" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300">
         숙어 148~160
       </button>
-      <button onclick="setChunkFilter('103-123')" id="tab-chunk-103-123" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300 hover:bg-slate-700">
+      <button onclick="setChunkFilter('103-123')" id="tab-chunk-103-123" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300">
         103~123
       </button>
-      <button onclick="setChunkFilter('084-102')" id="tab-chunk-084-102" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300 hover:bg-slate-700">
+      <button onclick="setChunkFilter('084-102')" id="tab-chunk-084-102" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300">
         084~102
       </button>
-      <button onclick="setChunkFilter('070-083')" id="tab-chunk-070-083" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300 hover:bg-slate-700">
+      <button onclick="setChunkFilter('070-083')" id="tab-chunk-070-083" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300">
         070~083
       </button>
-      <button onclick="setChunkFilter('059-069')" id="tab-chunk-059-069" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300 hover:bg-slate-700">
+      <button onclick="setChunkFilter('059-069')" id="tab-chunk-059-069" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300">
         059~069
       </button>
-      <button onclick="setChunkFilter('040-049')" id="tab-chunk-040-049" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300 hover:bg-slate-700">
+      <button onclick="setChunkFilter('040-049')" id="tab-chunk-040-049" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300">
         040~049
       </button>
     </div>
   </header>
 
-  <!-- MAIN RETRIEVAL CARD CONTAINER -->
-  <main class="max-w-xl mx-auto w-full flex-1 p-3 flex flex-col justify-center">
+  <!-- MAIN TAP-ENABLED CONTAINER (화면 아무 곳이나 탭하면 다음 단계 오픈) -->
+  <main onclick="revealNextStage()" class="max-w-xl mx-auto w-full flex-1 p-3 flex flex-col justify-center cursor-pointer active:opacity-95">
 
     <!-- UPPER CARD: WORD & PHONETIC -->
     <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-2xl relative overflow-hidden mb-3">
@@ -92,7 +94,7 @@
       </div>
 
       <!-- MAIN HEADWORD -->
-      <div class="py-3 text-center">
+      <div class="py-2 text-center">
         <h2 id="card-word" class="text-3xl sm:text-4xl font-black tracking-tight text-white select-all">
           latitude
         </h2>
@@ -102,7 +104,7 @@
       </div>
 
       <!-- TTS AUDIO BUTTON -->
-      <button onclick="speakWord()" class="absolute bottom-3 right-3 p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition">
+      <button onclick="event.stopPropagation(); speakWord();" class="absolute bottom-3 right-3 p-2 rounded-xl bg-slate-800/80 active:bg-slate-700 text-slate-300 hover:text-white transition">
         <i class="ph-bold ph-speaker-high text-base"></i>
       </button>
     </div>
@@ -117,10 +119,10 @@
             <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
             1. 기본 뜻 (1차 사전 의미)
           </span>
-          <span class="text-[10px] text-slate-500 font-mono">[Space 1회]</span>
+          <span class="text-[10px] text-slate-500 font-mono">[1차 탭]</span>
         </div>
         <div id="content-basic-blind" class="text-xs text-slate-600 py-1 font-mono">
-          [ 입으로 먼저 0.5초 직독직해 후 Space 누르기 ]
+          [ 입으로 먼저 0.5초 외친 후 화면 터치 ]
         </div>
         <div id="content-basic" class="text-sm sm:text-base font-bold text-slate-100 hidden step-reveal">
           위도
@@ -134,10 +136,10 @@
             <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
             2. 평가원·공무원 실전 속뜻 (V-Sense)
           </span>
-          <span class="text-[10px] text-slate-500 font-mono">[Space 2회]</span>
+          <span class="text-[10px] text-slate-500 font-mono">[2차 탭]</span>
         </div>
         <div id="content-hidden-blind" class="text-xs text-slate-600 py-1 font-mono">
-          [ 지문 속 진짜 문맥 속뜻 입으로 뱉어보기 ]
+          [ 지문 속 문맥 속뜻 떠올리고 터치 ]
         </div>
         <div id="content-hidden" class="text-sm sm:text-base font-black text-rose-200 hidden step-reveal">
           (행동·판단의) 자유재량, 허용 범위
@@ -149,12 +151,12 @@
         <div class="flex items-center justify-between text-[11px] font-bold text-amber-400 mb-1">
           <span class="flex items-center gap-1.5">
             <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-            3. 혼동어·대립쌍·문법 킬러 인출 검증
+            3. 혼동어·대립쌍·문법 인출 검증
           </span>
-          <span class="text-[10px] text-slate-500 font-mono">[Space 3회]</span>
+          <span class="text-[10px] text-slate-500 font-mono">[3차 탭]</span>
         </div>
         <div id="content-extra-blind" class="text-xs text-slate-600 py-1 font-mono">
-          [ 헷갈리는 짝꿍 단어·문법 포인트를 머리로 떠올리기 ]
+          [ 짝꿍 단어·문법 포인트를 머리로 떠올리기 ]
         </div>
 
         <!-- ACTIVE RETRIEVAL PROMPT BOX -->
@@ -174,8 +176,8 @@
               </div>
             </div>
 
-            <button onclick="revealExtraAnswer()" id="btn-reveal-answer" class="w-full mt-2 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold text-xs transition border border-amber-500/40">
-              [Space 한 번 더] 정답 대조 확인
+            <button onclick="event.stopPropagation(); revealExtraAnswer();" id="btn-reveal-answer" class="w-full mt-2 py-2 rounded-xl bg-amber-500/20 active:bg-amber-500/40 text-amber-300 font-bold text-xs transition border border-amber-500/40 flex items-center justify-center gap-1.5">
+              <span>👆 한 번 더 터치하여 정답 대조 확인</span>
             </button>
           </div>
         </div>
@@ -183,25 +185,28 @@
 
     </div>
 
+    <!-- MOBILE DIRECT ACTION HELPER -->
+    <div id="touch-hint-bar" class="mt-3 py-2 px-3 rounded-xl bg-slate-900/60 border border-slate-800 text-center text-xs font-bold text-slate-400 flex items-center justify-center gap-1.5">
+      <i class="ph-bold ph-hand-tap text-rose-400 animate-pulse text-sm"></i>
+      <span id="touch-hint-text">화면 아무 곳이나 가볍게 탭하세요 (1단계 열기)</span>
+    </div>
+
   </main>
 
   <!-- BOTTOM ACTION BAR -->
-  <footer class="border-t border-slate-800/80 bg-slate-900/80 backdrop-blur px-3 py-3 sticky bottom-0 z-30">
+  <footer class="border-t border-slate-800/80 bg-slate-900/90 backdrop-blur px-3 py-2.5 sticky bottom-0 z-30" onclick="event.stopPropagation()">
     <div class="max-w-xl mx-auto flex items-center gap-2">
-      <button onclick="handleJudge(false)" class="flex-1 py-3 px-3 rounded-2xl bg-rose-950/40 border border-rose-600/50 hover:bg-rose-900/60 text-rose-200 font-black text-sm flex items-center justify-center gap-1.5 transition active:scale-95">
+      <button onclick="handleJudge(false)" class="flex-1 py-3 px-3 rounded-2xl bg-rose-950/50 border border-rose-600/60 active:bg-rose-900 text-rose-200 font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 transition active:scale-95 shadow-lg">
         <i class="ph-bold ph-x text-rose-400 text-base"></i>
-        <span>헷갈림 (2단어 뒤 재등판)</span>
+        <span>헷갈림 (재등판)</span>
         <span class="text-[10px] text-rose-400/80 font-mono">[1]</span>
       </button>
 
-      <button onclick="handleJudge(true)" class="flex-1 py-3 px-3 rounded-2xl bg-emerald-950/40 border border-emerald-600/50 hover:bg-emerald-900/60 text-emerald-200 font-black text-sm flex items-center justify-center gap-1.5 transition active:scale-95">
+      <button onclick="handleJudge(true)" class="flex-1 py-3 px-3 rounded-2xl bg-emerald-950/50 border border-emerald-600/60 active:bg-emerald-900 text-emerald-200 font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 transition active:scale-95 shadow-lg">
         <i class="ph-bold ph-check text-emerald-400 text-base"></i>
-        <span>알겠음 (2회 연속 시 마스터)</span>
+        <span>알겠음 (마스터)</span>
         <span class="text-[10px] text-emerald-400/80 font-mono">[2]</span>
       </button>
-    </div>
-    <div class="text-center text-[10px] text-slate-500 mt-2 font-mono">
-      [Space]: 단계별 오픈 & 정답 확인 | [1]: 헷갈림 | [2]: 알겠음 | [S]: 발음 듣기
     </div>
   </footer>
 
@@ -211,7 +216,6 @@
   </div>
 
   <script>
-    // 001번부터 160번까지 단 한 번호의 누락도 없이 완벽 구축된 데이터베이스
     const SEED_WORDS = [
       // === 124 score ~ 147 other than (신규 보강 분량) ===
       {
@@ -1380,10 +1384,9 @@
       }
     ];
 
-    // 상태 관리
     let deck = [];
     let currentIndex = 0;
-    let stage = 0; // 0: 블라인드, 1: 기본뜻, 2: 숨은뜻, 3: 혼동어 질문
+    let stage = 0;
     let quizResolved = false;
     let prisonOnly = false;
     let streakMap = {};
@@ -1418,7 +1421,7 @@
       currentChunk = chunk;
       prisonOnly = false;
       document.querySelectorAll('[id^="tab-chunk-"]').forEach(el => {
-        el.className = "px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300 hover:bg-slate-700";
+        el.className = "px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300";
       });
       const activeTab = document.getElementById(`tab-chunk-${chunk}`);
       if (activeTab) activeTab.className = "px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-rose-500 text-white shadow-sm";
@@ -1450,7 +1453,6 @@
     function buildFilteredDeck() {
       let filtered = [...SEED_WORDS];
 
-      // 청크 필터
       if (currentChunk === '124-147') {
         filtered = filtered.filter(w => {
           const num = parseInt(w.id.split('-')[0], 10);
@@ -1488,7 +1490,6 @@
         });
       }
 
-      // 오답 감옥 필터
       if (prisonOnly) {
         filtered = filtered.filter(w => (mistakeMap[w.id] || 0) > 0 && (streakMap[w.id] || 0) < 2);
       }
@@ -1554,6 +1555,22 @@
       expBox.classList.remove('hidden');
       btnReveal.classList.add('hidden');
       quizResolved = true;
+      updateTouchHint();
+    }
+
+    function updateTouchHint() {
+      const hintText = document.getElementById('touch-hint-text');
+      if (stage === 0) {
+        hintText.innerText = "화면 아무 곳이나 탭하세요 (1단계 기본 뜻 열기)";
+      } else if (stage === 1) {
+        hintText.innerText = "탭하여 2단계 [실전 속뜻] 열기";
+      } else if (stage === 2) {
+        hintText.innerText = "탭하여 3단계 [혼동어/문법 인출 질문] 열기";
+      } else if (stage === 3 && !quizResolved) {
+        hintText.innerText = "탭하여 [정답 및 해설 대조] 확인";
+      } else {
+        hintText.innerText = "하단 [헷갈림] 또는 [알겠음]을 눌러 판정하세요";
+      }
     }
 
     function updateStageUI() {
@@ -1598,6 +1615,7 @@
         quizBox.classList.remove('hidden');
         rowExtra.className = "rounded-2xl border transition-all p-3 bg-amber-950/25 border-amber-500/40 shadow-sm";
       }
+      updateTouchHint();
     }
 
     function revealNextStage() {
@@ -1607,6 +1625,7 @@
       } else if (stage === 3 && !quizResolved) {
         revealExtraAnswer();
       } else {
+        // 이미 다 열렸을 때 화면을 누르면 '알겠음'으로 쾌속 진행
         handleJudge(true);
       }
     }
@@ -1618,7 +1637,7 @@
       if (isCorrect) {
         streakMap[item.id] = (streakMap[item.id] || 0) + 1;
         if (streakMap[item.id] >= 2) {
-          showToast(`🎯 [${item.word}] 2회 연속 정답! 마스터 달성`);
+          showToast(`🎯 [${item.word}] 2회 연속 정답! 마스터`);
           mistakeMap[item.id] = 0;
         } else {
           showToast(`👍 1회 정답 통과 (${streakMap[item.id]}/2)`);
@@ -1627,7 +1646,7 @@
       } else {
         streakMap[item.id] = 0;
         mistakeMap[item.id] = (mistakeMap[item.id] || 0) + 1;
-        showToast(`🚨 오답 등록! 2단어 뒤에 다시 튀어나옵니다`);
+        showToast(`🚨 오답! 2단어 뒤에 다시 출현`);
 
         const failedItem = deck.splice(currentIndex, 1)[0];
         const reinsertIndex = Math.min(currentIndex + 2, deck.length);
@@ -1660,7 +1679,7 @@
       setTimeout(() => {
         toast.classList.remove('opacity-100');
         toast.classList.add('opacity-0');
-      }, 1300);
+      }, 1200);
     }
 
     function resetToInitialSeed() {
@@ -1670,7 +1689,7 @@
         saveStorage();
         currentChunk = 'ALL';
         setChunkFilter('ALL');
-        showToast("전체 덱(001~160)으로 초기화되었습니다");
+        showToast("전체 덱으로 초기화되었습니다");
       }
     }
 
