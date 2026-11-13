@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>V-Matrix (공무원·수능 실전 초고속 인출기)</title>
+  <title>V-Flash | 극단적 미니멀 V단어 인출기</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <style>
@@ -13,1704 +13,563 @@
       font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
+      touch-action: pan-y;
     }
-    .step-reveal {
-      animation: fadeIn 0.15s ease-out;
+    .card-enter {
+      animation: popIn 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.97) translateY(6px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .scrollbar-none::-webkit-scrollbar {
+      display: none;
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-rose-500 selection:text-white">
+<body class="bg-neutral-950 text-neutral-100 h-[100dvh] flex flex-col justify-between overflow-hidden selection:bg-rose-500 selection:text-white">
 
-  <!-- TOP HEADER -->
-  <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-30 px-3 py-2">
-    <div class="max-w-xl mx-auto flex items-center justify-between gap-2">
-      <div class="flex items-center gap-1.5">
-        <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-rose-500/20 text-rose-400 border border-rose-500/30">
-          V-Matrix
-        </span>
-        <h1 class="text-xs sm:text-sm font-bold text-slate-200 truncate">V단어 0.5초 모바일 인출기</h1>
+  <!-- MINIMAL TOP BAR -->
+  <header class="pt-3 pb-2 px-4 max-w-md mx-auto w-full z-20">
+    <div class="flex items-center justify-between mb-2">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+        <span class="text-xs font-bold tracking-wider text-neutral-400">V-FLASH</span>
+        <span id="progress-text" class="text-xs font-mono text-neutral-500 ml-1">1 / 160</span>
       </div>
 
-      <div class="flex items-center gap-1.5">
-        <button onclick="event.stopPropagation(); togglePrisonOnly();" id="btn-prison-filter" class="px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-slate-800 text-slate-300 border border-slate-700">
-          <i class="ph-bold ph-fire text-rose-400"></i>
-          <span>오답</span>
-          <span id="badge-prison-count" class="px-1.5 py-0.2 bg-rose-500 text-[10px] font-black text-white rounded-full">0</span>
+      <div class="flex items-center gap-2">
+        <button onclick="toggleMistakeFilter()" id="btn-mistake-filter" class="px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-1.5 transition">
+          <i class="ph-fill ph-fire text-rose-500"></i>
+          <span>오답만</span>
+          <span id="mistake-count" class="text-rose-400 font-mono">0</span>
         </button>
-        <button onclick="event.stopPropagation(); resetToInitialSeed();" title="전체 초기화" class="p-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white bg-slate-800 transition border border-slate-700">
-          <i class="ph-bold ph-arrows-clockwise text-sm"></i>
+        <button onclick="resetProgress()" title="초기화" class="p-1.5 rounded-full text-neutral-500 hover:text-neutral-300 transition">
+          <i class="ph-bold ph-arrow-counter-clockwise text-sm"></i>
         </button>
       </div>
     </div>
 
-    <!-- CHUNK FILTER BAR -->
-    <div class="max-w-xl mx-auto flex items-center gap-1 overflow-x-auto py-1 mt-1 scrollbar-none text-[11px]" onclick="event.stopPropagation()">
-      <button onclick="setChunkFilter('ALL')" id="tab-chunk-ALL" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-rose-500 text-white shadow-sm">
-        전체 (<span id="count-all">0</span>)
+    <!-- CLEAN CHUNK TABS -->
+    <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1 text-xs">
+      <button onclick="setFilter('ALL')" id="tab-ALL" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-100 text-neutral-950 transition">
+        전체
       </button>
-      <button onclick="setChunkFilter('124-147')" id="tab-chunk-124-147" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300">
-        신규 124~147 ★
+      <button onclick="setFilter('174-188')" id="tab-174-188" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
+        숙어 174~188
       </button>
-      <button onclick="setChunkFilter('148-160')" id="tab-chunk-148-160" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300">
+      <button onclick="setFilter('148-160')" id="tab-148-160" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
         숙어 148~160
       </button>
-      <button onclick="setChunkFilter('103-123')" id="tab-chunk-103-123" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300">
+      <button onclick="setFilter('124-147')" id="tab-124-147" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
+        124~147
+      </button>
+      <button onclick="setFilter('103-123')" id="tab-103-123" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
         103~123
       </button>
-      <button onclick="setChunkFilter('084-102')" id="tab-chunk-084-102" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300">
+      <button onclick="setFilter('084-102')" id="tab-084-102" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
         084~102
       </button>
-      <button onclick="setChunkFilter('070-083')" id="tab-chunk-070-083" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300">
+      <button onclick="setFilter('070-083')" id="tab-070-083" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
         070~083
       </button>
-      <button onclick="setChunkFilter('059-069')" id="tab-chunk-059-069" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300">
-        059~069
+      <button onclick="setFilter('040-069')" id="tab-040-069" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
+        040~069
       </button>
-      <button onclick="setChunkFilter('040-049')" id="tab-chunk-040-049" class="px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300">
-        040~049
+      <button onclick="setFilter('001-039')" id="tab-001-039" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
+        001~039
       </button>
     </div>
   </header>
 
-  <!-- MAIN TAP-ENABLED CONTAINER (화면 아무 곳이나 탭하면 다음 단계 오픈) -->
-  <main onclick="revealNextStage()" class="max-w-xl mx-auto w-full flex-1 p-3 flex flex-col justify-center cursor-pointer active:opacity-95">
-
-    <!-- UPPER CARD: WORD & PHONETIC -->
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-2xl relative overflow-hidden mb-3">
-      <div class="flex items-center justify-between mb-2">
-        <span id="badge-word-id" class="px-2 py-0.5 rounded-full text-xs font-black bg-slate-800 text-slate-400 border border-slate-700">
-          001
-        </span>
-        <span id="badge-word-type" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-500/15 text-rose-300 border border-rose-500/30">
-          V단어
-        </span>
-        <span id="badge-streak" class="text-xs font-bold text-slate-400 flex items-center gap-1">
-          <i class="ph-fill ph-check-circle text-emerald-400"></i> 0/2
-        </span>
+  <!-- MAIN SINGLE-TAP FLASHCARD -->
+  <main class="flex-1 max-w-md mx-auto w-full px-4 py-2 flex flex-col justify-center">
+    <div id="flashcard" onclick="flipCard()" class="w-full h-full max-h-[540px] bg-neutral-900 border border-neutral-800/90 rounded-[2rem] p-7 flex flex-col justify-between relative shadow-2xl cursor-pointer transition-transform duration-150 active:scale-[0.99]">
+      
+      <!-- CARD TOP META -->
+      <div class="flex items-center justify-between">
+        <span id="card-id" class="text-xs font-mono font-bold text-neutral-500">188</span>
+        <div class="flex items-center gap-2">
+          <span id="card-streak" class="text-xs font-mono text-neutral-500">0/2</span>
+          <button onclick="event.stopPropagation(); speakWord();" class="p-2 -mr-2 text-neutral-400 hover:text-white transition">
+            <i class="ph-bold ph-speaker-high text-lg"></i>
+          </button>
+        </div>
       </div>
 
-      <!-- MAIN HEADWORD -->
-      <div class="py-2 text-center">
-        <h2 id="card-word" class="text-3xl sm:text-4xl font-black tracking-tight text-white select-all">
-          latitude
+      <!-- FRONT FACE: ONLY HEADWORD -->
+      <div id="face-front" class="my-auto text-center px-2 card-enter">
+        <h2 id="front-word" class="text-4xl sm:text-5xl font-black tracking-tight text-white leading-tight">
+          give way to
         </h2>
-        <p id="card-phonetic" class="text-xs text-slate-500 mt-1 font-mono">
-          [No. 001-C]
+        <p class="text-xs text-neutral-600 mt-6 font-medium">
+          탭하여 뜻 확인
         </p>
       </div>
 
-      <!-- TTS AUDIO BUTTON -->
-      <button onclick="event.stopPropagation(); speakWord();" class="absolute bottom-3 right-3 p-2 rounded-xl bg-slate-800/80 active:bg-slate-700 text-slate-300 hover:text-white transition">
-        <i class="ph-bold ph-speaker-high text-base"></i>
-      </button>
-    </div>
-
-    <!-- LOWER CARD: EXCEL 3-ROW ACTIVE RETRIEVAL MATRIX -->
-    <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-4 sm:p-5 shadow-xl space-y-2.5">
-
-      <!-- ROW 1: BASIC MEANING -->
-      <div id="row-basic" class="rounded-2xl border transition-all p-3 bg-slate-950/70 border-slate-800">
-        <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 mb-1">
-          <span class="flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
-            1. 기본 뜻 (1차 사전 의미)
-          </span>
-          <span class="text-[10px] text-slate-500 font-mono">[1차 탭]</span>
-        </div>
-        <div id="content-basic-blind" class="text-xs text-slate-600 py-1 font-mono">
-          [ 입으로 먼저 0.5초 외친 후 화면 터치 ]
-        </div>
-        <div id="content-basic" class="text-sm sm:text-base font-bold text-slate-100 hidden step-reveal">
-          위도
-        </div>
-      </div>
-
-      <!-- ROW 2: HIDDEN SENSE (EVALUATION KILLER SENSE) -->
-      <div id="row-hidden" class="rounded-2xl border transition-all p-3 bg-slate-950/70 border-slate-800">
-        <div class="flex items-center justify-between text-[11px] font-bold text-rose-400 mb-1">
-          <span class="flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
-            2. 평가원·공무원 실전 속뜻 (V-Sense)
-          </span>
-          <span class="text-[10px] text-slate-500 font-mono">[2차 탭]</span>
-        </div>
-        <div id="content-hidden-blind" class="text-xs text-slate-600 py-1 font-mono">
-          [ 지문 속 문맥 속뜻 떠올리고 터치 ]
-        </div>
-        <div id="content-hidden" class="text-sm sm:text-base font-black text-rose-200 hidden step-reveal">
-          (행동·판단의) 자유재량, 허용 범위
-        </div>
-      </div>
-
-      <!-- ROW 3: CONFUSION / COLLOCATION RETRIEVAL TEST -->
-      <div id="row-extra" class="rounded-2xl border transition-all p-3 bg-slate-950/70 border-slate-800">
-        <div class="flex items-center justify-between text-[11px] font-bold text-amber-400 mb-1">
-          <span class="flex items-center gap-1.5">
-            <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-            3. 혼동어·대립쌍·문법 인출 검증
-          </span>
-          <span class="text-[10px] text-slate-500 font-mono">[3차 탭]</span>
-        </div>
-        <div id="content-extra-blind" class="text-xs text-slate-600 py-1 font-mono">
-          [ 짝꿍 단어·문법 포인트를 머리로 떠올리기 ]
+      <!-- BACK FACE: CORE SENSE + DETAILS -->
+      <div id="face-back" class="my-auto hidden card-enter space-y-5 overflow-y-auto scrollbar-none py-2">
+        <div>
+          <div id="back-word" class="text-lg font-bold text-neutral-400 mb-1">give way to</div>
+          <div id="back-core" class="text-2xl sm:text-3xl font-black text-rose-400 leading-snug">
+            A가 B에게 밀려 대체되다 (A↓, B↑)
+          </div>
         </div>
 
-        <!-- ACTIVE RETRIEVAL PROMPT BOX -->
-        <div id="confusion-quiz-box" class="hidden step-reveal mt-1">
-          <div class="p-3 bg-slate-950/90 rounded-xl border border-amber-500/30">
-            <div class="flex items-start gap-2 mb-2">
-              <i class="ph-bold ph-lightning text-amber-400 text-sm mt-0.5"></i>
-              <div id="quiz-prompt-detail" class="text-xs sm:text-sm font-bold text-amber-200 leading-snug">
-                짝꿍 단어의 정확한 뜻을 입으로 외쳐보세요!
-              </div>
-            </div>
+        <div class="h-px bg-neutral-800 w-full"></div>
 
-            <!-- EXPLANATION (REVEALED ON ENTER/CLICK) -->
-            <div id="quiz-explanation-box" class="hidden text-xs text-slate-300 border-t border-slate-800/80 pt-2.5 mt-2 space-y-1">
-              <div id="content-extra" class="text-xs text-slate-300 whitespace-pre-line leading-relaxed">
-                해설 내용
-              </div>
-            </div>
-
-            <button onclick="event.stopPropagation(); revealExtraAnswer();" id="btn-reveal-answer" class="w-full mt-2 py-2 rounded-xl bg-amber-500/20 active:bg-amber-500/40 text-amber-300 font-bold text-xs transition border border-amber-500/40 flex items-center justify-center gap-1.5">
-              <span>👆 한 번 더 터치하여 정답 대조 확인</span>
-            </button>
+        <div class="space-y-3 text-sm">
+          <div>
+            <span class="text-[11px] font-bold text-neutral-500 block mb-0.5">1차 기본 뜻</span>
+            <p id="back-basic" class="text-neutral-200 font-semibold">길을 내어 주다, 양보하다</p>
+          </div>
+          <div>
+            <span class="text-[11px] font-bold text-neutral-500 block mb-0.5">실전 급소 · 짝꿍</span>
+            <p id="back-note" class="text-neutral-300 leading-relaxed whitespace-pre-line">• A give way to B: 구세대 A가 저물고 신세대 B가 부상함</p>
           </div>
         </div>
       </div>
 
+      <!-- BOTTOM SWIPE HINT -->
+      <div class="text-center">
+        <span id="card-tag" class="text-[11px] font-medium text-neutral-600">
+          평가원 논리 전환 시그널
+        </span>
+      </div>
     </div>
-
-    <!-- MOBILE DIRECT ACTION HELPER -->
-    <div id="touch-hint-bar" class="mt-3 py-2 px-3 rounded-xl bg-slate-900/60 border border-slate-800 text-center text-xs font-bold text-slate-400 flex items-center justify-center gap-1.5">
-      <i class="ph-bold ph-hand-tap text-rose-400 animate-pulse text-sm"></i>
-      <span id="touch-hint-text">화면 아무 곳이나 가볍게 탭하세요 (1단계 열기)</span>
-    </div>
-
   </main>
 
-  <!-- BOTTOM ACTION BAR -->
-  <footer class="border-t border-slate-800/80 bg-slate-900/90 backdrop-blur px-3 py-2.5 sticky bottom-0 z-30" onclick="event.stopPropagation()">
-    <div class="max-w-xl mx-auto flex items-center gap-2">
-      <button onclick="handleJudge(false)" class="flex-1 py-3 px-3 rounded-2xl bg-rose-950/50 border border-rose-600/60 active:bg-rose-900 text-rose-200 font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 transition active:scale-95 shadow-lg">
-        <i class="ph-bold ph-x text-rose-400 text-base"></i>
-        <span>헷갈림 (재등판)</span>
-        <span class="text-[10px] text-rose-400/80 font-mono">[1]</span>
+  <!-- MINIMAL BOTTOM CONTROLS -->
+  <footer class="pb-6 pt-2 px-4 max-w-md mx-auto w-full z-20">
+    <!-- BEFORE FLIP: SINGLE BIG REVEAL BUTTON -->
+    <div id="controls-front">
+      <button onclick="flipCard()" class="w-full py-4 rounded-2xl bg-neutral-800 hover:bg-neutral-750 active:bg-neutral-700 text-neutral-200 font-bold text-base transition">
+        정답 확인
       </button>
+    </div>
 
-      <button onclick="handleJudge(true)" class="flex-1 py-3 px-3 rounded-2xl bg-emerald-950/50 border border-emerald-600/60 active:bg-emerald-900 text-emerald-200 font-black text-xs sm:text-sm flex items-center justify-center gap-1.5 transition active:scale-95 shadow-lg">
-        <i class="ph-bold ph-check text-emerald-400 text-base"></i>
-        <span>알겠음 (마스터)</span>
-        <span class="text-[10px] text-emerald-400/80 font-mono">[2]</span>
+    <!-- AFTER FLIP: TWO CLEAN JUDGE BUTTONS -->
+    <div id="controls-back" class="hidden grid grid-cols-2 gap-3">
+      <button onclick="judgeCard(false)" class="py-4 rounded-2xl bg-neutral-900 border border-rose-500/40 active:bg-rose-950/60 text-rose-400 font-black text-base flex items-center justify-center gap-2 transition">
+        <i class="ph-bold ph-x text-lg"></i>
+        <span>모름</span>
+      </button>
+      <button onclick="judgeCard(true)" class="py-4 rounded-2xl bg-rose-500 active:bg-rose-600 text-white font-black text-base flex items-center justify-center gap-2 shadow-lg shadow-rose-500/20 transition">
+        <i class="ph-bold ph-check text-lg"></i>
+        <span>알겠음</span>
       </button>
     </div>
   </footer>
 
-  <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="fixed top-14 left-1/2 -translate-x-1/2 z-50 px-4 py-2 bg-slate-800 border border-slate-700 text-white font-bold text-xs rounded-xl shadow-2xl pointer-events-none opacity-0 transition-opacity duration-200">
-    알림 메시지
+  <!-- SUBTLE TOAST -->
+  <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 px-3.5 py-1.5 bg-neutral-800 text-neutral-200 text-xs font-bold rounded-full shadow-xl pointer-events-none opacity-0 transition-opacity duration-150">
+    메시지
   </div>
 
   <script>
-    const SEED_WORDS = [
-      // === 124 score ~ 147 other than (신규 보강 분량) ===
-      {
-        id: "124-A",
-        word: "score",
-        type: "음악/다의어 속뜻 ★",
-        basic: "득점, 점수; 점수를 매기다",
-        hidden: "1) 악보, 음악 작품 (musical score)  2) 20개 (a score of = 약 20개)",
-        extra: "• musical score: 영화나 클래식의 음악 악보\n• a score of cars: 약 20대 정도의 자동차들\n• scores of boxes: 수십 개의(아주 많은) 상자들",
-        quiz: { q: "'the musical score for the film'과 'a score of years'에서 score의 각각 다른 뜻은?" }
-      },
-      {
-        id: "124-B",
-        word: "scores of",
-        type: "수량 표현 관용구",
-        basic: "수십의, 아주 많은",
-        hidden: "score(20)의 복수형 ➔ 수십 명의, 수많은 (= dozens of, lots of)",
-        extra: "• scores of people: 수많은 사람들\n• scores of crates: 아주 많은 상자들",
-        quiz: { q: "'scores of students'에서 scores of의 뜻은?" }
-      },
-      {
-        id: "125-A",
-        word: "integrate",
-        type: "통합/융합 어휘",
-        basic: "통합하다, 융합하다",
-        hidden: "여러 부분을 하나로 합쳐 온전한 전체로 만들다 (integrate into a whole)",
-        extra: "• integrated into a whole: 전체로 하나로 통합된\n• integration: 통합, 융합\n• disintegrated: 붕괴된, 해체된",
-        quiz: { q: "'integrate new data into the system'에서 integrate의 뜻은?" }
-      },
-      {
-        id: "125-B",
-        word: "integral",
-        type: "평가원 킬러 형용사 ★",
-        basic: "필수적인, 필요불가결한; 내장된",
-        hidden: "전체를 이루는 데 '절대 빠져서는 안 될 핵심 필수 요소' (= essential, indispensable)",
-        extra: "• an integral part of: ~의 없어서는 안 될 필수적 부분\n• integral component: 필수 구성 요소",
-        quiz: { q: "'Music is an integral part of our life'에서 integral의 정확한 뜻은?" }
-      },
-      {
-        id: "125-C",
-        word: "integrity",
-        type: "윤리/철학 킬러 명사 ★",
-        basic: "온전함; 진실성, 청렴",
-        hidden: "1) 도덕적 진실성, 청렴결백  2) (원형 그대로의) 온전함, 완전성",
-        extra: "• moral integrity: 도덕적 진실성/청렴\n• historical integrity: 역사의 온전함(훼손되지 않음)\n• territorial integrity: 영토의 온전성",
-        quiz: { q: "'He is a man of great integrity'에서 integrity의 뜻은?" }
-      },
-      {
-        id: "126",
-        word: "mark",
-        type: "동사 특징화 속뜻 ★",
-        basic: "표시, 흔적; 표시하다",
-        hidden: "[동사] 특징짓다, 두드러지게 하다 (= characterize, distinguish)",
-        extra: "• be marked by: ~로 특징지어지다\n• marked difference: 눈에 띄는 현저한 차이\n• marked out: 뚜렷이 표시된",
-        quiz: { q: "'The era was marked by rapid change'에서 be marked by의 번역은?" }
-      },
-      {
-        id: "127-A",
-        word: "condition",
-        type: "심리/환경 조건화 킬러 ★",
-        basic: "상태, 조건",
-        hidden: "[동사] 길들이다, 훈련시키다, (환경에) 조건화하다 (= train, influence over time)",
-        extra: "• conditioned to: ~하도록 조건화된/길들여진 (파블로프의 개)\n• precondition: 전제 조건\n• unconditional: 무조건적인 (unconditional love)",
-        quiz: { q: "'Humans are conditioned to avoid strangers'에서 condition의 동사 뜻은?" }
-      },
-      {
-        id: "127-B",
-        word: "unconditional",
-        type: "파생 반의어",
-        basic: "무조건적인, 절대적인",
-        hidden: "어떤 조건도 달지 않는 전폭적인 (unconditional love = 무조건적 사랑)",
-        extra: "• unconditional surrender: 무조건 항복\n• unconditional support: 전폭적 지지",
-        quiz: { q: "'unconditional academic status'에서 unconditional의 의미는?" }
-      },
-      {
-        id: "128",
-        word: "minute",
-        type: "발음·품사 분기 킬러 ★",
-        basic: "[mínit] 분, 순간",
-        hidden: "[mainjú:t] 형용사: '미세한, 아주 작은, 극미량의' (= tiny, microscopic)",
-        extra: "• minute amounts of chemicals: 극미량의 화학 물질\n• in minute detail: 아주 미세하고 정밀한 부분까지\n• At that very minute: 바로 그 순간에",
-        quiz: { q: "'minute bacteria'라고 할 때 minute의 발음과 뜻은?" }
-      },
-      {
-        id: "129",
-        word: "invariably",
-        type: "평가원 100% 항상 시그널 ★",
-        basic: "변함없이, 언제나, 예외 없이",
-        hidden: "독해 1초 직결: '항상, 언제나 예외 없이(= always, without exception)'",
-        extra: "• invariably true: 언제나 변함없이 참인\n• invariably happens: 예외 없이 항상 일어난다\n• variable: 변하기 쉬운, 변수",
-        quiz: { q: "독해 지문에서 'invariably'를 만났을 때 0.1초 만에 떠올릴 동의어는?" }
-      },
-      {
-        id: "130",
-        word: "question",
-        type: "동사 의심/불신 시그널 ★",
-        basic: "질문, 의문",
-        hidden: "[동사] (진실성이나 타당성을) 의심하다, 의문을 제기하다 (= doubt, dispute)",
-        extra: "• question the validity: 타당성을 의심하다\n• open question: 미해결 과제\n• unquestionable: 의심할 여지 없는 확고한",
-        quiz: { q: "'Scientists questioned the findings'에서 question의 동사 뜻은?" }
-      },
-      {
-        id: "131",
-        word: "immune",
-        type: "영향 면역 속뜻 ★",
-        basic: "(질병에) 면역성이 있는",
-        hidden: "be immune to A = 'A에 영향을 받지 않는, 끄떡없는' (= unaffected by)",
-        extra: "• immune to criticism: 비판에 전혀 영향을 받지 않는\n• immune system: 면역 체계\n• immunity: 면역력; 면제",
-        quiz: { q: "'No institution is immune to change'에서 be immune to의 비유적 뜻은?" }
-      },
-      {
-        id: "132",
-        word: "in light of",
-        type: "관점/이유 연결 숙어 ★",
-        basic: "~에 비추어 볼 때, ~을 고려하여",
-        hidden: "in this light = 이러한 관점(측면)에서 볼 때 (= from this perspective)",
-        extra: "• in light of recent findings: 최근 발견을 고려해 볼 때\n• seen in this light: 이런 관점에서 바라보면",
-        quiz: { q: "'in light of the evidence'에서 light가 갖는 문맥 뜻은?" }
-      },
-      {
-        id: "133",
-        word: "sound",
-        type: "형용사 건전/타당 극찬 ★",
-        basic: "소리; 소리가 나다",
-        hidden: "[형용사] 건강한, 건전한, 타당한, 믿을 만한 (+) (= valid, solid, robust)",
-        extra: "• sound argument / judgment: 타당하고 논리적인 주장 / 판단\n• sound sleep: 깊은 숙면\n• sound mind in a sound body: 건강한 신체에 건강한 정신",
-        quiz: { q: "'a sound economic policy'에서 sound의 형용사 뜻은?" }
-      },
-      {
-        id: "134",
-        word: "fine",
-        type: "다의어 및 미세 속뜻",
-        basic: "좋은, 건강한; 벌금",
-        hidden: "[형용사] '미세한, 정밀한, 섬세한' (➔ refine: 불순물을 걸러 정제하다)",
-        extra: "• fine detail: 아주 정밀하고 미세한 세부사항\n• fine gold: 순금\n• fine line: 미세한 차이\n• refine: 정제하다, 개선하다",
-        quiz: { q: "'a fine distinction'에서 fine의 정확한 뜻은?" }
-      },
-      {
-        id: "135-A",
-        word: "treat",
-        type: "명사 한턱/특별대접",
-        basic: "대우하다, 치료하다",
-        hidden: "[명사] 한턱, 특별한 대접, 맛있는 것 (It's my treat = 내가 살게!)",
-        extra: "• Trick or treat: 맛있는 거 안 주면 장난칠 거야!\n• dog treat: 강아지 간식\n• treatment: 치료, 대우",
-        quiz: { q: "'Let's go out, it's my treat'에서 treat의 명사 뜻은?" }
-      },
-      {
-        id: "135-B",
-        word: "treaty vs retreat",
-        type: "철자 낚시 혼동어 ★",
-        basic: "treaty: 조약, 협약 / retreat: 후퇴하다, 퇴각하다",
-        hidden: "treaty(국가 간 법적 조약) vs retreat(군대의 후퇴, 조용한 피서지)",
-        extra: "• peace treaty: 평화 조약\n• forced to retreat: 후퇴할 수밖에 없었던\n• sign a treaty: 조약에 서명하다",
-        quiz: { q: "조약(treaty)과 후퇴하다(retreat)의 스펠링 구별!" }
-      },
-      {
-        id: "136",
-        word: "authorize",
-        type: "권한 부여 어휘",
-        basic: "권한을 부여하다, 허가하다, 공인하다",
-        hidden: "author(권위를 가진 사람)에서 파생 ➔ 공식적인 힘/권한을 허락하다",
-        extra: "• authorized biography: 공인된 전기\n• authorized personnel only: 관계자 외 출입금지 (공인된 인원)\n• authority: 권위, 당국",
-        quiz: { q: "'an authorized dealer'에서 authorized의 뜻은?" }
-      },
-      {
-        id: "137",
-        word: "mechanical",
-        type: "방향성 (-) 영혼 없음 ★",
-        basic: "기계의, 기계로 작동되는",
-        hidden: "추상적 속뜻: '영혼 없는, 진심이 담기지 않은, 무감각한, 기계적인' (-)",
-        extra: "• mechanical response: 영혼 없는 형식적 반응 (-)\n• mechanical singing: 감정이 전혀 안 실린 기계적 노래\n• mechanically: 기계적으로, 무의식적으로",
-        quiz: { q: "'His smile was purely mechanical'에서 mechanical의 뉘앙스는?" }
-      },
-      {
-        id: "138",
-        word: "code",
-        type: "규범/법전 속뜻 ★",
-        basic: "암호, 부호",
-        hidden: "[사회학/법학] '행동 규범, 수칙, 관례, 법전'",
-        extra: "• code of conduct / ethics: 행동 규범 / 윤리 강령\n• penal code: 형법전\n• dress code: 복장 규정",
-        quiz: { q: "'moral code'에서 code의 뜻은 암호일까 규범일까?" }
-      },
-      {
-        id: "139",
-        word: "be it A or B",
-        type: "양보 도치 구문 ★",
-        basic: "A이든 B이든 간에 (= whether it be A or B)",
-        hidden: "whether가 생략되면서 동사 be가 문두로 튀어나온 양보 도치 구문!",
-        extra: "• be it a business or social occasion: 비즈니스이든 사교 모임이든\n• be it large or small: 크든 작든 간에 상관없이",
-        quiz: { q: "'be it true or false' 구문의 원래 접속사 형태는?" }
-      },
-      {
-        id: "140",
-        word: "turn sour",
-        type: "관계 악화 관용구 ★",
-        basic: "음식이 시어지다, 상하다",
-        hidden: "독해 속뜻: (관계·일·협상이) '틀어지다, 잘못되다, 험악해지다' (-)",
-        extra: "• relationship turned sour: 관계가 험악하게 틀어졌다\n• The deal turned sour: 거래가 수포로 돌아갔다",
-        quiz: { q: "'Their partnership turned sour'에서 turn sour의 비유적 뜻은?" }
-      },
-      {
-        id: "141",
-        word: "contribute to",
-        type: "독해 인과관계 공식 ★",
-        basic: "~에 공헌하다, 기여하다",
-        hidden: "독해 1초 인과도식: [원인 A contribute to 결과 B] = 'A가 B의 원인이 되다'!",
-        extra: "• 좋은 일 기여뿐 아니라: 'contribute to cancer/global warming' = 암/온난화의 원인이 되다(-)\n• contribution: 기부, 기여",
-        quiz: { q: "'Smoking contributes to heart disease'에서 contribute to의 정확한 인과 뜻은?" }
-      },
-      {
-        id: "142",
-        word: "it follows that S V",
-        type: "논리 결론 도출 시그널 ★",
-        basic: "자연히 ~라는 결론에 이르게 되다",
-        hidden: "앞선 전제들로부터 '필연적으로 ~라는 결론이 도출된다' (★필자의 주장!)",
-        extra: "• It follows that the hypothesis is false: 따라서 그 가설은 거짓이라는 결론에 이른다\n• logical consequence: 논리적 귀결",
-        quiz: { q: "지문에서 'It follows that~'이 뜨면 글의 어느 부분에 해당할까?" }
-      },
-      {
-        id: "143",
-        word: "at best",
-        type: "필자의 한계 비판 (-) ★",
-        basic: "잘해야, 기껏해야, 고작 (= only, at most)",
-        hidden: "필자가 대상의 한계를 깎아내리는 마이너스(-) 시그널! (기껏해야 이 정도에 불과함)",
-        extra: "• playing video games is at best a pleasant break: 기껏해야 즐거운 휴식에 불과하다\n• at most: 기껏해야 (↔ at least: 적어도)",
-        quiz: { q: "'His explanation is at best an excuse'에서 at best의 뉘앙스는 (+/-)?" }
-      },
-      {
-        id: "144",
-        word: "at worst",
-        type: "극단적 악조건",
-        basic: "최악의 경우에는",
-        hidden: "상황이 가장 나쁘게 흘러갈 때의 극단적 마이너스(-) 상황 가정",
-        extra: "• At worst, we lose the deposit: 최악의 경우 보증금을 날린다",
-        quiz: { q: "at best(잘해봐야 고작)와 대립되는 at worst의 뜻은?" }
-      },
-      {
-        id: "145",
-        word: "A is a product of B",
-        type: "평가원 인과 귀속 공식 ★",
-        basic: "A는 B의 산물/창작물/결과이다",
-        hidden: "[원인 B ➔ 결과 A] (A라는 인간·현상은 결국 B라는 환경이 만들어낸 결과물이다!)",
-        extra: "• We are the product of our environment: 우리는 환경의 산물이다\n• A is a function of B: A는 B의 함수(결과)이다",
-        quiz: { q: "'Our choices are a product of culture'에서 원인은 선택일까, 문화일까?" }
-      },
-      {
-        id: "146",
-        word: "not so much A as B",
-        type: "주제문 강조 시그널 ★",
-        basic: "A라기보다는 차라리 B이다",
-        hidden: "A는 기각(X)하고, 필자가 진짜 말하고 싶은 B(O)를 강조하는 핵심 주제문!",
-        extra: "• not so much A as B = B rather than A = not A but B\n• not so much ambitious as plain: 야심차다기보다는 수수하다",
-        quiz: { q: "'not so much A as B'에서 필자의 주장은 A일까 B일까?" }
-      },
-      {
-        id: "147",
-        word: "other than A",
-        type: "예외/부정 대조 숙어",
-        basic: "A 이외의, 다른; A를 제외하고 (= except)",
-        hidden: "other than = except처럼 '부정(A 빼고 나머지)'의 역할을 수행!",
-        extra: "• no other choice than: ~외에 다른 선택이 없는\n• other than financial support: 재정 지원 이외의 것들",
-        quiz: { q: "'I know nothing other than this'에서 other than의 의미는?" }
-      },
+    const VOCAB_DB = [
+      // === 174 ~ 188 ===
+      { id: "188", word: "give way to", core: "A가 B로 대체되다 (A↓, B↑)", basic: "길을 내어 주다, 양보하다", note: "• A give way to B: 구세대 A는 쇠퇴하고 신세대 B가 주류가 됨", tag: "세대교체 · 대체 공식" },
+      { id: "187", word: "boil down to A", core: "결국 A로 요약·수렴되다", basic: "졸아들다, 요약되다", note: "• narrow down to A / (be) reduced to A 동일\n• 여러 갈래가 핵심 본질 A 하나로 좁혀짐", tag: "핵심 수렴 시그널" },
+      { id: "186", word: "This is not to say that A", core: "그것이 A라는 뜻은 아니다 (양보 ➔ 반전)", basic: "~라고 말하는 것은 아니다", note: "• 꼬리표(양보)를 먼저 던지고 뒤에 'But / Rather'로 진짜 주장(빈칸) 제시!", tag: "양보 후 반전 공식" },
+      { id: "185", word: "It is (not) that S V", core: "~때문이다 / ~때문이 아니다", basic: "~라는 것이다", note: "• 강조구문과 달리 It과 that 사이에 아무것도 없음\n• 원인·이유를 밝히는 기출 빈출 구문", tag: "이유 설명 구문" },
+      { id: "184", word: "give away", core: "1) 거저 주다  2) (비밀을) 누설하다", basic: "나누어 주다, 기부하다", note: "• give away a secret: 비밀이나 정체를 무심코 폭로하다", tag: "다의어 숙어" },
+      { id: "183", word: "cannot but + 동사원형", core: "~하지 않을 수 없다", basic: "~할 수밖에 없다", note: "• cannot help + -ing / cannot help but + 동사원형 동일", tag: "필수 관용 구문" },
+      { id: "182", word: "rob A of B", core: "A에게서 B를 빼앗다, 박탈하다", basic: "강탈하다, 털다", note: "• strip A of B / deprive A of B 동일 구조 (전치사 of 필수)", tag: "박탈 동사 구문" },
+      { id: "181", word: "deal with", core: "(문제를) 다루다, 해결하다", basic: "처리하다, 대처하다", note: "• solve a problem / cope with 동일", tag: "문제 해결 숙어" },
+      { id: "180", word: "in V-ing", core: "~할 때, ~함에 있어서", basic: "~하는 중에", note: "• in doing so: 그렇게 할 때 (독해 연결 고리 빈출)", tag: "전치사 관용구" },
+      { id: "179", word: "rule out", core: "제외하다, 배제하다, 불가능하게 하다", basic: "선을 그어 지우다", note: "• exclude / prevent / make impossible 동일", tag: "배제 · 차단 숙어" },
+      { id: "178", word: "nothing but A", core: "오직 A만 (= only A)", basic: "A를 제외하고는 아무것도 없는", note: "• but = except (A 빼고 아무것도 없음 ➔ 결국 A뿐임)", tag: "강조 관용구" },
+      { id: "177", word: "lay off", core: "1) 그만두다  2) (직원을) 해고하다", basic: "중단하다", note: "• layoff (붙여 쓰면 명사): 정리해고", tag: "다의어 숙어" },
+      { id: "176", word: "take place", core: "발생하다, 일어나다 (= happen)", basic: "개최되다", note: "• 수동태 불가 자동사 표현\n• take the place of (~을 대신하다)와 구별!", tag: "문법 · 숙어 주의" },
+      { id: "175", word: "give rise to", core: "(결과를) 일으키다, 야기하다 (= cause)", basic: "발생시키다", note: "• [원인 A give rise to 결과 B] 소재 간 인과관계 파악 시그널", tag: "인과관계 시그널" },
+      { id: "174", word: "take over", core: "인계받다, 장악하다, 인수하다", basic: "떠맡다, 대신하다", note: "• 기업 인수(takeover) 및 주도권 장악", tag: "기본 핵심 숙어" },
 
-      // === Chapter 04 숙어 / 구문 148~160 ===
-      {
-        id: "148",
-        word: "not A until B",
-        type: "공무원 1순위 독해·문법 ★",
-        basic: "B할 때까지는 A하지 않다",
-        hidden: "실전 직독직해: 'B하고 나서야 비로소 A하다' (시간 순서: B가 1번 ➔ A가 2번!)",
-        extra: "• 시간 순서: B를 먼저 하고 나서야 비로소 A한다!\n• 도치 문법: Not until B did A... (부정어 문두 도치 매년 출제!)\n• cast shadows do not appear until 400 BCE: 기원전 400년이 되어서야 비로소 그림자가 나타났다",
-        quiz: { q: "'not A until B'에서 A와 B 중 실제로 '먼저 일어난 사건'은 어느 쪽일까?" }
-      },
-      {
-        id: "149",
-        word: "removed from A",
-        type: "거리/단절 속뜻 ★",
-        basic: "A로부터 제거된",
-        hidden: "독해 속뜻: 'A로부터 (물리적·개념적으로) 멀리 떨어진, 거리가 먼'",
-        extra: "• far removed from: ~와는 거리가 아주 먼, 동떨어진\n• removed from adult habitats: 성체 서식지로부터 멀리 떨어진\n• remove: 제거하다; 이사하다",
-        quiz: { q: "'far removed from reality'에서 removed from의 정확한 문맥 뜻은?" }
-      },
-      {
-        id: "150",
-        word: "A is a window into B",
-        type: "평가원 비유 공식 ★",
-        basic: "A는 B를 들여다보는 창문이다",
-        hidden: "실전 독해: 'A를 통해 B를 들여다보고 이해할 수 있다' (A = B를 관찰하는 도구/수단)",
-        extra: "• offer a window into: ~를 들여다보는 통찰/창을 제공하다\n• Eye: A Window to Our Soul: 눈은 영혼을 들여다보는 창이다\n• A serves as a window into B: A는 B의 내막을 보여주는 창 역할을 한다",
-        quiz: { q: "'A is a window into B'에서 필자가 말하고자 하는 A와 B의 관계는?" }
-      },
-      {
-        id: "151",
-        word: "attend to",
-        type: "공무원 자동사 킬러 ★",
-        basic: "~에 주의를 기울이다; ~을 처리하다, 돌보다",
-        hidden: "1) pay attention to (~에 주의를 집중하다)  2) deal with (~의 용무를 처리하다)",
-        extra: "• attend school: 학교에 다니다 (타동사: 전치사 X)\n• attend to urgent business: 급한 용무를 처리하다 (자동사+to)\n• attend to patients/children: 환자나 아이들을 돌보다",
-        quiz: { q: "attend the meeting과 attend to urgent business에서 attend의 차이는?" }
-      },
-      {
-        id: "152",
-        word: "aside from A",
-        type: "순서배열 전환 시그널 ★",
-        basic: "A와는 별개로, A 외에도 (= apart from)",
-        hidden: "문장 삽입/순서 킬러: 'A에 대한 서술은 일단 끝내고, 이제 B라는 새로운 이야기로 전환하겠다!'",
-        extra: "• Aside from A, B: A는 제쳐두고(기본 깔고), B를 새로 이야기하겠다\n• Aside from heat, magma also exchanges...: 열 외에도 마그마는 또한...\n• Apart from A = Aside from A",
-        quiz: { q: "독해 지문에서 'Aside from A, B...'가 나오면 글의 흐름은 어떻게 바뀔까?" }
-      },
-      {
-        id: "153",
-        word: "confuse A with B",
-        type: "독해 오류 지적 시그널 ★",
-        basic: "A와 B를 혼동하다",
-        hidden: "영영 정의: A와 B를 구별하지 못하고 'A를 B인 줄로 잘못 착각하다'",
-        extra: "• confuse activities with results: 활동(노동)과 실제 성과를 착각하다\n• confuse reason with calculation: 이성과 단순 계산을 혼동하다\n• confusion: 혼란, 혼동",
-        quiz: { q: "'confuse A with B'를 필자가 지적할 때의 핵심 논리적 오류는?" }
-      },
-      {
-        id: "154",
-        word: "be programmed to V",
-        type: "선천성 7대 패밀리 속뜻 ★",
-        basic: "~하도록 프로그램 되어 있다",
-        hidden: "상징적 속뜻: '타고남, 내재됨, 선천적으로 유전자에 박혀있다' (= innate, inborn, hardwired)",
-        extra: "• biologically programmed to: 생물학적으로 타고나다\n• programmed to be afraid: 선천적으로 두려워하도록 설계되다\n• 후천적 학습(learned/acquired)과 정반대 대립쌍!",
-        quiz: { q: "'Humans are programmed to cooperate'에서 programmed의 대립 개념은?" }
-      },
-      {
-        id: "155",
-        word: "distinction between A and B",
-        type: "평가원 대립쌍 공식 ★",
-        basic: "A와 B 사이의 구별, 차이",
-        hidden: "A ↔ B 대립 구도를 선언하는 시그널! (gap between A and B)",
-        extra: "• distinction between energy and power: 에너지와 전력의 차이\n• make a distinction: 구별하다, 차별짓다\n• distinctive: 독특한, 뚜렷이 구별되는",
-        quiz: { q: "지문에 'distinction between A and B'가 뜨면 머릿속에 어떤 기호가 서야 할까?" }
-      },
-      {
-        id: "156",
-        word: "A is to B as C is to D",
-        type: "공무원·수능 비례 유추 공식 ★",
-        basic: "A와 B의 관계는 C와 D의 관계와 같다",
-        hidden: "A : B = C : D 비례 도식! (친숙한 C:D의 관계를 빌려와 생소한 A:B를 설명하는 유추 기법)",
-        extra: "• Help is to us as water is to fish: 도움과 우리의 관계는 물과 물고기의 관계와 같다\n• What A is to B, C is to D\n• 비유를 통한 핵심 주제 강조",
-        quiz: { q: "'A is to B as C is to D' 구문의 수학적 비례 도식은?" }
-      },
-      {
-        id: "157",
-        word: "as 형용사 as",
-        type: "양보 부사절 도치 킬러 ★",
-        basic: "~만큼 ~한 (동등 비교)",
-        hidden: "문두 도치 양보절: [형용사 + as + S + V] = '비록 ~일지라도' (= Although S + V + 형용사)",
-        extra: "• As important as it is...: 비록 그것이 중요할지라도 (양보!)\n• Reasonable as it appears...: 비록 그것이 합리적으로 보일지라도\n• 문두에 [형용사+as+S+V]가 오면 뒤에 반전(However) 기대!",
-        quiz: { q: "문두에 'Important as it is, S+V'가 나오면 'as'는 어떤 의미로 쓰였을까?" }
-      },
-      {
-        id: "158",
-        word: "even so",
-        type: "공무원 접속부사 1순위 ★",
-        basic: "그렇기는 하지만, 그럼에도 불구하고",
-        hidden: "앞 문장의 사실을 인정하면서도 역접 반전을 때리는 강력한 시그널 (= nevertheless, nonetheless)",
-        extra: "• 앞 내용: 문법 실수가 많다. Even so, it's a good essay: 그렇지만 좋은 글이다.\n• 2년 연속 평가원 및 공무원 접속사 빈칸 출제 포인트!\n• even if: 비록 ~일지라도 (접속사) vs even so: 그럼에도 불구하고 (부사)",
-        quiz: { q: "'even if'와 'even so'의 문법적 품사 및 쓰임의 차이는?" }
-      },
-      {
-        id: "159",
-        word: "replace A with B",
-        type: "공무원 전치사 낚시 0순위 ★",
-        basic: "A를 B로 대체하다, 교체하다",
-        hidden: "★결과: 기존의 구태의연한 A는 버리고(X), 새로운 B를 취한다(O)! (A 사라짐, B 남음)",
-        extra: "• replace A with B: A를 버리고 B로 갈아치우다\n• substitute B for A: A 대신 B를 쓰다 (전치사 with vs for 구별 매년 출제!)\n• replace existing methods with new tech: 기존 방식을 버리고 신기술 채택",
-        quiz: { q: "'replace A with B'와 'substitute B for A'에서 최종적으로 남는 것은 A일까 B일까?" }
-      },
-      {
-        id: "160",
-        word: "be absorbed in A",
-        type: "심리 몰두 숙어",
-        basic: "A에 푹 빠지다, 열중하다, 몰두하다",
-        hidden: "absorb(흡수하다) ➔ 정신이 빨려 들어가 사로잡힌 상태 (= be occupied with A)",
-        extra: "• absorbed in thought: 생각에 푹 빠진\n• totally absorbed in the movie: 영화에 완전히 몰입한\n• absorption: 흡수; 몰두, 열중",
-        quiz: { q: "앞서 배운 occupy의 숙어 중 'be absorbed in'과 완벽한 동의어는?" }
-      },
+      // === 148 ~ 160 ===
+      { id: "160", word: "be absorbed in A", core: "A에 푹 빠지다, 몰두하다", basic: "A에 흡수되다, 열중하다", note: "• be occupied with A 동일", tag: "몰입 · 집중 숙어" },
+      { id: "159", word: "replace A with B", core: "기존 A를 버리고(X) 새 B로 갈아치우다(O)", basic: "A를 B로 대체하다", note: "• substitute B for A (전치사 with vs for 공무원 단골 낚시!)", tag: "대체 · 전치사 킬러" },
+      { id: "158", word: "even so", core: "그렇기는 하지만, 그럼에도 불구하고", basic: "설령 그렇다 하더라도", note: "• 앞 문장 인정 후 역접 반전 (= nevertheless)", tag: "역접 접속부사" },
+      { id: "157", word: "as 형용사 as", core: "[문두 도치] 비록 ~일지라도 (양보)", basic: "~만큼 ~한", note: "• Important as it is = Although it is important (뒤에 반전 예고)", tag: "양보 도치 구문" },
+      { id: "156", word: "A is to B as C is to D", core: "A와 B의 관계는 C와 D의 관계와 같다", basic: "비례 유추 공식 (A:B = C:D)", note: "• What A is to B, C is to D 동일", tag: "비례 유추 공식" },
+      { id: "155", word: "distinction between A and B", core: "A와 B의 명확한 대립·차이 선언", basic: "A와 B 사이의 구별", note: "• gap between A and B 동일 (A ↔ B 대립쌍 구조)", tag: "대립쌍 시그널" },
+      { id: "154", word: "be programmed to V", core: "선천적으로 타고나다, 내재되다", basic: "~하도록 프로그램 되어 있다", note: "• innate, inborn, hardwired와 같은 선천성 패밀리", tag: "선천성 시그널" },
+      { id: "153", word: "confuse A with B", core: "A와 B를 구별 못 하고 착각하다", basic: "A와 B를 혼동하다", note: "• 필자가 대중의 논리적 오류를 지적할 때 사용", tag: "오류 지적 구문" },
+      { id: "152", word: "aside from A", core: "A는 별개로 하고, A 외에도 (= apart from)", basic: "A를 제외하고", note: "• A 이야기는 끝내고 B라는 새로운 화제로 전환하는 시그널", tag: "화제 전환 시그널" },
+      { id: "151", word: "attend to", core: "1) 주의를 기울이다  2) (용무를) 처리하다", basic: "돌보다, 시중들다", note: "• attend the meeting(타동사: 참석하다)과 전치사 유무 구별", tag: "자·타동사 킬러" },
+      { id: "150", word: "A is a window into B", core: "A를 통해 B의 내막을 들여다볼 수 있다", basic: "A는 B를 보는 창이다", note: "• A = B를 이해하는 통찰의 도구", tag: "비유 독해 공식" },
+      { id: "149", word: "removed from A", core: "A로부터 멀리 떨어진, 동떨어진", basic: "A로부터 제거된", note: "• far removed from reality: 현실과 거리가 아주 먼", tag: "거리 · 단절 숙어" },
+      { id: "148", word: "not A until B", core: "B하고 나서야 비로소 A하다 (순서: B ➔ A)", basic: "B할 때까지 A하지 않다", note: "• Not until B did A... (공무원 부정어 도치 0순위)", tag: "시간 순서 · 도치" },
 
-      // === 103 account ~ 123 cast ===
-      {
-        id: "103-A",
-        word: "account",
-        type: "평가원 킬러 속뜻 ★",
-        basic: "계좌, 계정",
-        hidden: "1) 설명, 이야기, 기술  2) 중요성 (of no account = 중요치 않은)",
-        extra: "• of no account / of little account: 중요하지 않은 (= unimportant)\n• short account: 짧은 설명/기술\n• accountant: 회계사",
-        quiz: { q: "'The matter is of no account'에서 of no account의 뜻은?" }
-      },
-      {
-        id: "103-B",
-        word: "account for",
-        type: "절대 빈출 숙어 ★",
-        basic: "설명하다; 차지하다",
-        hidden: "1) (비율·수치를) 차지하다  2) (이유·원인을) 설명하다, 해명하다",
-        extra: "• account for 40 percent: 40%를 차지하다\n• account for the delay: 지연 이유를 설명하다\n• take into account: ~을 고려하다",
-        quiz: { q: "'Coal accounts for 30% of energy'에서 account for의 뜻은?" }
-      },
-      {
-        id: "103-C",
-        word: "accountable",
-        type: "책임/설명 파생어",
-        basic: "책임이 있는",
-        hidden: "be accountable to/for = (~에 대해) 해명할 책임이 있는 (unaccountable = 설명할 수 없는)",
-        extra: "• accountable for the outcome: 결과에 책임을 져야 하는\n• unaccountable: 설명할 수 없는, 불가해한",
-        quiz: { q: "accountable(책임 있는)과 반대말 unaccountable의 뜻은?" }
-      },
-      {
-        id: "104",
-        word: "edge",
-        type: "사전 끝 우위 속뜻 ★",
-        basic: "끝, 모서리, 가장자리",
-        hidden: "평가원 독해 속뜻: (남보다 앞서는) '우위, 유리함, 장점' (= advantage)",
-        extra: "• have an edge over: ~보다 우위에 있다/유리하다\n• competitive edge: 경쟁 우위\n• leading edge: 최첨단 (leading-edge technology)",
-        quiz: { q: "'have an edge over competitors'에서 edge의 1초 독해 뜻은?" }
-      },
-      {
-        id: "105",
-        word: "rewarding",
-        type: "방향성 (+) 형용사 ★",
-        basic: "보람 있는, 가치 있는 (+)",
-        hidden: "만족감과 보람을 주는 활동 (+) ↔ 힘 빠지게 고된 활동 (demanding: -)",
-        extra: "• rewarding career: 보람차고 뜻깊은 직업 (+)\n• demanding job: 많은 에너지를 쥐어짜는 고된 직업 (-)\n• reward: 보상, 보답",
-        quiz: { q: "demanding(고된:-)과 정반대 짝꿍인 rewarding(+)의 뜻은?" }
-      },
-      {
-        id: "106-A",
-        word: "substance",
-        type: "철학/논리 속뜻",
-        basic: "물질",
-        hidden: "실체, 본질, 알맹이 (without substance = 실체가 없는/알맹이 없는)",
-        extra: "• arguments without substance: 실체(알맹이) 없는 주장\n• substantial: 상당한, 실질적인\n• substantially: 상당히, 주로",
-        quiz: { q: "'an idea without substance'에서 substance의 문맥 속뜻은?" }
-      },
-      {
-        id: "106-B",
-        word: "substantial",
-        type: "평가원 빈출 형용사",
-        basic: "상당한, 실질적인",
-        hidden: "양이나 크기가 꽤 많은 (= considerable, significant)",
-        extra: "• substantial progress: 상당한 진전\n• substantial cognitive leap: 실질적인 인지적 도약\n• substantially: 실질적으로, 상당히",
-        quiz: { q: "substantial progress에서 substantial의 정확한 의미는?" }
-      },
-      {
-        id: "107",
-        word: "original",
-        type: "평가원 독창성 극찬 ★",
-        basic: "원래의, 본래의",
-        hidden: "평가원 킬러 속뜻: '독창적인, 참신한' (= inventive, creative)",
-        extra: "• original thinkers: 독창적인 사상가들\n• originality: 독창성, 참신함\n• originate: 비롯되다, 유래하다",
-        quiz: { q: "독해 지문에서 'an original work of art'의 original은 무슨 뜻?" }
-      },
-      {
-        id: "108",
-        word: "measure",
-        type: "정책/조치 속뜻 ★",
-        basic: "측정하다, 재다 / 단위, 치수",
-        hidden: "[명사] 조치, 대책, 정책, 법안",
-        extra: "• take measures to: ~하기 위한 조치를 취하다\n• preventative measure: 예방 조치\n• emergency measure: 비상 대책",
-        quiz: { q: "'take strict measures against crime'에서 measures의 뜻은?" }
-      },
-      {
-        id: "109",
-        word: "address",
-        type: "평가원 킬러 동사 ★",
-        basic: "주소, 연설 / 연설하다",
-        hidden: "[동사] (문제·상황·위기를) 다루다, 해결하다, 고심하다 (= tackle, deal with)",
-        extra: "• address the problem: 문제를 다루다/처리하다\n• address climate change: 기후 변화에 대응하다\n• address inequalities: 불평등을 해결하다",
-        quiz: { q: "'The government must address this issue'에서 address의 뜻은?" }
-      },
-      {
-        id: "110",
-        word: "represent",
-        type: "다의어 및 비율 속뜻",
-        basic: "대표하다, 나타내다, 묘사하다",
-        hidden: "1) (비율·수치에) 해당하다  2) represent A as B = A를 B라고 기술하다",
-        extra: "• represents 20% of the total: 전체의 20%에 해당하다\n• representative: 대표자; 전형적인\n• representation: 표현, 묘사",
-        quiz: { q: "'Women represent 40% of the workforce'에서 represent의 뜻은?" }
-      },
-      {
-        id: "111",
-        word: "compound",
-        type: "동사 악화 킬러 ★",
-        basic: "화합물, 혼합물 / 혼합의",
-        hidden: "[동사] (문제·어려움을) 더 심각하게 만들다, 악화시키다 (= worsen, aggravate)",
-        extra: "• compound the difficulty: 어려움을 가중시키다/악화시키다\n• compound interest: 복리 (이자)",
-        quiz: { q: "'The mistake will compound the problem'에서 compound의 동사 뜻은?" }
-      },
-      {
-        id: "112-A",
-        word: "observation",
-        type: "명사 분기 낚시 ★",
-        basic: "관찰, 관측",
-        hidden: "observe(보다, 관찰하다)의 명사형 (↔ observance: 준수, 의식)",
-        extra: "• close observation: 면밀한 관찰\n• observational study: 관찰 연구\n• observe: 관찰하다; 말하다",
-        quiz: { q: "observe의 두 명사형 'observation'과 'observance'의 뜻 차이는?" }
-      },
-      {
-        id: "112-B",
-        word: "observance",
-        type: "명사 분기 낚시 ★",
-        basic: "(법·규칙의) 준수; (종교적) 의식",
-        hidden: "observe(법을 지키다/준수하다)의 명사형",
-        extra: "• observance of laws: 법률 준수\n• religious observance: 종교적 의식/예식",
-        quiz: { q: "'observance of safety rules'에서 observance의 정확한 뜻은?" }
-      },
-      {
-        id: "113",
-        word: "anchor",
-        type: "비유적 고정 속뜻 ★",
-        basic: "닻; 닻을 내리다",
-        hidden: "비유적 속뜻: (확고히) 고정시키다, 닻을 내리다, 정박시키다",
-        extra: "• be anchored in reality: 현실에 확고히 뿌리박다/고정되다\n• anchor of motivation: 동기부여의 든든한 닻(지탱목)",
-        quiz: { q: "'The theory is firmly anchored in facts'에서 anchor의 뉘앙스는?" }
-      },
-      {
-        id: "114-A",
-        word: "marginal",
-        type: "평가원 킬러 형용사 ★",
-        basic: "가장자리의, 여백의",
-        hidden: "핵심(core)이 아닌: '미미한, 중요하지 않은, 하찮은' (= insignificant)",
-        extra: "• marginal effect: 미미한 효과\n• marginal group: 주변부/소외 계층\n• marginal cost: 한계 비용",
-        quiz: { q: "core(핵심)와 대립되는 marginal의 평가원 독해 속뜻은?" }
-      },
-      {
-        id: "114-B",
-        word: "marginalize",
-        type: "사회학 킬러 동사 ★",
-        basic: "사회적으로 소외시키다, 무시하다",
-        hidden: "주류 중심부에서 밀어내어 변두리(margin)로 소외시키다",
-        extra: "• marginalized people: 사회적으로 소외된 사람들\n• marginalization: 소외, 비주류화",
-        quiz: { q: "'marginalize minority voices'에서 marginalize의 뜻은?" }
-      },
-      {
-        id: "115",
-        word: "shallow",
-        type: "방향성 (-) 형용사",
-        basic: "깊이가 얕은",
-        hidden: "추상적 속뜻: (사람·생각·지식이) '얄팍한, 천박한, 피상적인' (-)",
-        extra: "• shallow analysis: 피상적이고 얄팍한 분석\n• deep / profound: 깊고 심오한 (↔ shallow)\n• shallowness: 피상성, 천박함",
-        quiz: { q: "'a shallow argument'에서 shallow의 비유적 속뜻은?" }
-      },
-      {
-        id: "116-A",
-        word: "respect",
-        type: "다의어 속뜻 ★",
-        basic: "존경하다, 존중하다",
-        hidden: "[명사] 점, 측면 (= aspect, point)",
-        extra: "• in this respect: 이러한 점(측면)에서\n• in all respects: 모든 면에서\n• in many respects: 여러모로, 많은 점에서",
-        quiz: { q: "'in this respect'에서 respect의 1초 독해 뜻은?" }
-      },
-      {
-        id: "116-B",
-        word: "respective",
-        type: "파생 분기 낚시 ★",
-        basic: "각각의, 각자의",
-        hidden: "각자 제각각의 (respectively = 부사: 각각, 제각기)",
-        extra: "• their respective roles: 그들의 각자의 역할\n• respectful: 공손한, 정중한\n• respectable: 존경할 만한, 훌륭한",
-        quiz: { q: "respective(각각의), respectful(공손한), respectable(존경할만한) 3단어 구별!" }
-      },
-      {
-        id: "117",
-        word: "property",
-        type: "과학/철학 킬러 속뜻 ★",
-        basic: "재산, 부동산",
-        hidden: "과학/철학 지문: '특성, 속성, 고유한 성질' (= characteristic, attribute)",
-        extra: "• chemical properties: 화학적 성질/특성\n• physical properties: 물리적 특성\n• intellectual property: 지적 재산",
-        quiz: { q: "화학/물리 지문에서 'properties of materials'의 property는 무슨 뜻?" }
-      },
-      {
-        id: "118",
-        word: "rough",
-        type: "어림치 속뜻",
-        basic: "거친, 난폭한",
-        hidden: "대략의, 대강의 (= approximate) / roughly = 대략, 거의",
-        extra: "• rough idea / calculation: 대략적인 생각 / 계산\n• roughly equal: 거의 대등한\n• roughness: 거침, 난폭함",
-        quiz: { q: "'I have a rough idea'에서 rough의 정확한 뜻은?" }
-      },
-      {
-        id: "119",
-        word: "successive",
-        type: "철자/파생 킬러 ★",
-        basic: "연속적인, 연이은",
-        hidden: "succeed(계승하다, 잇다)의 형용사 (↔ successful: 성공적인)",
-        extra: "• successive days: 연이은 며칠, 연속된 날들\n• succession: 연속, 계승\n• successful: 성공한, 성공적인",
-        quiz: { q: "successive(연속적인)와 successful(성공적인)의 결정적 차이는?" }
-      },
-      {
-        id: "120",
-        word: "custom",
-        type: "맞춤 제작 파생어",
-        basic: "관습, 풍습",
-        hidden: "customize = (고객 주문·필요에 따라) 맞춤 제작하다, 변경하다",
-        extra: "• customized curriculum: 맞춤형 교육과정\n• customization: 맞춤 제작\n• customs: 세관, 관세",
-        quiz: { q: "'customized for each student'에서 customize의 뜻은?" }
-      },
-      {
-        id: "121",
-        word: "climate",
-        type: "비유적 분위기 속뜻",
-        basic: "기후",
-        hidden: "독해 속뜻: (사회·정치적) '분위기, 풍조, 환경' (= atmosphere, trend)",
-        extra: "• economic climate: 경제적 분위기/여건\n• climate of fear: 공포 분위기\n• political climate: 정치적 풍조",
-        quiz: { q: "'in the current economic climate'에서 climate의 비유적 뜻은?" }
-      },
-      {
-        id: "122",
-        word: "pitch",
-        type: "음향/물리 킬러",
-        basic: "던지다, 투구하다 / 경기장",
-        hidden: "[소리·음향·물리] '음의 높낮이, 음고'",
-        extra: "• high pitch: 고음 (↔ low pitch: 저음)\n• rhythm and pitch: 리듬과 음고\n• sales pitch: 영업용 홍보 문구",
-        quiz: { q: "음악/물리 지문에서 'the pitch of the human voice'의 pitch는 무슨 뜻?" }
-      },
-      {
-        id: "123",
-        word: "cast",
-        type: "다의어 속뜻",
-        basic: "던지다, 배역을 주다",
-        hidden: "1) (그림자를) 드리우다  2) (의심·불안을) 던지다  3) 깁스",
-        extra: "• cast shadow: 그림자를 드리우다\n• cast doubt on: ~에 의심을 던지다/품다\n• cast: 출연진, 깁스",
-        quiz: { q: "'cast doubt on the theory'와 'cast shadow'에서 cast의 뜻은?" }
-      },
+      // === 124 ~ 147 ===
+      { id: "147", word: "other than A", core: "A 이외의, A를 제외하고 (= except)", basic: "A와 다른", note: "• nothing other than A = only A", tag: "예외 · 부정 숙어" },
+      { id: "146", word: "not so much A as B", core: "A라기보다는 B이다 (A 기각, B 강조)", basic: "A만큼 B는 아니다", note: "• B rather than A / not A but B 동일 (주제문 시그널)", tag: "주제문 강조 공식" },
+      { id: "145", word: "A is a product of B", core: "[원인 B ➔ 결과 A] A는 B의 산물이다", basic: "A는 B의 창조물이다", note: "• A is a function of B 동일", tag: "인과 귀속 공식" },
+      { id: "144", word: "at worst", core: "최악의 경우에는 (-)", basic: "가장 나빠도", note: "• 부정적 극단 상황 가정", tag: "극단 가정 숙어" },
+      { id: "143", word: "at best", core: "기껏해야, 잘해야 고작 (= only) (-)", basic: "최선의 상태에서", note: "• 대상의 한계를 깎아내리는 마이너스(-) 시그널", tag: "한계 비판 시그널" },
+      { id: "142", word: "it follows that S V", core: "따라서 ~라는 결론에 이른다 (주제문)", basic: "뒤이어 ~가 오다", note: "• 논리적 필연 결론 도출 시그널", tag: "결론 도출 시그널" },
+      { id: "141", word: "contribute to", core: "[원인 A ➔ 결과 B] A가 B의 원인이 되다", basic: "~에 공헌하다, 기여하다", note: "• 좋은 일뿐 아니라 'contribute to disease(질병의 원인이 되다)' 빈출", tag: "인과관계 동사" },
+      { id: "140", word: "turn sour", core: "(관계·일이) 틀어지다, 잘못되다 (-)", basic: "음식이 시어지다, 상하다", note: "• partnership turned sour: 동업 관계가 틀어졌다", tag: "비유 관용구" },
+      { id: "139", word: "be it A or B", core: "A이든 B이든 간에 (= whether it be A or B)", basic: "양보 도치 구문", note: "• whether 생략으로 동사 be가 문두로 도치됨", tag: "양보 도치 구문" },
+      { id: "138", word: "code", core: "행동 규범, 수칙, 관례, 법전", basic: "암호, 부호", note: "• code of conduct (행동 수칙) / penal code (형법전)", tag: "사회 · 법학 다의어" },
+      { id: "137", word: "mechanical", core: "영혼 없는, 무감각한, 형식적인 (-)", basic: "기계의, 기계적인", note: "• mechanical answer: 진심이 안 담긴 기계적 답변", tag: "방향성 (-) 어휘" },
+      { id: "136", word: "authorize", core: "권한을 부여하다, 공인하다, 허가하다", basic: "권위를 주다", note: "• authorized biography: 공인된 전기", tag: "권한 파생어" },
+      { id: "135-B", word: "treaty vs retreat", core: "treaty: 조약 / retreat: 후퇴하다", basic: "철자 혼동어", note: "• peace treaty (평화 조약) vs forced to retreat (후퇴하다)", tag: "철자 낚시" },
+      { id: "135-A", word: "treat", core: "[명사] 한턱, 특별한 대접, 간식", basic: "대우하다, 치료하다", note: "• It's my treat: 내가 한턱낼게", tag: "명사 속뜻" },
+      { id: "134", word: "fine", core: "[형용사] 미세한, 정밀한, 섬세한", basic: "좋은; 벌금", note: "• fine detail (미세한 세부사항) ➔ refine (정제하다)", tag: "다의어 속뜻" },
+      { id: "133", word: "sound", core: "[형용사] 건전한, 타당한, 믿을 만한 (+)", basic: "소리; 소리가 나다", note: "• sound argument (타당한 논증) / sound sleep (깊은 잠)", tag: "형용사 극찬 (+)" },
+      { id: "132", word: "in light of", core: "~에 비추어 볼 때, ~을 고려하여", basic: "~의 빛 속에서", note: "• in this light: 이러한 관점(측면)에서 볼 때", tag: "관점 숙어" },
+      { id: "131", word: "immune", core: "be immune to A: A에 영향을 받지 않는", basic: "면역성이 있는", note: "• immune to criticism: 비판에 전혀 흔들리지 않는", tag: "영향 면역 속뜻" },
+      { id: "130", word: "question", core: "[동사] 의심하다, 이의를 제기하다 (= doubt)", basic: "질문, 의문", note: "• question the validity: 타당성을 의심하다", tag: "동사 불신 시그널" },
+      { id: "129", word: "invariably", core: "언제나, 예외 없이 (= always)", basic: "변함없이", note: "• 독해에서 만나면 100% '항상'으로 직결", tag: "100% 항상 시그널" },
+      { id: "128", word: "minute", core: "[mainjú:t] 미세한, 극미량의 (= tiny)", basic: "[mínit] 분, 순간", note: "• minute amounts of chemicals: 극미량의 화학물질", tag: "발음·품사 분기" },
+      { id: "127", word: "condition", core: "[동사] 길들이다, 훈련시키다, 조건화하다", basic: "상태, 조건", note: "• conditioned to: ~하도록 길들여진 (파블로프의 개)", tag: "심리 조건화 동사" },
+      { id: "126", word: "mark", core: "[동사] 특징짓다, 두드러지게 하다", basic: "표시, 흔적", note: "• be marked by: ~로 특징지어지다", tag: "동사 특징화" },
+      { id: "125-B", word: "integral", core: "필수적인, 필요불가결한 (= essential)", basic: "내장된, 통합된", note: "• integral part of: ~의 없어서는 안 될 핵심 부분", tag: "필수 형용사" },
+      { id: "125-A", word: "integrity", core: "도덕적 진실성, 청렴; 온전함", basic: "통합성", note: "• moral integrity (도덕적 청렴) / territorial integrity (영토 보전)", tag: "윤리 · 철학 명사" },
+      { id: "124", word: "score", core: "1) 악보 (musical score)  2) 20개", basic: "득점, 점수", note: "• scores of: 수십의, 아주 많은 (= dozens of)", tag: "음악 · 수량 다의어" },
 
-      // === 084 settle ~ 102 figure ===
-      {
-        id: "084",
-        word: "settle",
-        type: "평가원 킬러 속뜻 ★",
-        basic: "정착하다",
-        hidden: "타동사일 때: (분쟁·문제를) 해결하다, 합의를 보다 (= solve)",
-        extra: "• settle disputes: 분쟁을 해결하다\n• settle the problem: 문제를 해결하다\n• settlement: 정착; 합의, 해결\n• settler: 정착민",
-        quiz: { q: "'settle disputes with workers'에서 settle의 정확한 독해 뜻은?" }
-      },
-      {
-        id: "085",
-        word: "dispute",
-        type: "파생 반전 킬러 ★",
-        basic: "분쟁, 논란 / 이의를 제기하다",
-        hidden: "undisputed = '반박의 여지가 없는, 모두가 인정하는' (= acknowledged, accepted)",
-        extra: "• disputed border: 분쟁 중인 국경\n• undisputed champion: 자타공인 모두가 인정하는 챔피언\n• undisputed leader: 반박할 수 없는 확고한 지도자",
-        quiz: { q: "undisputed가 사람이나 기업 앞에 붙을 때의 한국어 뜻은?" }
-      },
-      {
-        id: "086",
-        word: "context",
-        type: "독해 본질 개념 ★",
-        basic: "맥락, 문맥, 전후 사정",
-        hidden: "독해 본질: 어떤 사건이나 개념과 연결된 '구체적 상황(general situation)'",
-        extra: "• cultural context: 문화적 맥락(상황)\n• contextual: 맥락상의, 전후 사정의\n• contextualize: 맥락과 관련짓다",
-        quiz: { q: "영영사전에서 context의 본질로 정의한 단어(상황)는?" }
-      },
-      {
-        id: "087",
-        word: "break",
-        type: "뉴스 전달 관용구 ★",
-        basic: "깨지다, 부수다, 고장 내다",
-        hidden: "break the news = '(뉴스·소식을) 알리다, (안 좋은 소식을) 털어놓다'",
-        extra: "• break the news to you: 당신에게 소식을 처음으로 알리다\n• break tradition: 전통을 깨다\n• break out: (전쟁·질병이) 발발하다",
-        quiz: { q: "'I hate to break it to you'에서 break의 숨은 속뜻은?" }
-      },
-      {
-        id: "088",
-        word: "relevant",
-        type: "평가원 시그니처 킬러 ★",
-        basic: "관련 있는",
-        hidden: "독해 속뜻: 1) 의의가 있는(유의미한), 대단히 중요한  2) 적절한",
-        extra: "• most relevant constants: 가장 중요하고 유의미한 상수들\n• highly relevant information: 대단히 적절하고 유의미한 정보\n• irrelevant: 무관한, 중요하지 않은 (-)",
-        quiz: { q: "relevant가 독해에서 갖는 2대 킬러 속뜻은?" }
-      },
-      {
-        id: "089",
-        word: "appreciate",
-        type: "다의어 총집합 ★",
-        basic: "진가를 알아보다, 높이 평가하다",
-        hidden: "1) 진가를 인정하다  2) 감사하다  3) 감상하다  4) 인식하다  5) 가치가 오르다",
-        extra: "• appreciate the nature: 진정한 본질을 제대로 인식하다\n• appreciate art: 예술을 감상하고 가치를 알아보다\n• appreciation: 평가; 감사; 감상; (가치) 상승",
-        quiz: { q: "appreciate의 5대 핵심 뜻(가치, 감사, 감상, 인식, 상승)을 읊어보세요!" }
-      },
-      {
-        id: "090",
-        word: "exceptional",
-        type: "극찬(+) 형용사 ★",
-        basic: "이례적인, 극히 예외적인",
-        hidden: "독해 속뜻: '이례적일 정도로 우수한, 대단히 뛰어난' (= outstanding, extraordinary)",
-        extra: "• exceptional talent: 예외적일 만큼 뛰어난 천재적 재능 (+)\n• exceptional effort: 탁월한 노력\n• exceptionally: 유난히, 특별히 (= unusually)",
-        quiz: { q: "except(제외하다)에서 나온 exceptional이 칭찬(+)으로 쓰일 때의 뜻은?" }
-      },
-      {
-        id: "091",
-        word: "credit",
-        type: "공로 귀속 공식 ★",
-        basic: "신용, 외상",
-        hidden: "be credited to B = 'A의 공로/업적/발견을 B의 탓·공으로 인정하다'",
-        extra: "• take credit for: ~에 대한 공로를 가로채다/차지하다\n• credit A with B: A에게 B의 공로가 있다고 인정하다\n• give credit: 공로를 인정하다",
-        quiz: { q: "'The discovery is credited to Pasteur'의 문맥 해석 공식은?" }
-      },
-      {
-        id: "092",
-        word: "frequency",
-        type: "물리/음향 킬러 다의어",
-        basic: "빈도, 잦음",
-        hidden: "[소리·전파·물리] '주파수, 진동수'",
-        extra: "• high frequency: 고주파 (높은 음)\n• frequency of visits: 방문 빈도\n• frequent: 잦은, 빈번한",
-        quiz: { q: "음향/물리 지문에서 'a note of higher frequency'의 frequency는 무슨 뜻?" }
-      },
-      {
-        id: "093",
-        word: "count",
-        type: "자동사 중요성 공식 ★",
-        basic: "수를 세다, 계산하다",
-        hidden: "진행형 없이 쓰이는 자동사 count = '중요하다, 가치가 있다' (= matter)",
-        extra: "• Every second counts: 1분 1초가 중요하다\n• count on: ~을 믿다, 의지하다 (= rely on)\n• count A as B: A를 B로 간주하다 (= regard)",
-        quiz: { q: "'Musical processes count'에서 count의 1초 독해 뜻은?" }
-      },
-      {
-        id: "094",
-        word: "case",
-        type: "평가원 진실/주장 시그널 ★",
-        basic: "경우, 사례, 소송",
-        hidden: "1) the case = 사실, 진실  2) make the case = 자신의 주장을 펴다",
-        extra: "• This is the case: 이것은 사실이다\n• make it the case that: ~을 사실이 되게 하다\n• make a case for: ~을 옹호하는 주장을 펼치다",
-        quiz: { q: "'That is not the case'와 'make their case'에서 case의 각각 다른 뜻은?" }
-      },
-      {
-        id: "095",
-        word: "inquire",
-        type: "학술 탐구 어휘",
-        basic: "물어보다, 질문하다",
-        hidden: "inquiry = 과학적/학술적 '조사, 연구, 탐구'",
-        extra: "• scientific inquiry: 과학적 탐구\n• philosophical inquiry: 철학적 탐구\n• inquire into: ~을 조사하다",
-        quiz: { q: "학술 지문에서 'field of scientific inquiry'의 inquiry는 무슨 뜻?" }
-      },
-      {
-        id: "096",
-        word: "positive",
-        type: "의학/태도 다의어",
-        basic: "긍정적인",
-        hidden: "1) (검사 결과) 양성의 (↔ negative: 음성)  2) 적극적인  3) 확신하는",
-        extra: "• positive test result: (질병 양성 반응: 병이 있음!)\n• positive rights: 적극적 권리 (↔ negative rights: 소극적 권리)\n• I am positive: 나는 확신한다",
-        quiz: { q: "의학 검사에서 positive와 법학/정치에서 positive rights의 뜻은?" }
-      },
-      {
-        id: "097",
-        word: "chemistry",
-        type: "인간관계 비유 속뜻",
-        basic: "화학, 화학적 성질",
-        hidden: "[사람 사이의] '교감, 끌림, 궁합, 케미'",
-        extra: "• good chemistry between us: 우리 사이의 훌륭한 교감/궁합\n• chemical: 화학의",
-        quiz: { q: "'There is good chemistry between the actors'에서 chemistry의 비유적 뜻은?" }
-      },
-      {
-        id: "098",
-        word: "cell",
-        type: "다의어 확장",
-        basic: "세포",
-        hidden: "1) (교도소의) 독방, 작은 방  2) (차량의) 승객실 (passenger cell)",
-        extra: "• prison cell: 교도소 감방\n• fuel cell: 연료 전지\n• cellular: 세포의",
-        quiz: { q: "'thrown into a cell'과 'passenger cell'에서 cell의 뜻은?" }
-      },
-      {
-        id: "099",
-        word: "contract",
-        type: "과학/의학 킬러 다의어 ★",
-        basic: "계약(서) / 계약하다",
-        hidden: "1) [물리/근육] 수축하다, 줄어들다  2) [의학] (중병에) 걸리다",
-        extra: "• expand or contract: 팽창하거나 수축하다\n• contract influenza: 독감에 걸리다\n• contraction: 수축; 축약",
-        quiz: { q: "'contract a disease'와 'muscles contract'에서 contract의 각각 다른 뜻은?" }
-      },
-      {
-        id: "100",
-        word: "register",
-        type: "심리/표현 킬러 속뜻 ★",
-        basic: "등록하다 / 등록부",
-        hidden: "1) (얼굴에 감정을) 나타내다, 표하다  2) 마음에 인식되다, 알아채다, 기억하다",
-        extra: "• register disbelief: 얼굴에 불신의 기색을 나타내다\n• It didn't register: 전혀 기억나지/인식되지 않았다\n• registration: 등록",
-        quiz: { q: "'The shock registered on his face'에서 register의 뉘앙스는?" }
-      },
-      {
-        id: "101-A",
-        word: "agent",
-        type: "철학/사회 주체 공식 ★",
-        basic: "중개인, 대리인, 요원",
-        hidden: "철학/사회학 지문: '주체적 행위자, 행동 주체' (human agents)",
-        extra: "• moral agent: 도덕적 행위 주체\n• cleaning agent: 세정제 (작용 물질)\n• agency: 행위 주체성; 대행사",
-        quiz: { q: "철학 지문에서 'moral agent'의 agent는 대리인일까, 행위자일까?" }
-      },
-      {
-        id: "101-B",
-        word: "agency",
-        type: "평가원 철학 핵심 개념 ★",
-        basic: "대행사, 대리점, 정부 기관",
-        hidden: "철학 지문 속뜻: '행위 능력, 주체성, 주도적 행동의 힘'",
-        extra: "• human agency: 인간의 주체적 행위 능력 (구조에 종속되지 않는 힘)\n• through one's own agency: 자기 자신의 주체적 행위로",
-        quiz: { q: "사회학/철학 지문에서 'human agency'의 킬러 독해 뜻은?" }
-      },
-      {
-        id: "102",
-        word: "figure",
-        type: "다의어 총집합 ★",
-        basic: "모양, 형태",
-        hidden: "1) 숫자, 수치  2) 인물  3) 도표  4) figure out = 이해하다, 알아내다",
-        extra: "• historical figure: 역사적 인물\n• sales figures: 매출 수치\n• see Figure 1: 도표 1을 보라\n• figure out: 문제를 이해하다, 풀어내다",
-        quiz: { q: "'historical figure'와 'figure out the problem'에서 figure의 뜻은?" }
-      },
+      // === 084 ~ 102 ===
+      { id: "102", word: "figure", core: "1) 수치  2) 인물  3) 도표  4) 알아내다", basic: "모양, 형태", note: "• historical figure (역사적 인물) / figure out (이해하다)", tag: "다의어 총집합" },
+      { id: "101-B", word: "agency", core: "[철학/사회] 주체적 행위 능력, 주체성", basic: "대행사, 정부 기관", note: "• human agency: 환경에 휘둘리지 않는 인간의 주체성", tag: "철학 핵심 개념" },
+      { id: "101-A", word: "agent", core: "주체적 행위자, 행동 주체", basic: "대리인, 요원", note: "• moral agent: 도덕적 행위 주체", tag: "철학 행위자" },
+      { id: "100", word: "register", core: "1) (감정을) 나타내다  2) 인식되다, 기억하다", basic: "등록하다", note: "• It didn't register: 머릿속에 전혀 인식되지 않았다", tag: "심리 · 표현 속뜻" },
+      { id: "099", word: "contract", core: "1) 수축하다, 줄어들다  2) (병에) 걸리다", basic: "계약(서); 계약하다", note: "• expand or contract (팽창/수축) / contract flu (독감에 걸리다)", tag: "과학 · 의학 다의어" },
+      { id: "098", word: "cell", core: "1) 독방, 감방  2) (차량) 승객실", basic: "세포", note: "• prison cell (독방) / passenger cell (승객실)", tag: "공간 다의어" },
+      { id: "097", word: "chemistry", core: "(사람 사이의) 교감, 궁합, 끌림", basic: "화학", note: "• good chemistry between us: 우리 사이의 좋은 케미/교감", tag: "비유 속뜻" },
+      { id: "096", word: "positive", core: "1) (검사 결과) 양성의  2) 적극적인  3) 확신하는", basic: "긍정적인", note: "• positive test (양성 반응: 병 있음!) ↔ negative (음성)", tag: "의학 · 태도 다의어" },
+      { id: "095", word: "inquire", core: "inquiry: 학술적 연구, 탐구, 조사", basic: "물어보다, 질문하다", note: "• scientific inquiry: 과학적 탐구", tag: "학술 탐구 어휘" },
+      { id: "094", word: "case", core: "1) the case: 사실, 진실  2) make the case: 주장하다", basic: "경우, 사례, 소송", note: "• That is not the case: 그것은 사실이 아니다", tag: "진실 · 주장 시그널" },
+      { id: "093", word: "count", core: "[자동사] 중요하다, 가치가 있다 (= matter)", basic: "수를 세다", note: "• count on (믿다) / count A as B (A를 B로 간주하다)", tag: "중요성 동사" },
+      { id: "092", word: "frequency", core: "[물리/음향] 주파수, 진동수", basic: "빈도, 잦음", note: "• high frequency: 고주파 (높은 음)", tag: "물리 · 음향 다의어" },
+      { id: "091", word: "credit", core: "be credited to B: B의 공로로 인정되다", basic: "신용, 외상", note: "• take credit for: ~에 대한 공로를 차지하다", tag: "공로 귀속 공식" },
+      { id: "090", word: "exceptional", core: "이례적일 정도로 뛰어난, 탁월한 (+)", basic: "예외적인", note: "• exceptional talent: 천재적이고 탁월한 재능 (= outstanding)", tag: "극찬 (+) 형용사" },
+      { id: "089", word: "appreciate", core: "진가를 인정하다, 감사하다, 감상하다, 인식하다", basic: "높이 평가하다", note: "• (가치가) 오르다 뜻까지 5대 의미 완비", tag: "5대 다의어" },
+      { id: "088", word: "relevant", core: "유의미한, 대단히 중요한, 적절한", basic: "관련 있는", note: "• irrelevant: 무관한, 중요치 않은 (-)", tag: "중요성 형용사" },
+      { id: "087", word: "break", core: "break the news: (안 좋은) 소식을 알리다", basic: "깨지다, 부수다", note: "• break it to you: 너에게 그 소식을 전하다", tag: "관용구 속뜻" },
+      { id: "086", word: "context", core: "어떤 사건과 연관된 구체적 '상황(situation)'", basic: "맥락, 문맥", note: "• cultural context: 문화적 배경/상황", tag: "독해 본질 개념" },
+      { id: "085", word: "dispute", core: "undisputed: 반박 여지가 없는, 자타공인 인정하는", basic: "분쟁, 논란; 반박하다", note: "• undisputed champion: 모두가 인정하는 챔피언", tag: "파생 반전 킬러" },
+      { id: "084", word: "settle", core: "[타동사] (분쟁·문제를) 해결하다 (= solve)", basic: "정착하다", note: "• settle disputes: 분쟁을 해결하다", tag: "타동사 해결 속뜻" },
 
-      // === 070 rather ~ 083 colony ===
-      {
-        id: "070",
-        word: "rather",
-        type: "평가원 주제문 시그널 ★",
-        basic: "꽤, 약간 / 오히려, 차라리",
-        hidden: "앞에 '부정적 뉘앙스 문장(not, rarely 등)'을 받고 뒤에 진짜 핵심(필자의 주장)을 제시! (A rather than B = B가 아니라 A)",
-        extra: "• not A, rather B: A가 아니라 오히려 B (★주제문!)\n• A rather than B: B라기보다는 오히려 A\n• correct something said: 앞선 말을 정정하여 참된 진실을 강조",
-        quiz: { q: "'not A, rather B' 구문에서 필자의 진짜 주장은 어디에 있을까?" }
-      },
-      {
-        id: "071",
-        word: "instead",
-        type: "대조 전환 시그널 ★",
-        basic: "대신에",
-        hidden: "Instead of A, B = 'A는 버리고(X) 대신 B를 취한다(O)'는 강력한 대조 시그널!",
-        extra: "• Instead of A, B: A 대신에 B (A=마이너스/기각 ↔ B=플러스/채택)\n• He didn't reply. Instead, he left: 대답 안 하고(X), 방을 나갔다(O)",
-        quiz: { q: "'Instead of A, B'에서 필자가 실제로 긍정하는 대상은 A일까 B일까?" }
-      },
-      {
-        id: "072",
-        word: "game",
-        type: "사전 맨 끝 숨은 뜻 ★",
-        basic: "게임, 경기, 시합",
-        hidden: "평가원 독해 속뜻: '사냥감' (Wild animals or birds hunted for sport/food)",
-        extra: "• large game: 대형 사냥감 (사슴, 곰 등)\n• game abundance: 풍부한 사냥감\n• hunter-gatherer diet: 수렵채집인의 사냥감 식단",
-        quiz: { q: "수렵·인류학 지문에서 'lived primarily on large game'의 game은 무슨 뜻?" }
-      },
-      {
-        id: "073",
-        word: "motor",
-        type: "생물/신경 킬러 속뜻 ★",
-        basic: "모터, 전동기 / 자동차",
-        hidden: "[의학/신경] '운동의, 근육 운동에 의한, 운동 신경의'",
-        extra: "• motor skills: 운동 기능, 신체 조작 기술\n• motor system: 운동 신경계\n• motor control: (손가락·근육의) 운동 제어",
-        quiz: { q: "뇌과학 지문에서 'patients with motor deficits'의 motor는 무슨 뜻?" }
-      },
-      {
-        id: "074",
-        word: "rate",
-        type: "다의어 / 동사 킬러",
-        basic: "비율, 요금, 속도",
-        hidden: "[동사] 등급을 매기다, 평가하다 (= assess, evaluate)",
-        extra: "• at a rapid rate: 빠른 속도로 (rate = speed)\n• rate their confidence: 자신감의 등급을 매기다(평가하다)\n• survival rates: 생존율",
-        quiz: { q: "'Participants were asked to rate the quality'에서 rate의 품사와 뜻은?" }
-      },
-      {
-        id: "075",
-        word: "contain",
-        type: "평가원 킬러 속뜻 ★",
-        basic: "함유하다, 포함하다, 들어 있다",
-        hidden: "독해 속뜻: '(감정·적대감·전염병·문제를) 억제하다, 참다, 방지하다'",
-        extra: "• contain hostility: 적대감을 억누르다, 자제하다\n• contain the outbreak: 전염병의 확산을 억제하다\n• cannot contain oneself: 감정을 주체할 수 없다(참을 수 없다)",
-        quiz: { q: "'help contain the deadly plague'에서 contain의 문맥 속뜻은?" }
-      },
-      {
-        id: "076",
-        word: "vehicle",
-        type: "상징적 매개체 공식 ★",
-        basic: "차량, 탈것, 운송 수단",
-        hidden: "평가원 공식: A as the vehicle for B = 'B를 달성하기 위한 수단, 매개체로서의 A'",
-        extra: "• vehicle for propaganda: 선전의 도구/수단\n• vehicle for promoting change: 변화를 촉진하는 매개체\n• Art as a vehicle: 사상을 전달하는 매개체로서의 예술",
-        quiz: { q: "'Art may be used as a vehicle for politics'에서 vehicle의 뜻은?" }
-      },
-      {
-        id: "077",
-        word: "flavor",
-        type: "비유적 속뜻",
-        basic: "풍미, 향미, 맛",
-        hidden: "독해 속뜻: (고유한) '특징, 특색' (= characteristic quality, distinctive nature)",
-        extra: "• very different flavors: 매우 다른 특색/특징들\n• add an American flavor: 미국적인 고유한 특색을 가미하다",
-        quiz: { q: "문화/정치 지문에서 'different flavors of democracy'의 flavor는 무슨 뜻?" }
-      },
-      {
-        id: "078",
-        word: "celebrity",
-        type: "가산/불가산 문맥 구별",
-        basic: "유명인사, 연예인",
-        hidden: "[불가산 명사일 때] '명성' (= fame, renown)",
-        extra: "• a celebrity: 한 명의 유명 인사 (셀 수 있음)\n• live a life of celebrity: 명성의 삶을 살다 (celebrity = fame, 셀 수 없음)",
-        quiz: { q: "'His celebrity intruded on his life'에서 celebrity의 추상명사 뜻은?" }
-      },
-      {
-        id: "079",
-        word: "virtual",
-        type: "문맥 대립 킬러 ★",
-        basic: "1) 사실상의, 거의 ~와 다름없는  2) 가상의 (VR)",
-        hidden: "virtually = '사실상, 거의' (= practically, almost) / virtual reality = 가상현실",
-        extra: "• virtually impossible: 사실상 불가능한\n• virtual monopoly: 사실상의 독점\n• virtual space: 가상공간",
-        quiz: { q: "'The task is virtually complete'에서 virtually의 정확한 뜻은?" }
-      },
-      {
-        id: "080",
-        word: "scarce",
-        type: "경제 희소성 & 짝꿍 부사",
-        basic: "부족한, 드문, 희소한",
-        hidden: "scarcity = 결핍, 희소성 (경제학 절대 개념) / scarcely = 거의 ~않다 (= hardly)",
-        extra: "• scarce resources: 희소한 자원\n• scarcity of capital: 자본의 결핍\n• scarcely exist: 거의 존재하지 않는다",
-        quiz: { q: "형용사 scarce(희소한)와 부사 scarcely의 결정적 차이는?" }
-      },
-      {
-        id: "081",
-        word: "grant",
-        type: "양보 반전 & 관용구 ★",
-        basic: "승인하다, 주다 / 보조금, 장학금",
-        hidden: "1) take A for granted = A를 당연시하다  2) Granted (that) ~ = 인정하지만, (그러나... 반전)",
-        extra: "• take for granted: 당연한 것으로 여기다 (소홀히 대하다)\n• Granted, they are right, but...: 그들이 옳다는 건 인정하지만... (양보 후 역접)\n• research grant: 연구 보조금",
-        quiz: { q: "문두에 'Granted, S+V'가 나오면 뒤에 어떤 접속사(반전)를 기대해야 할까?" }
-      },
-      {
-        id: "082",
-        word: "engage",
-        type: "다의어 및 형용사 확장",
-        basic: "(주의·관심을) 사로잡다, 끌다",
-        hidden: "engage in A = A에 관여/참여하다 / engaging = 매력적인 (= attractive)",
-        extra: "• engage the mind: 마음과 흥미를 사로잡다\n• engage in trade / reflection: 무역 / 성찰에 참여하다\n• an engaging story: 매력적이고 흥미진진한 이야기",
-        quiz: { q: "'engage in discussions'와 'an engaging smile'에서 각각의 뜻은?" }
-      },
-      {
-        id: "083",
-        word: "colony",
-        type: "생물 지문 킬러 속뜻",
-        basic: "식민지",
-        hidden: "[생물학 지문] (동물·곤충·세균의) '군집, 무리, 집단'",
-        extra: "• bee colony: 꿀벌 군집/무리\n• bacterial colony: 세균 군락\n• colonial: 식민지의; 군집성의",
-        quiz: { q: "생태학 지문에서 'ants defending their colony'의 colony는 무슨 뜻?" }
-      },
+      // === 070 ~ 083 ===
+      { id: "083", word: "colony", core: "[생물학] (곤충·동물·세균의) 군집, 무리", basic: "식민지", note: "• bee colony (꿀벌 무리) / bacterial colony (세균 군락)", tag: "생물 지문 다의어" },
+      { id: "082", word: "engage", core: "engage in: 참여하다 / engaging: 매력적인", basic: "(관심을) 사로잡다", note: "• an engaging story: 흥미진진하고 매력적인 이야기", tag: "파생 형용사 주의" },
+      { id: "081", word: "grant", core: "1) take for granted: 당연시하다  2) Granted ~: 인정하지만", basic: "승인하다, 주다; 보조금", note: "• 문두 Granted는 양보 후 역접(But) 예고 시그널", tag: "양보 반전 구문" },
+      { id: "080", word: "scarce", core: "부족한, 희소한 (scarcity: 희소성)", basic: "드문", note: "• scarcely: 거의 ~않다 (= hardly, 부사 구별!)", tag: "경제 핵심 어휘" },
+      { id: "079", word: "virtual", core: "1) 사실상의 (virtually: 거의)  2) 가상의", basic: "실질적인", note: "• virtually impossible: 사실상 불가능한", tag: "문맥 대립 다의어" },
+      { id: "078", word: "celebrity", core: "[불가산] 명성 (= fame)", basic: "유명인사, 연예인", note: "• live a life of celebrity: 명성의 삶을 살다", tag: "추상명사 전환" },
+      { id: "077", word: "flavor", core: "고유한 특징, 특색 (= distinctive quality)", basic: "풍미, 맛", note: "• add an American flavor: 미국적 특색을 더하다", tag: "비유 속뜻" },
+      { id: "076", word: "vehicle", core: "(목적 달성을 위한) 수단, 매개체", basic: "차량, 탈것", note: "• A as the vehicle for B: B를 이루기 위한 수단 A", tag: "상징적 매개체" },
+      { id: "075", word: "contain", core: "(감정·적대감·전염병을) 억제하다, 참다", basic: "포함하다, 함유하다", note: "• contain the outbreak: 전염병 확산을 억제하다", tag: "억제 · 통제 속뜻" },
+      { id: "074", word: "rate", core: "[동사] 등급을 매기다, 평가하다 (= assess)", basic: "비율, 요금, 속도", note: "• at a rapid rate: 빠른 속도로", tag: "동사 평가 속뜻" },
+      { id: "073", word: "motor", core: "[의학/신경] 운동의, 근육 운동 신경의", basic: "모터, 자동차", note: "• motor skills: 운동 기능 / motor system: 운동 신경계", tag: "신경과학 다의어" },
+      { id: "072", word: "game", core: "[수렵/인류] 사냥감 (야생 동물)", basic: "게임, 경기", note: "• large game: 대형 사냥감 (사슴, 곰 등)", tag: "사전 끝 숨은 뜻" },
+      { id: "071", word: "instead", core: "Instead of A, B: A는 버리고(X) B를 취함(O)", basic: "대신에", note: "• 앞 문장의 부정적 상황을 뒤집는 대조 시그널", tag: "대조 전환 시그널" },
+      { id: "070", word: "rather", core: "not A, rather B: A가 아니라 오히려 B (주제문)", basic: "꽤, 약간; 오히려", note: "• A rather than B = B가 아니라 A", tag: "주제문 시그널" },
 
-      // === 059 establish ~ 069 provide ===
-      {
-        id: "059-A",
-        word: "establish",
-        type: "설립 / 정립",
-        basic: "설립하다, 확립하다",
-        hidden: "어떤 이론이나 제도를 확실하게 정착시키다",
-        extra: "• established: 인정받는, 저명한 (= recognized)\n• well-established: 확실히 자리 잡은, 정평이 난\n• establishment: 기득권층, 지배체제",
-        quiz: { q: "established scholar와 well-established fact의 문맥 속뜻은?" }
-      },
-      {
-        id: "059-B",
-        word: "established",
-        type: "평가원 킬러",
-        basic: "인정받는, 저명한, 확실히 자리 잡은",
-        hidden: "이미 학계나 사회에서 권위를 공인받아 의심할 여지가 없는 (= conventional, existing)",
-        extra: "• established theory: 기존의 통념 이론 (novel theory와 대립!)\n• established order: 기존의 지배 질서",
-        quiz: { q: "'novel(새로운)'과 대립되는 established의 의미는?" }
-      },
-      {
-        id: "060-A",
-        word: "even",
-        type: "형용사 킬러",
-        basic: "1) 평평한, 고른  2) 균등한  3) 짝수의",
-        hidden: "at an even pace = 일정한 속도로 / even distribution = 균등한 분배",
-        extra: "• even: 평평한, 균등한, 짝수\n• uneven: 울퉁불퉁한, 고르지 못한, 불공평한, 홀수의\n• evenly: 고르게, 균등하게\n• unevenly: 불균등하게",
-        quiz: { q: "even numbers와 even pace에서 even의 각각 다른 뜻은?" }
-      },
-      {
-        id: "060-B",
-        word: "uneven",
-        type: "대립쌍",
-        basic: "평평하지 않은, 고르지 않은, 불균등한",
-        hidden: "uneven access to information = 정보에 대한 불균등한 접근 (불공평한 상태)",
-        extra: "• uneven distribution: 불균등한 분배\n• uneven surface: 울퉁불퉁한 표면\n• an uneven contest: 일방적인 불공평한 경기",
-        quiz: { q: "even(균등한)의 반대말 uneven의 핵심 뉘앙스는?" }
-      },
-      {
-        id: "061-A",
-        word: "odd",
-        type: "다의어 / 짝꿍",
-        basic: "1) 이상한, 특이한  2) 홀수의 (↔ even)",
-        hidden: "1, 3, 5, 7 are odd numbers = 홀수 / It may seem odd = 이상하게 보일 수 있다",
-        extra: "• odd: 이상한; 홀수의 (odd number = 홀수)\n• at odds with: ~와 불화하여, 상충하여",
-        quiz: { q: "even(짝수)의 반대말인 odd의 2가지 뜻은?" }
-      },
-      {
-        id: "061-B",
-        word: "odds",
-        type: "평가원 시그니처 ★",
-        basic: "1) 가능성, 확률  2) 고난, 역경",
-        hidden: "The odds of winning = 승리할 확률 / against all odds = 모든 역경을 딛고",
-        extra: "• The odds are against him: 그에게 승산(확률)이 없다\n• against all the odds: 모든 역경과 난관에도 불구하고\n• The odds of finding a partner: 짝을 찾을 확률",
-        quiz: { q: "'against all odds'에서 odds의 정확한 뜻은?" }
-      },
-      {
-        id: "062-A",
-        word: "mean",
-        type: "형용사/명사 킬러",
-        basic: "1) 못된, 비열한  2) [명사] 중간, 평균",
-        hidden: "Don't be mean = 못되게 굴지 마 / regression to the mean = 평균으로의 회귀 (통계/과학 빈출)",
-        extra: "• mean: 못된, 비열한; 보통의, 평균의; [명사] 평균\n• by no means: 결코 ~가 아니다 (= never)\n• by all means: 반드시, 기꺼이",
-        quiz: { q: "통계학 지문에서 'regression to the mean'의 mean은 무슨 뜻?" }
-      },
-      {
-        id: "062-B",
-        word: "means",
-        type: "수단 / 부",
-        basic: "수단, 방법, 재산(재력)",
-        hidden: "means of survival = 생존 수단 / a man of means = 재산가, 부자",
-        extra: "• a means of transportation: 교통수단\n• beyond one's means: 분수에 넘치게, 분에 넘치는\n• means of production: 생산 수단",
-        quiz: { q: "mean에 s가 붙은 'means'의 2가지 핵심 뜻은?" }
-      },
-      {
-        id: "063",
-        word: "claim",
-        type: "평가원 킬러 속뜻 ★",
-        basic: "주장하다, 요구하다",
-        hidden: "1) (사고·재난이) 목숨을 앗아가다  2) 차지하다, 소유권을 주장하다",
-        extra: "• The crash claimed three lives: 충돌 사고가 3명의 목숨을 앗아갔다\n• claim the real estate: 부동산 소유권을 차지하다\n• reclaim: 되찾다, 간척하다\n• acclaim: 칭송하다, 환호하다",
-        quiz: { q: "'The hurricane claimed 50 lives'에서 claim의 번역은?" }
-      },
-      {
-        id: "064",
-        word: "subject",
-        type: "숙어 / 형용사 킬러 ★",
-        basic: "주제, 과목, 실험 대상(피험자)",
-        hidden: "be subject to A = 1) A의 영향을 받기 쉬운  2) A(법·검사 등)를 받아야 하는",
-        extra: "• subject to change: 예고 없이 변경될 수 있는\n• subject to distortion: 왜곡의 영향을 받기 쉬운\n• be subjected to: (고통·모욕을) 당하다\n• subjection: 정복, 복종",
-        quiz: { q: "'be subject to change without notice'의 정확한 뜻은?" }
-      },
-      {
-        id: "065",
-        word: "contemporary",
-        type: "다의어 / 명사 킬러",
-        basic: "현대의, 당대의, 동시대의",
-        hidden: "[명사 복수형 contemporaries] 동시대 사람들, 동년배",
-        extra: "• contemporary art: 현대 미술\n• ignored by his contemporaries: 그의 동시대인들에게 무시당한\n• temporary: 일시적인, 임시의 (구별!)",
-        quiz: { q: "형용사 '현대의' 말고 명사 'contemporaries'의 뜻은?" }
-      },
-      {
-        id: "066",
-        word: "demanding",
-        type: "방향성 (-) 형용사 ★",
-        basic: "힘든, 고된, 까다로운, 많은 노력을 요구하는 (-)",
-        hidden: "손이 많이 가고 에너지를 엄청나게 쥐어짜는 마이너스(-) 상태",
-        extra: "• demanding job: 고되고 벅찬 일\n• energetically demanding activity: 많은 에너지를 요구하는 힘든 활동\n• demanding customer: 까다로운 손님\n• demand: 요구하다; 수요",
-        quiz: { q: "'a demanding task'에서 demanding의 방향성과 뜻은?" }
-      },
-      {
-        id: "067",
-        word: "consequential",
-        type: "평가원 킬러 속뜻 ★",
-        basic: "중대한, 대단히 중요한 (= important, significant)",
-        hidden: "of no consequence = 전혀 중요하지 않은 / consequential = 중대한 영향을 미치는",
-        extra: "• consequence: 결과, 영향; 중요성\n• of consequence: 중요한 (= of importance)\n• of no consequence: 중요하지 않은, 하찮은\n• inconsequential: 하찮은, 사소한",
-        quiz: { q: "'It is of no consequence'와 'consequential decision'의 뜻은?" }
-      },
-      {
-        id: "068",
-        word: "scale",
-        type: "다의어 총집합",
-        basic: "규모, 범위",
-        hidden: "1) 축척, 등급  2) (물고기) 비늘, 비늘/치석을 벗기다  3) [scales] 저울",
-        extra: "• on a global scale: 전 지구적 규모로\n• a scale of 1:25,000: 1대 2만5천 축척\n• scale of justice: 정의의 저울\n• scale the fish / teeth: 물고기 비늘을 치다 / 치석을 긁어내다",
-        quiz: { q: "'scale of justice'와 'scale the teeth'에서 scale의 각각 다른 뜻은?" }
-      },
-      {
-        id: "069",
-        word: "provided",
-        type: "조건 접속사 킬러 ★",
-        basic: "접속사: 만약 ~라면 (= If, providing that)",
-        hidden: "provided (that) S + V = 뒷 문장이 충족되는 조건 하에서만 (= only if)",
-        extra: "• provided the retrieval is successful: 만약 인출이 성공적이라면\n• provide A with B: A에게 B를 제공하다\n• provision: 제공, 공급; [복수] 식량; 조항",
-        quiz: { q: "문두에 나온 'Provided that you agree'의 정확한 해석은?" }
-      },
+      // === 040 ~ 069 ===
+      { id: "069", word: "provided (that)", core: "[접속사] 만약 ~라면 (= If)", basic: "제공하다", note: "• 문두에 나오면 100% 조건절 If", tag: "조건 접속사 킬러" },
+      { id: "068", word: "scale", core: "1) 축척  2) 저울  3) 물고기 비늘(을 벗기다)", basic: "규모, 범위", note: "• scale of justice (정의의 저울) / 1:25,000 scale (축척)", tag: "다의어 총집합" },
+      { id: "067", word: "consequential", core: "중대한, 대단히 중요한 (= important)", basic: "결과의", note: "• of no consequence: 전혀 중요하지 않은", tag: "중요성 형용사" },
+      { id: "066", word: "demanding", core: "힘든, 고된, 까다로운 (-)", basic: "요구하는", note: "• rewarding(보람 있는: +)과 정반대 대립쌍", tag: "방향성 (-) 어휘" },
+      { id: "065", word: "contemporaries", core: "[복수명사] 동시대인들, 동년배", basic: "현대의, 동시대의", note: "• ignored by his contemporaries: 동시대인들에게 외면받은", tag: "명사 전환 주의" },
+      { id: "064", word: "be subject to A", core: "A의 영향을 받기 쉬운, A를 받아야 하는", basic: "주제, 피험자", note: "• subject to change: 변경될 수 있는", tag: "빈출 숙어 킬러" },
+      { id: "063", word: "claim", core: "1) 목숨을 앗아가다  2) 차지하다", basic: "주장하다", note: "• The crash claimed three lives: 사고가 3명의 목숨을 앗아갔다", tag: "평가원 킬러 속뜻" },
+      { id: "062-B", word: "means", core: "수단, 방법, 재산", basic: "의미하다", note: "• means of survival: 생존 수단", tag: "수단 명사" },
+      { id: "062-A", word: "mean", core: "[형용사] 못된, 비열한 / [명사] 평균", basic: "의미하다", note: "• Regression to the mean: 평균으로의 회귀", tag: "다의어 분기" },
+      { id: "061-B", word: "odds", core: "1) 가능성, 확률  2) 고난, 역경", basic: "odd: 이상한, 홀수의", note: "• against all odds: 모든 역경을 딛고", tag: "평가원 시그니처" },
+      { id: "060", word: "even vs uneven", core: "even: 평평한, 균등한, 짝수의 / uneven: 불균등한", basic: "심지어", note: "• at an even pace: 일정한 속도로", tag: "반의어 대립쌍" },
+      { id: "059", word: "established", core: "확실히 자리 잡은, 공인된, 저명한", basic: "설립하다", note: "• established scholars: 저명한 학자들", tag: "형용사 속뜻" },
+      { id: "058", word: "initiate", core: "개시하다 / initiative: 진취성, 주도권, 계획", basic: "시작하다", note: "• take the initiative: 주도권을 잡다", tag: "파생 명사 킬러" },
+      { id: "057", word: "mobilize", core: "(특정 행동을 위해) 가동하다, 준비시키다", basic: "동원하다", note: "• mobilized to produce cells: 세포 생성을 위해 작동되다", tag: "생물·사회 확장" },
+      { id: "056", word: "counterpart", core: "동등한 지위·기능의 대응 상대방 (Same/Similar)", basic: "상응하는 것", note: "• 반대(counter)가 아니라 동격의 대응 상대!", tag: "오해 방지 1순위" },
+      { id: "055", word: "reconsider", core: "기존 결정을 바꿀 가능성을 두고 재고하다", basic: "다시 생각하다", note: "• in order to change a decision (변화·번복 시그널)", tag: "영영 코어 뉘앙스" },
+      { id: "054", word: "identify with A", core: "A와 자신을 동일시하다", basic: "식별하다", note: "• national identity: 국가 정체성", tag: "전치사 결합 속뜻" },
+      { id: "053", word: "orient", core: "A-oriented: A 지향적인 / disorient: 길을 잃게 하다", basic: "지향하게 하다, 적응하다", note: "• process-oriented: 과정 지향적인", tag: "접사 파생 어휘" },
+      { id: "052", word: "seize vs siege", core: "seize: (기회를) 꽉 잡다 / siege: 포위 작전", basic: "움켜쥐다", note: "• seize the day (지금 이 순간을 잡아라)", tag: "철자 혼동어" },
+      { id: "051", word: "displace", core: "밀어내고 대체하다, (난민 등을) 쫓아내다", basic: "옮겨 놓다", note: "• displaced workers: 일자리를 잃고 쫓겨난 노동자", tag: "어원 분해 어휘" },
+      { id: "050", word: "static", core: "움직임 없이 고정된(정적인); (오디오) 잡음", basic: "정적인", note: "• static condition: 변화 없는 고정 상태", tag: "과학 · 음향 다의어" },
+      { id: "049", word: "mere", core: "깔봄(겨우) ➔ 그 사소한 것 하나만으로도 큰 영향", basic: "겨우 ~의, 단순한", note: "• His mere presence: 단지 그가 거기 있었다는 사실만으로도", tag: "반전 트리거" },
+      { id: "048", word: "presume", core: "확실한 증거 없이 ~일 것이라 추정/간주하다", basic: "추정하다", note: "• presumed innocent: 무죄로 추정되는", tag: "추정 동사" },
+      { id: "047", word: "prescribe", core: "1) (약을) 처방하다  2) (법·규칙이) 규정하다", basic: "처방하다", note: "• culturally prescribed: 문화적으로 규정된", tag: "다의어 속뜻" },
+      { id: "046", word: "exclusive", core: "독점적인, 배타적인 (exclusively: 오로지)", basic: "전용의", note: "• almost exclusively: 거의 오로지 ~만 (= only)", tag: "독점 · 배타 어휘" },
+      { id: "045", word: "biology", core: "상징적 속뜻: 타고남, 선천적, 유전적", basic: "생물학", note: "• 선천성 7패밀리: biology, infant, inborn, innate, gene, DNA, hardwire", tag: "선천성 시그널" },
+      { id: "044", word: "compromise", core: "(-) 굽히다, 양보하다, 훼손시키다, 위태롭게 하다", basic: "타협하다", note: "• compromise their identity: 정체성을 훼손하다 (negotiate와 구별)", tag: "방향성 (-) 어휘" },
+      { id: "043", word: "assume", core: "사실이 아닐 수도 있는 것을 가정하다 (반전 예고)", basic: "가정하다, 추정하다", note: "• assume responsibility: 책임을 떠맡다", tag: "통념 반전 예고" },
+      { id: "042", word: "paradox", core: "겉보기엔 모순이나 깊이 보면 진실인 역설", basic: "역설, 패러독스", note: "• (+)와 (-)가 동시에 양립하는 논리적 모순", tag: "역설 논리" },
+      { id: "041", word: "irony", core: "예상과 정반대로 뒤틀리는 상황 모순 [(+) ➔ (-)]", basic: "아이러니", note: "• 안전장치가 오히려 사고를 부르는 역설적 상황", tag: "상황 반전 모순" },
+      { id: "040", word: "existing", core: "새로운 혁신 이전의 '기존의 구태의연한'", basic: "존재하는", note: "• existing paradigms(기존 틀) ↔ novel theory(새 이론)", tag: "대립쌍 시그널" },
 
-      // === 040 exist ~ 049 mere ===
-      {
-        id: "040",
-        word: "exist",
-        type: "대립쌍 시그널",
-        basic: "존재하다",
-        hidden: "existing A = 새로운 혁신 이전의 '기존의 구태의연한 A'",
-        extra: "• existing paradigms: 기존 패러다임 (novel theory와 대립!)\n• existing beliefs: 기존의 믿음/통념\n• existence: 존재",
-        quiz: { q: "'existing theories'에서 existing이 내포하는 평가원 문맥은?" }
-      },
-      {
-        id: "041",
-        word: "irony",
-        type: "인과 반전 (+/-)",
-        basic: "아이러니, 모순적인 상황",
-        hidden: "예상과 정반대의 결과가 벌어지는 모순적 상황 [(+) ➔ (-) or (-) ➔ (+)]",
-        extra: "• irony: 결과의 얄궂은 반전 (연결성이 늘었더니 고립이 가속됨)\n• ironic / ironically: 반어적으로, 역설적이게도",
-        quiz: { q: "아이러니(irony)의 인과 반전 공식 방향성은?" }
-      },
-      {
-        id: "042",
-        word: "paradox",
-        type: "논리 모순",
-        basic: "역설, 패러독스",
-        hidden: "양립 불가능해 보이는 두 명제가 둘 다 참인 논리적 모순",
-        extra: "• paradox of modern life: 자유 시간을 주는 기술이 선택 압박을 늘림\n• mapmaking paradox: 유용한 지도는 거짓말(축약)을 해야 함",
-        quiz: { q: "irony(상황적 반전)와 paradox(논리적 모순)의 차이는?" }
-      },
-      {
-        id: "043",
-        word: "assume",
-        type: "통념 반전 예고",
-        basic: "가정하다, 추정하다",
-        hidden: "사실이 아닐 수도 있는 것을 지레짐작하다 (뒤에 However 반전 예고!)",
-        extra: "• assume (that) S+V: 사실이 아닐 가능성 높음!\n• assume responsibility: 책임을 떠맡다\n• assumption: 가정, 억측",
-        quiz: { q: "'We often assume that~' 뒤에 전개될 논리 구조는?" }
-      },
-      {
-        id: "044",
-        word: "compromise",
-        type: "방향성 (-) 마이너스",
-        basic: "타협하다",
-        hidden: "(-) 굽히다, 양보하다, 훼손시키다, 위태롭게 하다",
-        extra: "• compromise their identity: 정체성을 훼손하다\n• compromise a truth: 진리를 훼손하다\n• compromise chances: 가능성을 위태롭게 하다\n• negotiate: 대등한 협상 (구별!)",
-        quiz: { q: "negotiate(대등한 협상)와 다른 compromise의 부정적 속뜻은?" }
-      },
-      {
-        id: "045",
-        word: "biology",
-        type: "선천성 7대 패밀리 ★",
-        basic: "생물학, 생명 작용",
-        hidden: "상징적 속뜻: '타고남, 선천적, 유전적 (후천적 학습과 대립)'",
-        extra: "• 선천성 패밀리: biology, infant, inborn, innate, gene(genetic), DNA, hardwire\n• biological destiny: 타고난 운명",
-        quiz: { q: "평가원에서 '후천적 환경(environment)'과 대립되는 선천성 7단어는?" }
-      },
-      {
-        id: "046",
-        word: "exclusive",
-        type: "강조 시그널",
-        basic: "배타적인, 독점적인",
-        hidden: "exclusively = 오로지, 단지 (= only)",
-        extra: "• exclusively love you: 너만 사랑해 (배타적으로 사랑해 X)\n• exclusive interview: 독점 인터뷰\n• mutually exclusive: 상호 배타적인",
-        quiz: { q: "'rely exclusively on data'에서 exclusively를 1초 만에 바꾸면?" }
-      },
-      {
-        id: "047",
-        word: "prescribe",
-        type: "명령/규정 속뜻",
-        basic: "처방하다",
-        hidden: "규정하다, 지시하다, 명령하다 (= dictate, ordain)",
-        extra: "• culturally prescribed: 문화적으로 규정된 행동\n• prescribed manner: 정해진 방식대로\n• prescription: 처방전, 규정",
-        quiz: { q: "'prescribed behaviors'에서 prescribe의 실전 독해 뜻은?" }
-      },
-      {
-        id: "048",
-        word: "presume",
-        type: "지레짐작",
-        basic: "추정하다, 생각하다",
-        hidden: "실질적 증거 없이 사실일 것이라고 지레짐작하다 (= assume)",
-        extra: "• presume guilt: 유죄로 지레짐작하다\n• presumably: 아마도, 짐작건대",
-        quiz: { q: "assume과 presume의 공통적인 뉘앙스는?" }
-      },
-      {
-        id: "049",
-        word: "mere",
-        type: "반전 트리거",
-        basic: "겨우 ~의, 단순한",
-        hidden: "깔봄(겨우) ➔ 역으로 '그 사소한 것 하나만으로도 엄청난 영향'으로 반전!",
-        extra: "• His mere presence: 단지 그가 거기 있었다는 그 사실 하나만으로도\n• merely: 한낱, 그저 (= only, simply)",
-        quiz: { q: "'His mere presence made her afraid'에서 mere의 뉘앙스는?" }
-      }
+      // === 001 ~ 039 (Restored Full Deck) ===
+      { id: "039", word: "tolerate", core: "1) 마지못해 용인하다  2) (의학) 독성을 견뎌내다", basic: "참다, 견디다", note: "• tolerance (관용; 내성) / intolerance (불관용; 과민증)", tag: "소극적 수용 · 내성" },
+      { id: "038", word: "bother", core: "[부정문/의문문] 굳이 애써 신경 쓰다, 수고를 들이다", basic: "괴롭히다, 귀찮게 하다", note: "• Don't bother to ask: 굳이 애써 물어볼 필요 없다", tag: "관용 속뜻" },
+      { id: "037", word: "faithful", core: "원본을 왜곡 없이 그대로 재현한 (= accurate)", basic: "충실한, 신의 있는", note: "• a faithful replica: 원본에 철저히 충실한 복제품", tag: "영영 코어 뉘앙스" },
+      { id: "036", word: "adjust", core: "오차를 바로잡기 위해 미세하게 조정하다", basic: "조정하다, 적응하다", note: "• adjust parameters: 수치를 정밀하게 보정하다", tag: "미세 조정 동사" },
+      { id: "035", word: "adapt", core: "1) 환경에 적응하다  2) (원작을) 각색하다", basic: "맞추다, 적응하다", note: "• adapt a novel for screen: 소설을 영화로 각색하다", tag: "적응 · 각색 다의어" },
+      { id: "034", word: "adopt", core: "원래 없던 새로운 제도·생각을 받아들여 채택하다", basic: "입양하다, 채택하다", note: "• adapt(적응/각색)와 철자 혼동 주의!", tag: "채택 · 획득 논리" },
+      { id: "033", word: "suspect vs doubt", core: "suspect: ~일 거라 추정(+) / doubt: ~가 아닐 거라 불신(-)", basic: "의심하다", note: "• I suspect he is guilty (범인 같아!) vs I doubt it (아닐 걸?)", tag: "평가원 시그니처" },
+      { id: "032", word: "develop", core: "(질병·결함·나쁜 것이) 생겨나다, 발현되다", basic: "개발하다, 발전하다", note: "• develop symptoms: 증상이 생겨나다", tag: "부정적 발현 속뜻" },
+      { id: "031", word: "fascinate vs tempt", core: "fascinate: 매혹하다(+) / tempt: (나쁜 길로) 유혹하다(-)", basic: "유혹하다", note: "• fascinated by art (+) vs tempted to cheat (-)", tag: "방향성 (+/-) 대조" },
+      { id: "030", word: "yield", core: "1) yield A: 산출하다  2) yield to A: 굴복·양보하다", basic: "생산하다, 양보하다", note: "• 전치사 to가 붙으면 '압력에 무릎 꿇고 항복하다'", tag: "전치사 급변 동사" },
+      { id: "029", word: "submit", core: "submit to A: A에게 굴복하다, 항복하다 (-)", basic: "제출하다", note: "• submit A (제출) vs submit to A (항복/복종)", tag: "전치사 급변 동사" },
+      { id: "028", word: "optional", core: "필수가 아닌, 해도 그만인, 부차적인", basic: "선택적인", note: "• mandatory(필수적인) ↔ optional(비필수적·부차적)", tag: "비필수 시그널" },
+      { id: "027", word: "manipulate", core: "교묘하고 부정한 방식으로 여론·데이터를 조작하다 (-)", basic: "조종하다, 다루다", note: "• manipulate statistics: 통계를 입맛대로 조작하다", tag: "방향성 (-) 어휘" },
+      { id: "026", word: "incidental", core: "핵심이 아닌 곁다리의, 부수적인 (= secondary)", basic: "우발적인", note: "• incident(사건)의 파생형: 본질이 아닌 부수적 부산물", tag: "부차적 요소 어휘" },
+      { id: "025", word: "informed", core: "정확한 지식과 정보에 근거한, 현명한", basic: "inform: 알리다", note: "• an informed decision: 데이터에 근거한 현명한 결정", tag: "분사 형용사 킬러" },
+      { id: "024", word: "weigh", core: "손익을 저울질하다, 깊이 숙고하다 (= ponder)", basic: "무게를 달다", note: "• weigh options: 선택지들을 신중히 저울질하다", tag: "심사숙고 동사" },
+      { id: "023", word: "alien", core: "본성에 맞지 않는 이질적인, 낯선 (alienate: 소외시키다)", basic: "외계인, 외국인", note: "• alien to human nature: 인간 본성에 낯설고 이질적인", tag: "이질성 · 소외 어휘" },
+      { id: "022", word: "myth", core: "대중이 잘못 믿고 있는 근거 없는 통념, 허구", basic: "신화", note: "• 독해 첫 줄 myth는 99% 뒤에서 반박(However)당하는 통념!", tag: "통념 비판 시그널" },
+      { id: "021", word: "vacuum", core: "외부와 단절된 고립된 상태 (= isolated state)", basic: "진공, 공백", note: "• No culture develops in a vacuum: 고립되어 자라는 문화는 없다", tag: "평가원 시그니처" },
+      { id: "020", word: "struggle vs strive", core: "struggle: 허우적대며 고투하다(-) / strive: 목표를 향해 분투하다(+)", basic: "투쟁하다, 애쓰다", note: "• struggle to survive (-) vs strive for excellence (+)", tag: "방향성 (+/-) 대조" },
+      { id: "019", word: "occupy", core: "be occupied with: 몰두하다 / preoccupation: 집착", basic: "차지하다, 점유하다", note: "• 정신과 뇌를 꽉 채워 몰두하게 만들다", tag: "심리적 몰두 어휘" },
+      { id: "018", word: "mixed", core: "(의견·평가가) 찬반이 엇갈리는, 양면적인", basic: "섞인, 혼합된", note: "• mixed reactions: 호평과 비판이 반반으로 갈리는 반응", tag: "양면성 시그널" },
+      { id: "017", word: "curb vs curve vs carve", core: "curb: 억제하다 / curve: 곡선 / carve: 조각하다", basic: "철자 혼동어", note: "• curb inflation: 치솟는 물가를 억누르다", tag: "철자 낚시 1순위" },
+      { id: "016", word: "comprehensive vs comprehensible", core: "comprehensive: 포괄적인 / comprehensible: 이해할 수 있는", basic: "파생 혼동어", note: "• comprehensive review (총체적 검토) vs comprehensible text (쉬운 글)", tag: "파생어 낚시" },
+      { id: "015", word: "spontaneously vs simultaneously", core: "spontaneously: 자발적으로 / simultaneously: 동시에", basic: "부사 혼동어", note: "• 외부 강제 없이 안에서 저절로 우러나와 (자발성)", tag: "부사 철자 낚시" },
+      { id: "014", word: "stationary vs stationery", core: "stationary(-ary): 정지된 / stationery(-ery): 문구류", basic: "철자 혼동어", note: "• stationary state: 변동 없이 멈춘 정체 상태", tag: "한 끗 철자 낚시" },
+      { id: "013", word: "root vs route", core: "root: 뿌리, 근원 / route: 길, 경로, 노선", basic: "발음 혼동어", note: "• root cause (근본 원인) vs trade route (무역 경로)", tag: "동음이의 혼동어" },
+      { id: "012", word: "alter vs alternate vs alternative", core: "alter: 바꾸다 / alternate: 번갈아 / alternative: 대안의(새로운)", basic: "어근 파생 혼동", note: "• alternative approach: 기존 방식을 대체하는 새로운 대안", tag: "파생어 3총사" },
+      { id: "011", word: "publicity", core: "언론·매스컴의 집중 조명, 주목, 홍보", basic: "public: 공공의", note: "• receive immense publicity: 언론의 대대적 주목을 받다", tag: "명사 속뜻 주의" },
+      { id: "010", word: "access vs assess", core: "access: 접근(권) / assess: 평가하다, 사정하다", basic: "철자 혼동어", note: "• access to data (접근) vs assess the risk (평가)", tag: "철자 낚시" },
+      { id: "009", word: "terrible vs terrific", core: "terrible: 끔찍한(-) / terrific: 대단히 멋진, 훌륭한(+)", basic: "방향성 반대 혼동", note: "• terrific achievement: 눈부시고 훌륭한 업적 (+)", tag: "방향성 (+/-) 반전" },
+      { id: "008", word: "reap vs rip vs ripe", core: "reap: 수확하다, 거두다 / rip: 찢다 / ripe: 익은", basic: "단음절 철자 혼동", note: "• You reap what you sow: 뿌린 대로 거둔다", tag: "단음절 철자 낚시" },
+      { id: "007", word: "causal vs casual", core: "causal: 인과관계의 / casual: 무심한, 우연한, 격식 없는", basic: "철자 u/s 위치 낚시", note: "• causal link (인과적 연결고리) vs casual coincidence (우연의 일치)", tag: "평가원 단골 낚시" },
+      { id: "006", word: "lie vs lay", core: "lie(자동사): 놓여 있다 / lay(타동사): ~을 놓다", basic: "자·타동사 혼동", note: "• The solution lies in ~: 해결책은 ~에 놓여 있다 (핵심 제시)", tag: "문법 · 독해 뼈대" },
+      { id: "005", word: "intelligent vs intelligible", core: "intelligent: 지적인 / intelligible: 이해하기 쉬운", basic: "파생 혼동어", note: "• unintelligible: 난해하여 도저히 이해할 수 없는", tag: "파생어 낚시" },
+      { id: "004", word: "appliance", core: "[단수/학술] (이론의) 적용, 응용 / [복수] 가전제품", basic: "기기, 장치", note: "• A is the appliance of B: A는 B를 현실에 적용한 것", tag: "단·복수 의미 전환" },
+      { id: "003", word: "priceless vs valueless", core: "priceless: 값을 매길 수 없이 귀한(+) / valueless: 가치 없는(-)", basic: "접미사 반전 낚시", note: "• priceless = invaluable (극찬의 최고급 어휘)", tag: "접미사 반전 킬러" },
+      { id: "002", word: "affect", core: "[명사] 감정, 정서 (= emotion) / [동사] 감정을 유발하다", basic: "영향을 미치다", note: "• affective: 정서적인 (심리·인문 지문 1순위 다의어)", tag: "심리학 다의어" },
+      { id: "001", word: "attitude (vs altitude/latitude/aptitude)", core: "attitude: 태도 / altitude: 고도 / latitude: 위도·자유재량 / aptitude: 적성", basic: "태도, 입장", note: "• longitude: 경도 / gratitude: 감사 (형태 낚시 5총사)", tag: "혼동어 5총사" }
     ];
 
-    let deck = [];
-    let currentIndex = 0;
-    let stage = 0;
-    let quizResolved = false;
-    let prisonOnly = false;
-    let streakMap = {};
-    let mistakeMap = {};
-    let currentChunk = 'ALL';
+    let activeDeck = [];
+    let currentIdx = 0;
+    let isFlipped = false;
+    let currentFilter = 'ALL';
+    let onlyMistakes = false;
+    let streaks = {};
+    let mistakes = {};
+
+    // Swipe gesture variables
+    let touchStartX = 0;
+    let touchEndX = 0;
 
     function init() {
-      loadStorage();
-      buildFilteredDeck();
-      renderCurrentCard();
-      updateHeaderCounts();
+      try {
+        streaks = JSON.parse(localStorage.getItem('vflash_streaks') || '{}');
+        mistakes = JSON.parse(localStorage.getItem('vflash_mistakes') || '{}');
+      } catch(e) {}
+      applyFilter();
+      setupSwipe();
     }
 
-    function loadStorage() {
-      const savedStreak = localStorage.getItem('v_matrix_streaks');
-      if (savedStreak) {
-        try { streakMap = JSON.parse(savedStreak); } catch(e){}
-      }
-      const savedMistakes = localStorage.getItem('v_matrix_mistakes');
-      if (savedMistakes) {
-        try { mistakeMap = JSON.parse(savedMistakes); } catch(e){}
-      }
+    function saveState() {
+      localStorage.setItem('vflash_streaks', JSON.stringify(streaks));
+      localStorage.setItem('vflash_mistakes', JSON.stringify(mistakes));
+      updateCounts();
     }
 
-    function saveStorage() {
-      localStorage.setItem('v_matrix_streaks', JSON.stringify(streakMap));
-      localStorage.setItem('v_matrix_mistakes', JSON.stringify(mistakeMap));
-      updateHeaderCounts();
-    }
-
-    function setChunkFilter(chunk) {
-      currentChunk = chunk;
-      prisonOnly = false;
-      document.querySelectorAll('[id^="tab-chunk-"]').forEach(el => {
-        el.className = "px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-slate-800 text-slate-300";
+    function setFilter(filterKey) {
+      currentFilter = filterKey;
+      onlyMistakes = false;
+      
+      document.querySelectorAll('[id^="tab-"]').forEach(btn => {
+        btn.className = "px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition";
       });
-      const activeTab = document.getElementById(`tab-chunk-${chunk}`);
-      if (activeTab) activeTab.className = "px-2 py-0.5 rounded-md font-bold whitespace-nowrap bg-rose-500 text-white shadow-sm";
+      const activeTab = document.getElementById(`tab-${filterKey}`);
+      if (activeTab) {
+        activeTab.className = "px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-100 text-neutral-950 transition";
+      }
 
-      const btnPrison = document.getElementById('btn-prison-filter');
-      btnPrison.className = "px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-slate-800 text-slate-300 border border-slate-700";
-
-      buildFilteredDeck();
-      currentIndex = 0;
-      renderCurrentCard();
-      showToast(`[${chunk}] 덱으로 전환되었습니다`);
+      document.getElementById('btn-mistake-filter').className = "px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-1.5 transition";
+      applyFilter();
     }
 
-    function togglePrisonOnly() {
-      prisonOnly = !prisonOnly;
-      const btn = document.getElementById('btn-prison-filter');
-      if (prisonOnly) {
-        btn.className = "px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-rose-600 text-white border border-rose-500 shadow-md";
-        showToast("오답 감옥 단어들만 집중 복습합니다");
+    function toggleMistakeFilter() {
+      onlyMistakes = !onlyMistakes;
+      const btn = document.getElementById('btn-mistake-filter');
+      if (onlyMistakes) {
+        btn.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/50 flex items-center gap-1.5 transition";
+        showToast("오답 단어만 모았습니다");
       } else {
-        btn.className = "px-2 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1 bg-slate-800 text-slate-300 border border-slate-700";
-        showToast("전체 모드로 복귀합니다");
+        btn.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-1.5 transition";
       }
-      buildFilteredDeck();
-      currentIndex = 0;
-      renderCurrentCard();
+      applyFilter();
     }
 
-    function buildFilteredDeck() {
-      let filtered = [...SEED_WORDS];
-
-      if (currentChunk === '124-147') {
-        filtered = filtered.filter(w => {
-          const num = parseInt(w.id.split('-')[0], 10);
-          return num >= 124 && num <= 147;
-        });
-      } else if (currentChunk === '148-160') {
-        filtered = filtered.filter(w => {
-          const num = parseInt(w.id.split('-')[0], 10);
-          return num >= 148 && num <= 160;
-        });
-      } else if (currentChunk === '103-123') {
-        filtered = filtered.filter(w => {
-          const num = parseInt(w.id.split('-')[0], 10);
-          return num >= 103 && num <= 123;
-        });
-      } else if (currentChunk === '084-102') {
-        filtered = filtered.filter(w => {
-          const num = parseInt(w.id.split('-')[0], 10);
-          return num >= 84 && num <= 102;
-        });
-      } else if (currentChunk === '070-083') {
-        filtered = filtered.filter(w => {
-          const num = parseInt(w.id.split('-')[0], 10);
-          return num >= 70 && num <= 83;
-        });
-      } else if (currentChunk === '059-069') {
-        filtered = filtered.filter(w => {
-          const num = parseInt(w.id.split('-')[0], 10);
-          return num >= 59 && num <= 69;
-        });
-      } else if (currentChunk === '040-049') {
-        filtered = filtered.filter(w => {
-          const num = parseInt(w.id.split('-')[0], 10);
-          return num >= 40 && num <= 49;
+    function applyFilter() {
+      let list = [...VOCAB_DB];
+      if (currentFilter !== 'ALL') {
+        const [min, max] = currentFilter.split('-').map(Number);
+        list = list.filter(item => {
+          const num = parseInt(item.id.split('-')[0], 10);
+          return num >= min && num <= max;
         });
       }
 
-      if (prisonOnly) {
-        filtered = filtered.filter(w => (mistakeMap[w.id] || 0) > 0 && (streakMap[w.id] || 0) < 2);
-      }
-
-      deck = filtered;
-      if (deck.length === 0 && prisonOnly) {
-        showToast("오답 감옥이 비어 있습니다! 🎉");
-        prisonOnly = false;
-        buildFilteredDeck();
-      }
-      updateHeaderCounts();
-    }
-
-    function updateHeaderCounts() {
-      document.getElementById('count-all').innerText = SEED_WORDS.length;
-      const prisonCount = SEED_WORDS.filter(w => (mistakeMap[w.id] || 0) > 0 && (streakMap[w.id] || 0) < 2).length;
-      document.getElementById('badge-prison-count').innerText = prisonCount;
-    }
-
-    function renderCurrentCard() {
-      if (deck.length === 0) return;
-      if (currentIndex >= deck.length) currentIndex = 0;
-
-      const item = deck[currentIndex];
-      const streak = streakMap[item.id] || 0;
-
-      document.getElementById('badge-word-id').innerText = item.id;
-      document.getElementById('badge-word-type').innerText = item.type || "V단어";
-      document.getElementById('card-word').innerText = item.word;
-      document.getElementById('card-phonetic').innerText = `[No. ${item.id}]`;
-
-      document.getElementById('content-basic').innerText = item.basic;
-      document.getElementById('content-hidden').innerText = item.hidden;
-      document.getElementById('content-extra').innerText = item.extra;
-
-      const streakBadge = document.getElementById('badge-streak');
-      streakBadge.innerHTML = `<i class="ph-fill ph-check-circle text-emerald-400"></i> ${streak}/2`;
-
-      setupQuizUI(item);
-      stage = 0;
-      quizResolved = false;
-      updateStageUI();
-    }
-
-    function setupQuizUI(item) {
-      const expBox = document.getElementById('quiz-explanation-box');
-      const promptDetail = document.getElementById('quiz-prompt-detail');
-      const btnReveal = document.getElementById('btn-reveal-answer');
-
-      expBox.classList.add('hidden');
-      btnReveal.classList.remove('hidden');
-
-      if (item.quiz && item.quiz.q) {
-        promptDetail.innerText = item.quiz.q;
-      } else {
-        promptDetail.innerText = `"${item.word}"의 공무원·평가원 킬러 뉘앙스와 짝꿍 포인트는?`;
-      }
-    }
-
-    function revealExtraAnswer() {
-      const expBox = document.getElementById('quiz-explanation-box');
-      const btnReveal = document.getElementById('btn-reveal-answer');
-      expBox.classList.remove('hidden');
-      btnReveal.classList.add('hidden');
-      quizResolved = true;
-      updateTouchHint();
-    }
-
-    function updateTouchHint() {
-      const hintText = document.getElementById('touch-hint-text');
-      if (stage === 0) {
-        hintText.innerText = "화면 아무 곳이나 탭하세요 (1단계 기본 뜻 열기)";
-      } else if (stage === 1) {
-        hintText.innerText = "탭하여 2단계 [실전 속뜻] 열기";
-      } else if (stage === 2) {
-        hintText.innerText = "탭하여 3단계 [혼동어/문법 인출 질문] 열기";
-      } else if (stage === 3 && !quizResolved) {
-        hintText.innerText = "탭하여 [정답 및 해설 대조] 확인";
-      } else {
-        hintText.innerText = "하단 [헷갈림] 또는 [알겠음]을 눌러 판정하세요";
-      }
-    }
-
-    function updateStageUI() {
-      const bBasicBlind = document.getElementById('content-basic-blind');
-      const bBasic = document.getElementById('content-basic');
-      const bHiddenBlind = document.getElementById('content-hidden-blind');
-      const bHidden = document.getElementById('content-hidden');
-      const bExtraBlind = document.getElementById('content-extra-blind');
-      const quizBox = document.getElementById('confusion-quiz-box');
-
-      const rowBasic = document.getElementById('row-basic');
-      const rowHidden = document.getElementById('row-hidden');
-      const rowExtra = document.getElementById('row-extra');
-
-      if (stage === 0) {
-        bBasicBlind.classList.remove('hidden');
-        bBasic.classList.add('hidden');
-        bHiddenBlind.classList.remove('hidden');
-        bHidden.classList.add('hidden');
-        bExtraBlind.classList.remove('hidden');
-        quizBox.classList.add('hidden');
-
-        rowBasic.className = "rounded-2xl border transition-all p-3 bg-slate-950/70 border-slate-800";
-        rowHidden.className = "rounded-2xl border transition-all p-3 bg-slate-950/70 border-slate-800";
-        rowExtra.className = "rounded-2xl border transition-all p-3 bg-slate-950/70 border-slate-800";
-      } else if (stage === 1) {
-        bBasicBlind.classList.add('hidden');
-        bBasic.classList.remove('hidden');
-        rowBasic.className = "rounded-2xl border transition-all p-3 bg-rose-950/20 border-rose-500/40 shadow-sm";
-      } else if (stage === 2) {
-        bBasicBlind.classList.add('hidden');
-        bBasic.classList.remove('hidden');
-        bHiddenBlind.classList.add('hidden');
-        bHidden.classList.remove('hidden');
-        rowHidden.className = "rounded-2xl border transition-all p-3 bg-indigo-950/25 border-indigo-500/40 shadow-sm";
-      } else if (stage >= 3) {
-        bBasicBlind.classList.add('hidden');
-        bBasic.classList.remove('hidden');
-        bHiddenBlind.classList.add('hidden');
-        bHidden.classList.remove('hidden');
-        bExtraBlind.classList.add('hidden');
-        quizBox.classList.remove('hidden');
-        rowExtra.className = "rounded-2xl border transition-all p-3 bg-amber-950/25 border-amber-500/40 shadow-sm";
-      }
-      updateTouchHint();
-    }
-
-    function revealNextStage() {
-      if (stage < 3) {
-        stage++;
-        updateStageUI();
-      } else if (stage === 3 && !quizResolved) {
-        revealExtraAnswer();
-      } else {
-        // 이미 다 열렸을 때 화면을 누르면 '알겠음'으로 쾌속 진행
-        handleJudge(true);
-      }
-    }
-
-    function handleJudge(isCorrect) {
-      if (deck.length === 0) return;
-      const item = deck[currentIndex];
-
-      if (isCorrect) {
-        streakMap[item.id] = (streakMap[item.id] || 0) + 1;
-        if (streakMap[item.id] >= 2) {
-          showToast(`🎯 [${item.word}] 2회 연속 정답! 마스터`);
-          mistakeMap[item.id] = 0;
-        } else {
-          showToast(`👍 1회 정답 통과 (${streakMap[item.id]}/2)`);
+      if (onlyMistakes) {
+        list = list.filter(item => (mistakes[item.id] || 0) > 0 && (streaks[item.id] || 0) < 2);
+        if (list.length === 0) {
+          showToast("오답 노트가 비어 있습니다!");
+          onlyMistakes = false;
+          document.getElementById('btn-mistake-filter').className = "px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-1.5 transition";
+          list = [...VOCAB_DB];
         }
-        currentIndex++;
+      }
+
+      activeDeck = list;
+      currentIdx = 0;
+      renderCard();
+      updateCounts();
+    }
+
+    function updateCounts() {
+      const mCount = VOCAB_DB.filter(item => (mistakes[item.id] || 0) > 0 && (streaks[item.id] || 0) < 2).length;
+      document.getElementById('mistake-count').innerText = mCount;
+    }
+
+    function renderCard() {
+      if (activeDeck.length === 0) return;
+      if (currentIdx >= activeDeck.length) currentIdx = 0;
+
+      const item = activeDeck[currentIdx];
+      const st = streaks[item.id] || 0;
+
+      document.getElementById('progress-text').innerText = `${currentIdx + 1} / ${activeDeck.length}`;
+      document.getElementById('card-id').innerText = `No. ${item.id}`;
+      document.getElementById('card-streak').innerText = `${st}/2`;
+      document.getElementById('card-tag').innerText = item.tag || "";
+
+      document.getElementById('front-word').innerText = item.word;
+      document.getElementById('back-word').innerText = item.word;
+      document.getElementById('back-core').innerText = item.core;
+      document.getElementById('back-basic').innerText = item.basic;
+      document.getElementById('back-note').innerText = item.note;
+
+      isFlipped = false;
+      updateFace();
+    }
+
+    function flipCard() {
+      if (!isFlipped) {
+        isFlipped = true;
+        updateFace();
+      }
+    }
+
+    function updateFace() {
+      const front = document.getElementById('face-front');
+      const back = document.getElementById('face-back');
+      const ctrlFront = document.getElementById('controls-front');
+      const ctrlBack = document.getElementById('controls-back');
+
+      if (isFlipped) {
+        front.classList.add('hidden');
+        back.classList.remove('hidden');
+        ctrlFront.classList.add('hidden');
+        ctrlBack.classList.remove('hidden');
       } else {
-        streakMap[item.id] = 0;
-        mistakeMap[item.id] = (mistakeMap[item.id] || 0) + 1;
-        showToast(`🚨 오답! 2단어 뒤에 다시 출현`);
+        front.classList.remove('hidden');
+        back.classList.add('hidden');
+        ctrlFront.classList.remove('hidden');
+        ctrlBack.classList.add('hidden');
+      }
+    }
 
-        const failedItem = deck.splice(currentIndex, 1)[0];
-        const reinsertIndex = Math.min(currentIndex + 2, deck.length);
-        deck.splice(reinsertIndex, 0, failedItem);
+    function judgeCard(known) {
+      if (activeDeck.length === 0) return;
+      const item = activeDeck[currentIdx];
+
+      if (known) {
+        streaks[item.id] = (streaks[item.id] || 0) + 1;
+        if (streaks[item.id] >= 2) {
+          mistakes[item.id] = 0;
+          showToast("완벽 암기 완료");
+        }
+        currentIdx++;
+      } else {
+        streaks[item.id] = 0;
+        mistakes[item.id] = (mistakes[item.id] || 0) + 1;
+        showToast("2장 뒤에 다시 나옵니다");
+
+        // Reinsert 2 cards later
+        const failed = activeDeck.splice(currentIdx, 1)[0];
+        const targetPos = Math.min(currentIdx + 2, activeDeck.length);
+        activeDeck.splice(targetPos, 0, failed);
       }
 
-      saveStorage();
-
-      if (currentIndex >= deck.length) {
-        currentIndex = 0;
-      }
-
-      renderCurrentCard();
+      saveState();
+      renderCard();
     }
 
     function speakWord() {
-      if (deck.length === 0) return;
-      const word = deck[currentIndex].word.split(' ')[0].replace(/[^a-zA-Z]/g, '');
-      const uttr = new SpeechSynthesisUtterance(word);
+      if (activeDeck.length === 0) return;
+      const clean = activeDeck[currentIdx].word.replace(/\(.*\)/g, '').trim();
+      const uttr = new SpeechSynthesisUtterance(clean);
       uttr.lang = 'en-US';
-      uttr.rate = 0.9;
+      uttr.rate = 0.92;
       window.speechSynthesis.speak(uttr);
     }
 
     function showToast(msg) {
-      const toast = document.getElementById('toast');
-      toast.innerText = msg;
-      toast.classList.remove('opacity-0');
-      toast.classList.add('opacity-100');
+      const el = document.getElementById('toast');
+      el.innerText = msg;
+      el.classList.remove('opacity-0');
+      el.classList.add('opacity-100');
       setTimeout(() => {
-        toast.classList.remove('opacity-100');
-        toast.classList.add('opacity-0');
-      }, 1200);
+        el.classList.remove('opacity-100');
+        el.classList.add('opacity-0');
+      }, 1000);
     }
 
-    function resetToInitialSeed() {
-      if (confirm("모든 진도와 정답 기록을 초기화하시겠습니까?")) {
-        streakMap = {};
-        mistakeMap = {};
-        saveStorage();
-        currentChunk = 'ALL';
-        setChunkFilter('ALL');
-        showToast("전체 덱으로 초기화되었습니다");
+    function resetProgress() {
+      if (confirm("학습 기록을 초기화할까요?")) {
+        streaks = {};
+        mistakes = {};
+        saveState();
+        setFilter('ALL');
+        showToast("초기화되었습니다");
       }
     }
 
-    window.addEventListener('keydown', (e) => {
-      if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+    function setupSwipe() {
+      const card = document.getElementById('flashcard');
+      card.addEventListener('touchstart', e => {
+        touchStartX = e.changedTouches[0].screenX;
+      }, { passive: true });
 
-      if (e.key === ' ' || e.code === 'Space' || e.key === 'Enter') {
+      card.addEventListener('touchend', e => {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+      }, { passive: true });
+    }
+
+    function handleSwipe() {
+      const diff = touchEndX - touchStartX;
+      if (Math.abs(diff) < 50) return;
+      if (!isFlipped) {
+        flipCard();
+        return;
+      }
+      if (diff < 0) {
+        judgeCard(false);
+      } else {
+        judgeCard(true);
+      }
+    }
+
+    window.addEventListener('keydown', e => {
+      if (e.code === 'Space' || e.key === 'Enter') {
         e.preventDefault();
-        revealNextStage();
-      } else if (e.key === '1') {
-        handleJudge(false);
-      } else if (e.key === '2') {
-        handleJudge(true);
-      } else if (e.key.toLowerCase() === 's') {
-        speakWord();
+        if (!isFlipped) flipCard();
+        else judgeCard(true);
+      } else if (e.key === '1' || e.key === 'ArrowLeft') {
+        if (isFlipped) judgeCard(false);
+      } else if (e.key === '2' || e.key === 'ArrowRight') {
+        if (isFlipped) judgeCard(true);
       }
     });
 
-    window.onload = function() {
-      init();
-    };
+    init();
   </script>
 </body>
 </html>
