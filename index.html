@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>V-Flash | 극단적 미니멀 V단어 인출기</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -38,11 +40,14 @@
         <span id="progress-text" class="text-xs font-mono text-neutral-500 ml-1">1 / 160</span>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5">
         <button onclick="toggleMistakeFilter()" id="btn-mistake-filter" class="px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-1.5 transition">
           <i class="ph-fill ph-fire text-rose-500"></i>
           <span>오답만</span>
           <span id="mistake-count" class="text-rose-400 font-mono">0</span>
+        </button>
+        <button onclick="openBackupModal()" title="백업 및 복구" class="p-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white transition">
+          <i class="ph-bold ph-floppy-disk text-sm"></i>
         </button>
         <button onclick="resetProgress()" title="초기화" class="p-1.5 rounded-full text-neutral-500 hover:text-neutral-300 transition">
           <i class="ph-bold ph-arrow-counter-clockwise text-sm"></i>
@@ -160,6 +165,41 @@
       </button>
     </div>
   </footer>
+
+  <!-- BACKUP & RESTORE MODAL (FOR SAFARI ITP PROTECTION) -->
+  <div id="backup-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-neutral-900 border border-neutral-800 rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-black text-white flex items-center gap-2">
+          <i class="ph-bold ph-shield-check text-rose-500"></i>
+          <span>Safari 기록 백업 / 복구</span>
+        </h3>
+        <button onclick="closeBackupModal()" class="text-neutral-500 hover:text-white p-1">
+          <i class="ph-bold ph-x text-lg"></i>
+        </button>
+      </div>
+      
+      <p class="text-xs text-neutral-400 leading-relaxed">
+        아이폰 Safari는 7일 이상 미접속 시 기록이 자동 초기화됩니다. 아래 백업 코드를 메모장에 복사해 두시면 언제든 1초 만에 복구됩니다.
+      </p>
+
+      <div class="space-y-2">
+        <label class="text-[11px] font-bold text-neutral-500">내 학습 기록 코드</label>
+        <textarea id="backup-code-box" rows="3" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-3 text-xs font-mono text-neutral-300 focus:outline-none focus:border-rose-500" placeholder="복구할 백업 코드를 여기에 붙여넣으세요"></textarea>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2.5 pt-1">
+        <button onclick="copyBackupCode()" class="py-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition">
+          <i class="ph-bold ph-copy"></i>
+          <span>코드 복사</span>
+        </button>
+        <button onclick="restoreBackupCode()" class="py-3 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition">
+          <i class="ph-bold ph-download-simple"></i>
+          <span>코드로 복구</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- SUBTLE TOAST -->
   <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 px-3.5 py-1.5 bg-neutral-800 text-neutral-200 text-xs font-bold rounded-full shadow-xl pointer-events-none opacity-0 transition-opacity duration-150">
@@ -299,7 +339,7 @@
       { id: "041", word: "irony", core: "예상과 정반대로 뒤틀리는 상황 모순 [(+) ➔ (-)]", basic: "아이러니", note: "• 안전장치가 오히려 사고를 부르는 역설적 상황", tag: "상황 반전 모순" },
       { id: "040", word: "existing", core: "새로운 혁신 이전의 '기존의 구태의연한'", basic: "존재하는", note: "• existing paradigms(기존 틀) ↔ novel theory(새 이론)", tag: "대립쌍 시그널" },
 
-      // === 001 ~ 039 (Restored Full Deck) ===
+      // === 001 ~ 039 ===
       { id: "039", word: "tolerate", core: "1) 마지못해 용인하다  2) (의학) 독성을 견뎌내다", basic: "참다, 견디다", note: "• tolerance (관용; 내성) / intolerance (불관용; 과민증)", tag: "소극적 수용 · 내성" },
       { id: "038", word: "bother", core: "[부정문/의문문] 굳이 애써 신경 쓰다, 수고를 들이다", basic: "괴롭히다, 귀찮게 하다", note: "• Don't bother to ask: 굳이 애써 물어볼 필요 없다", tag: "관용 속뜻" },
       { id: "037", word: "faithful", core: "원본을 왜곡 없이 그대로 재현한 (= accurate)", basic: "충실한, 신의 있는", note: "• a faithful replica: 원본에 철저히 충실한 복제품", tag: "영영 코어 뉘앙스" },
@@ -349,11 +389,17 @@
     let streaks = {};
     let mistakes = {};
 
-    // Swipe gesture variables
     let touchStartX = 0;
     let touchEndX = 0;
 
-    function init() {
+    async function init() {
+      // Safari ITP 대응: 영구 저장소 권한 요청
+      if (navigator.storage && navigator.storage.persist) {
+        try {
+          await navigator.storage.persist();
+        } catch (e) {}
+      }
+
       try {
         streaks = JSON.parse(localStorage.getItem('vflash_streaks') || '{}');
         mistakes = JSON.parse(localStorage.getItem('vflash_mistakes') || '{}');
@@ -363,9 +409,58 @@
     }
 
     function saveState() {
-      localStorage.setItem('vflash_streaks', JSON.stringify(streaks));
-      localStorage.setItem('vflash_mistakes', JSON.stringify(mistakes));
+      try {
+        localStorage.setItem('vflash_streaks', JSON.stringify(streaks));
+        localStorage.setItem('vflash_mistakes', JSON.stringify(mistakes));
+      } catch (e) {}
       updateCounts();
+    }
+
+    // 백업 / 복구 모달 제어
+    function openBackupModal() {
+      const payload = JSON.stringify({ s: streaks, m: mistakes });
+      const encoded = btoa(encodeURIComponent(payload));
+      document.getElementById('backup-code-box').value = encoded;
+      document.getElementById('backup-modal').classList.remove('hidden');
+    }
+
+    function closeBackupModal() {
+      document.getElementById('backup-modal').classList.add('hidden');
+    }
+
+    function copyBackupCode() {
+      const box = document.getElementById('backup-code-box');
+      box.select();
+      box.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(box.value).then(() => {
+        showToast("백업 코드가 복사되었습니다!");
+      }).catch(() => {
+        document.execCommand('copy');
+        showToast("백업 코드가 복사되었습니다!");
+      });
+    }
+
+    function restoreBackupCode() {
+      const raw = document.getElementById('backup-code-box').value.trim();
+      if (!raw) {
+        showToast("코드를 먼저 붙여넣어 주세요");
+        return;
+      }
+      try {
+        const decoded = JSON.parse(decodeURIComponent(atob(raw)));
+        if (decoded && typeof decoded.s === 'object' && typeof decoded.m === 'object') {
+          streaks = decoded.s;
+          mistakes = decoded.m;
+          saveState();
+          applyFilter();
+          closeBackupModal();
+          showToast("학습 기록이 완벽히 복구되었습니다!");
+        } else {
+          showToast("올바르지 않은 코드 형식입니다");
+        }
+      } catch (e) {
+        showToast("복구 실패: 코드를 다시 확인해 주세요");
+      }
     }
 
     function setFilter(filterKey) {
@@ -491,7 +586,6 @@
         mistakes[item.id] = (mistakes[item.id] || 0) + 1;
         showToast("2장 뒤에 다시 나옵니다");
 
-        // Reinsert 2 cards later
         const failed = activeDeck.splice(currentIdx, 1)[0];
         const targetPos = Math.min(currentIdx + 2, activeDeck.length);
         activeDeck.splice(targetPos, 0, failed);
