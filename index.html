@@ -60,6 +60,9 @@
       <button onclick="setFilter('ALL')" id="tab-ALL" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-100 text-neutral-950 transition">
         전체
       </button>
+      <button onclick="setFilter('189-205')" id="tab-189-205" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
+        관계 189~205
+      </button>
       <button onclick="setFilter('174-188')" id="tab-174-188" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
         숙어 174~188
       </button>
@@ -208,6 +211,29 @@
 
   <script>
     const VOCAB_DB = [
+      // === 189 ~ 205 (Chapter 05 관계를 주는 단어) ===
+      { id: "205", word: "owe A to B", core: "A는 B 덕분이다, A를 B에게 빚지다 (A ⟵ B)", basic: "빚지고 있다", note: "• modern people owe much to ancestors: 현대인은 조상 덕을 많이 보고 있다\n• 결과 A가 원인 B로부터 비롯됨을 나타내는 인과 도식", tag: "인과 귀속 (A ⟵ B)" },
+      { id: "204", word: "independent of / from", core: "A와 B는 서로 분리된·무관한 관계 (A ≠ B)", basic: "독립적인, 독자적인", note: "• independent of time and place: 시간과 장소에 구애받지 않는\n• 전치사 of / from 결합 시 '서로 영향을 주지 않는 별개'", tag: "단절 · 무관 (A ≠ B)" },
+      { id: "203", word: "subordinate", core: "A is subordinate to B: A가 B에 종속되다 (A < B)", basic: "종속된, 부차적인; 하급자", note: "• facts are subordinate to political view: 사실이 정치적 관점에 종속됨\n• 덜 중요하거나 아래에 예속되는 위계 관계", tag: "종속 · 열위 (A < B)" },
+      { id: "202-B", word: "outgrowth", core: "[명사] 결과, 결과물, 부산물", basic: "성장, 발아", note: "• A is an outgrowth of B: A는 B에서 비롯된 자연적 결과물이다 (A ⟵ B)\n• 대수능·평가원 정답 선지 2년 연속 출제 핵심 명사", tag: "결과 명사 (A ⟵ B)" },
+      { id: "202-A", word: "outgrow", core: "A가 B보다 더 커지다, 성장해 벗어나다 (A > B)", basic: "~보다 더 커지다", note: "• outgrow old habits: 성장하면서 옛 습관을 벗어나다", tag: "우열 비교 (A > B)" },
+      { id: "201", word: "outweigh", core: "A가 B보다 더 중요하다, 능가하다 (A > B)", basic: "~보다 무게가 더 나가다", note: "• A be outweighed by B (수동태): A보다 B가 더 중요하다 (A < B)\n• outstand / outnumber / outperform 모두 'A > B' 우위 동사", tag: "중요도 비교 (A > B)" },
+      { id: "200", word: "follow / be followed by", core: "A is followed by B: A 발생 후 뒤이어 B 발생 (A ➔ B)", basic: "따라가다", note: "• A follow B: B가 먼저 일어나고 뒤이어 A가 발생 (A ⟵ B)\n• 사건의 시간 선후 관계를 뒤집어 출제하는 1순위 킬러!", tag: "시간 선후 킬러" },
+      { id: "199", word: "according to", core: "B에 따라서 A하다 (B ➔ A 기준·인과 관계)", basic: "~에 따르면", note: "• mold it according to personal tastes: 개인 취향이라는 기준에 따라 빚어내다\n• 단순 인용('~가 말하길') 외에 'B를 근거/기준으로 A가 결정됨'", tag: "기준 · 인과 (A ⟵ B)" },
+      { id: "198", word: "depend on (rely / resort to)", core: "A는 B에 좌우되다, 달려 있다 (A ⟵ B)", basic: "의지하다, 의존하다", note: "• rely on / count on / lean on / resort to 모두 'A ⟵ B' 관계\n• taste depends on psychological factors: 미각은 심리적 요인에 좌우된다", tag: "의존 · 결정 (A ⟵ B)" },
+      { id: "197", word: "require", core: "A require B: A를 위해서는 B가 필요하다 (A ⟵ B)", basic: "요구하다, 필요로 하다", note: "• A be required to B (수동태 주의): A가 B하도록 요구받다\n• 성취(A)를 위해 시행착오(B)라는 선행 조건이 필수적임", tag: "필요 조건 (A ⟵ B)" },
+      { id: "196-B", word: "reflect on / reflection", core: "reflect on A: A를 깊이 숙고하다 (reflection: 심사숙고)", basic: "반사하다", note: "• without reflection: 깊은 생각(성찰) 없이\n• on이 없어도 문맥상 '곰곰이 성찰하다'로 빈출", tag: "심리 · 성찰 속뜻" },
+      { id: "196-A", word: "reflect", core: "A reflect B: A에 B가 반영되다, 나타내다 (A ⟵ B)", basic: "반사하다, 반향을 일으키다", note: "• maps reflect the world views of makers: 지도는 제작자의 세계관을 반영함", tag: "반영 관계 (A ⟵ B)" },
+      { id: "195-B", word: "distinguished vs distinguishing", core: "distinguished: 저명한, 뛰어난 / distinguishing: 독특한, 특유의", basic: "구별된", note: "• distinguished scholar (저명한 학자) vs distinguishing feature (독특한 특징)\n• 분사 형용사 의미 분기 킬러", tag: "분사 형용사 분기" },
+      { id: "195-A", word: "distinguish A from B", core: "A와 B를 구별하다, 식별하다 (A ≠ B)", basic: "구분하다", note: "• distinguish between A and B 동일: 두 개념의 경계를 명확히 가름", tag: "구별 · 대조 (A ≠ B)" },
+      { id: "194-B", word: "determinant / determinism", core: "determinant: 결정 요인 / determinism: 결정론", basic: "determine 파생 명사", note: "• determinacy: 확정성 / determination: 결정, 결단력, 확인\n• genetic determinants: 유전적 결정 요인들", tag: "파생 명사 4총사" },
+      { id: "194-A", word: "determine", core: "A determine B: A가 B를 결정짓다, 좌우하다 (A ➔ B)", basic: "결정하다, 알아내다", note: "• ratings determine the price: 고객 평가가 가격을 결정한다", tag: "인과 결정 (A ➔ B)" },
+      { id: "193", word: "A is a driving force in B", core: "A가 원동력이 되어 B를 이끌다 (A ➔ B)", basic: "A는 B의 원동력이다", note: "• the main factor that causes something to happen\n• 인구 증가(A)가 과학 발달(B)의 추진력이 됨", tag: "원동력 인과 (A ➔ B)" },
+      { id: "192", word: "base (be based on)", core: "A be based on B: B에 근거하여 A가 성립하다 (A ⟵ B)", basic: "근거를 두다; 기초, 토대", note: "• A on which B is based: B가 근거를 두고 있는 토대 A\n• 전치사 + 관계대명사 구조에서 A와 B의 인과 방향 주의!", tag: "근거 인과 (A ⟵ B)" },
+      { id: "191", word: "outnumber", core: "A outnumber B: A가 B보다 수가 더 많다 (A > B)", basic: "수적으로 우세하다", note: "• A is outnumbered by B (수동태): A가 B보다 수가 적다 (A < B)", tag: "수적 우열 (A > B)" },
+      { id: "190", word: "outpace", core: "A outpace B: A가 B를 앞지르다, 능가하다 (A > B)", basic: "앞지르다, 앞서다", note: "• ingenuity will outpace material supplies: 창의력이 물자 공급을 앞지를 것", tag: "속도 우열 (A > B)" },
+      { id: "189", word: "mover (prime mover)", core: "prime mover: 핵심 원동력, 주된 동인 (A ➔ B)", basic: "움직이는 사람(것)", note: "• prime mover in evolution: 진화를 움직이는 근본 동력\n• 단순 이동자가 아니라 사건을 촉발하는 원인(Cause)", tag: "근본 동인 (A ➔ B)" },
+
       // === 174 ~ 188 ===
       { id: "188", word: "give way to", core: "A가 B로 대체되다 (A↓, B↑)", basic: "길을 내어 주다, 양보하다", note: "• A give way to B: 구세대 A는 쇠퇴하고 신세대 B가 주류가 됨", tag: "세대교체 · 대체 공식" },
       { id: "187", word: "boil down to A", core: "결국 A로 요약·수렴되다", basic: "졸아들다, 요약되다", note: "• narrow down to A / (be) reduced to A 동일\n• 여러 갈래가 핵심 본질 A 하나로 좁혀짐", tag: "핵심 수렴 시그널" },
