@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>V-Flash | 극단적 미니멀 V단어 인출기</title>
+  <title>V-Flash | 챕터별 중점 주제 맞춤형 V단어</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <style>
@@ -31,13 +31,13 @@
 </head>
 <body class="bg-neutral-950 text-neutral-100 h-[100dvh] flex flex-col justify-between overflow-hidden selection:bg-rose-500 selection:text-white">
 
-  <!-- MINIMAL TOP BAR -->
+  <!-- TOP HEADER -->
   <header class="pt-3 pb-2 px-4 max-w-md mx-auto w-full z-20">
     <div class="flex items-center justify-between mb-2">
       <div class="flex items-center gap-2">
-        <span class="w-2 h-2 rounded-full bg-rose-500"></span>
-        <span class="text-xs font-bold tracking-wider text-neutral-400">V-FLASH</span>
-        <span id="progress-text" class="text-xs font-mono text-neutral-500 ml-1">1 / 160</span>
+        <span class="w-2 h-2 rounded-full bg-emerald-500" title="4중 자동 영구 저장 활성화됨"></span>
+        <span class="text-xs font-black tracking-wider text-neutral-300">V-FLASH</span>
+        <span id="progress-text" class="text-xs font-mono text-neutral-500 ml-1">1 / 177</span>
       </div>
 
       <div class="flex items-center gap-1.5">
@@ -49,78 +49,69 @@
         <button onclick="openBackupModal()" title="백업 및 복구" class="p-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white transition">
           <i class="ph-bold ph-floppy-disk text-sm"></i>
         </button>
-        <button onclick="resetProgress()" title="초기화" class="p-1.5 rounded-full text-neutral-500 hover:text-neutral-300 transition">
-          <i class="ph-bold ph-arrow-counter-clockwise text-sm"></i>
-        </button>
       </div>
     </div>
 
-    <!-- CLEAN CHUNK TABS -->
+    <!-- CHAPTER THEME TABS -->
     <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1 text-xs">
-      <button onclick="setFilter('ALL')" id="tab-ALL" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-100 text-neutral-950 transition">
+      <button onclick="setFilter('ALL')" id="tab-ALL" class="px-3 py-1.5 rounded-full font-bold whitespace-nowrap bg-neutral-100 text-neutral-950 transition">
         전체
       </button>
-      <button onclick="setFilter('189-205')" id="tab-189-205" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
-        관계 189~205
+      <button onclick="setFilter('CH1')" id="tab-CH1" class="px-3 py-1.5 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
+        Ch.1 혼동어 대조
       </button>
-      <button onclick="setFilter('174-188')" id="tab-174-188" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
-        숙어 174~188
+      <button onclick="setFilter('CH2')" id="tab-CH2" class="px-3 py-1.5 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
+        Ch.2 속뜻·방향성
       </button>
-      <button onclick="setFilter('148-160')" id="tab-148-160" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
-        숙어 148~160
+      <button onclick="setFilter('CH3')" id="tab-CH3" class="px-3 py-1.5 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
+        Ch.3 다의어 N개
       </button>
-      <button onclick="setFilter('124-147')" id="tab-124-147" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
-        124~147
+      <button onclick="setFilter('CH4')" id="tab-CH4" class="px-3 py-1.5 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
+        Ch.4 숙어·논리
       </button>
-      <button onclick="setFilter('103-123')" id="tab-103-123" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
-        103~123
-      </button>
-      <button onclick="setFilter('084-102')" id="tab-084-102" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
-        084~102
-      </button>
-      <button onclick="setFilter('070-083')" id="tab-070-083" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
-        070~083
-      </button>
-      <button onclick="setFilter('040-069')" id="tab-040-069" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
-        040~069
-      </button>
-      <button onclick="setFilter('001-039')" id="tab-001-039" class="px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
-        001~039
+      <button onclick="setFilter('CH5')" id="tab-CH5" class="px-3 py-1.5 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
+        Ch.5 관계·화살표
       </button>
     </div>
   </header>
 
-  <!-- MAIN SINGLE-TAP FLASHCARD -->
+  <!-- MAIN FLASHCARD -->
   <main class="flex-1 max-w-md mx-auto w-full px-4 py-2 flex flex-col justify-center">
     <div id="flashcard" onclick="flipCard()" class="w-full h-full max-h-[540px] bg-neutral-900 border border-neutral-800/90 rounded-[2rem] p-7 flex flex-col justify-between relative shadow-2xl cursor-pointer transition-transform duration-150 active:scale-[0.99]">
       
-      <!-- CARD TOP META -->
+      <!-- CARD TOP: CHAPTER THEME BADGE & STREAK -->
       <div class="flex items-center justify-between">
-        <span id="card-id" class="text-xs font-mono font-bold text-neutral-500">188</span>
+        <span id="card-chapter-badge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-md bg-rose-500/15 text-rose-400">
+          Ch.1 혼동어 구별
+        </span>
         <div class="flex items-center gap-2">
-          <span id="card-streak" class="text-xs font-mono text-neutral-500">0/2</span>
-          <button onclick="event.stopPropagation(); speakWord();" class="p-2 -mr-2 text-neutral-400 hover:text-white transition">
-            <i class="ph-bold ph-speaker-high text-lg"></i>
+          <span id="card-id" class="text-xs font-mono text-neutral-500">No.001</span>
+          <span id="card-streak" class="text-xs font-mono font-bold text-neutral-400">0/2</span>
+          <button onclick="event.stopPropagation(); speakWord();" class="p-1.5 -mr-1.5 text-neutral-400 hover:text-white transition">
+            <i class="ph-bold ph-speaker-high text-base"></i>
           </button>
         </div>
       </div>
 
-      <!-- FRONT FACE: ONLY HEADWORD -->
-      <div id="face-front" class="my-auto text-center px-2 card-enter">
-        <h2 id="front-word" class="text-4xl sm:text-5xl font-black tracking-tight text-white leading-tight">
-          give way to
+      <!-- FRONT FACE: THEME-SPECIFIC ACTIVE MISSION -->
+      <div id="face-front" class="my-auto text-center px-1 card-enter">
+        <h2 id="front-word" class="text-3xl sm:text-4xl font-black tracking-tight text-white leading-snug mb-5">
+          stationary vs stationery
         </h2>
-        <p class="text-xs text-neutral-600 mt-6 font-medium">
-          탭하여 뜻 확인
-        </p>
+        
+        <div class="inline-block bg-neutral-950/90 border border-neutral-800 rounded-2xl px-4 py-3 max-w-full">
+          <p id="front-mission" class="text-sm font-bold text-amber-300 leading-relaxed">
+            두 단어의 철자 차이와 각각의 뜻을 구분하시오
+          </p>
+        </div>
       </div>
 
-      <!-- BACK FACE: CORE SENSE + DETAILS -->
-      <div id="face-back" class="my-auto hidden card-enter space-y-5 overflow-y-auto scrollbar-none py-2">
+      <!-- BACK FACE: ANSWER & CORE LOGIC -->
+      <div id="face-back" class="my-auto hidden card-enter space-y-4 overflow-y-auto scrollbar-none py-1">
         <div>
-          <div id="back-word" class="text-lg font-bold text-neutral-400 mb-1">give way to</div>
-          <div id="back-core" class="text-2xl sm:text-3xl font-black text-rose-400 leading-snug">
-            A가 B에게 밀려 대체되다 (A↓, B↑)
+          <div id="back-word" class="text-sm font-bold text-neutral-400 mb-1">stationary vs stationery</div>
+          <div id="back-core" class="text-xl sm:text-2xl font-black text-rose-400 leading-snug">
+            stationary(-ary): 정지된 / stationery(-ery): 문구류
           </div>
         </div>
 
@@ -128,54 +119,52 @@
 
         <div class="space-y-3 text-sm">
           <div>
-            <span class="text-[11px] font-bold text-neutral-500 block mb-0.5">1차 기본 뜻</span>
-            <p id="back-basic" class="text-neutral-200 font-semibold">길을 내어 주다, 양보하다</p>
+            <span id="back-basic-label" class="text-[11px] font-bold text-neutral-500 block mb-0.5">기본 뜻 · 출발점</span>
+            <p id="back-basic" class="text-neutral-200 font-semibold">철자 a vs e 한 끗 차이</p>
           </div>
           <div>
-            <span class="text-[11px] font-bold text-neutral-500 block mb-0.5">실전 급소 · 짝꿍</span>
-            <p id="back-note" class="text-neutral-300 leading-relaxed whitespace-pre-line">• A give way to B: 구세대 A가 저물고 신세대 B가 부상함</p>
+            <span id="back-note-label" class="text-[11px] font-bold text-neutral-500 block mb-0.5">출제 포인트 · 실전 적용</span>
+            <p id="back-note" class="text-neutral-300 leading-relaxed whitespace-pre-line">• stationary state: 변동 없이 멈춘 정체 상태</p>
           </div>
         </div>
       </div>
 
-      <!-- BOTTOM SWIPE HINT -->
+      <!-- BOTTOM HINT -->
       <div class="text-center">
-        <span id="card-tag" class="text-[11px] font-medium text-neutral-600">
-          평가원 논리 전환 시그널
+        <span id="card-footer-hint" class="text-[11px] font-medium text-neutral-600">
+          머릿속으로 답을 먼저 떠올린 뒤 탭하세요
         </span>
       </div>
     </div>
   </main>
 
-  <!-- MINIMAL BOTTOM CONTROLS -->
+  <!-- BOTTOM CONTROLS -->
   <footer class="pb-6 pt-2 px-4 max-w-md mx-auto w-full z-20">
-    <!-- BEFORE FLIP: SINGLE BIG REVEAL BUTTON -->
     <div id="controls-front">
       <button onclick="flipCard()" class="w-full py-4 rounded-2xl bg-neutral-800 hover:bg-neutral-750 active:bg-neutral-700 text-neutral-200 font-bold text-base transition">
         정답 확인
       </button>
     </div>
 
-    <!-- AFTER FLIP: TWO CLEAN JUDGE BUTTONS -->
     <div id="controls-back" class="hidden grid grid-cols-2 gap-3">
       <button onclick="judgeCard(false)" class="py-4 rounded-2xl bg-neutral-900 border border-rose-500/40 active:bg-rose-950/60 text-rose-400 font-black text-base flex items-center justify-center gap-2 transition">
         <i class="ph-bold ph-x text-lg"></i>
-        <span>모름</span>
+        <span>모름 (2장 뒤 재출제)</span>
       </button>
       <button onclick="judgeCard(true)" class="py-4 rounded-2xl bg-rose-500 active:bg-rose-600 text-white font-black text-base flex items-center justify-center gap-2 shadow-lg shadow-rose-500/20 transition">
         <i class="ph-bold ph-check text-lg"></i>
-        <span>알겠음</span>
+        <span>완벽 인출</span>
       </button>
     </div>
   </footer>
 
-  <!-- BACKUP & RESTORE MODAL (FOR SAFARI ITP PROTECTION) -->
+  <!-- BACKUP MODAL -->
   <div id="backup-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-neutral-900 border border-neutral-800 rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-2xl">
       <div class="flex items-center justify-between">
         <h3 class="text-base font-black text-white flex items-center gap-2">
-          <i class="ph-bold ph-shield-check text-rose-500"></i>
-          <span>Safari 기록 백업 / 복구</span>
+          <i class="ph-bold ph-shield-check text-emerald-500"></i>
+          <span>4중 자동 영구 저장 & 백업 코드</span>
         </h3>
         <button onclick="closeBackupModal()" class="text-neutral-500 hover:text-white p-1">
           <i class="ph-bold ph-x text-lg"></i>
@@ -183,13 +172,10 @@
       </div>
       
       <p class="text-xs text-neutral-400 leading-relaxed">
-        아이폰 Safari는 7일 이상 미접속 시 기록이 자동 초기화됩니다. 아래 백업 코드를 메모장에 복사해 두시면 언제든 1초 만에 복구됩니다.
+        학습 기록은 <strong class="text-emerald-400">IndexedDB + Cache + URL 주소창</strong>에 실시간 자동 저장됩니다. 기기 변경 시에만 아래 코드를 사용하세요.
       </p>
 
-      <div class="space-y-2">
-        <label class="text-[11px] font-bold text-neutral-500">내 학습 기록 코드</label>
-        <textarea id="backup-code-box" rows="3" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-3 text-xs font-mono text-neutral-300 focus:outline-none focus:border-rose-500" placeholder="복구할 백업 코드를 여기에 붙여넣으세요"></textarea>
-      </div>
+      <textarea id="backup-code-box" rows="3" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-3 text-xs font-mono text-neutral-300 focus:outline-none focus:border-rose-500" placeholder="복구할 백업 코드 붙여넣기"></textarea>
 
       <div class="grid grid-cols-2 gap-2.5 pt-1">
         <button onclick="copyBackupCode()" class="py-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 text-white text-xs font-bold flex items-center justify-center gap-1.5 transition">
@@ -204,208 +190,222 @@
     </div>
   </div>
 
-  <!-- SUBTLE TOAST -->
+  <!-- TOAST -->
   <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 z-50 px-3.5 py-1.5 bg-neutral-800 text-neutral-200 text-xs font-bold rounded-full shadow-xl pointer-events-none opacity-0 transition-opacity duration-150">
     메시지
   </div>
 
   <script>
+    // ch: 'CH1'(혼동어), 'CH2'(속뜻·방향성), 'CH3'(다의어), 'CH4'(숙어·논리), 'CH5'(관계·화살표)
     const VOCAB_DB = [
-      // === 189 ~ 205 (Chapter 05 관계를 주는 단어) ===
-      { id: "205", word: "owe A to B", core: "A는 B 덕분이다, A를 B에게 빚지다 (A ⟵ B)", basic: "빚지고 있다", note: "• modern people owe much to ancestors: 현대인은 조상 덕을 많이 보고 있다\n• 결과 A가 원인 B로부터 비롯됨을 나타내는 인과 도식", tag: "인과 귀속 (A ⟵ B)" },
-      { id: "204", word: "independent of / from", core: "A와 B는 서로 분리된·무관한 관계 (A ≠ B)", basic: "독립적인, 독자적인", note: "• independent of time and place: 시간과 장소에 구애받지 않는\n• 전치사 of / from 결합 시 '서로 영향을 주지 않는 별개'", tag: "단절 · 무관 (A ≠ B)" },
-      { id: "203", word: "subordinate", core: "A is subordinate to B: A가 B에 종속되다 (A < B)", basic: "종속된, 부차적인; 하급자", note: "• facts are subordinate to political view: 사실이 정치적 관점에 종속됨\n• 덜 중요하거나 아래에 예속되는 위계 관계", tag: "종속 · 열위 (A < B)" },
-      { id: "202-B", word: "outgrowth", core: "[명사] 결과, 결과물, 부산물", basic: "성장, 발아", note: "• A is an outgrowth of B: A는 B에서 비롯된 자연적 결과물이다 (A ⟵ B)\n• 대수능·평가원 정답 선지 2년 연속 출제 핵심 명사", tag: "결과 명사 (A ⟵ B)" },
-      { id: "202-A", word: "outgrow", core: "A가 B보다 더 커지다, 성장해 벗어나다 (A > B)", basic: "~보다 더 커지다", note: "• outgrow old habits: 성장하면서 옛 습관을 벗어나다", tag: "우열 비교 (A > B)" },
-      { id: "201", word: "outweigh", core: "A가 B보다 더 중요하다, 능가하다 (A > B)", basic: "~보다 무게가 더 나가다", note: "• A be outweighed by B (수동태): A보다 B가 더 중요하다 (A < B)\n• outstand / outnumber / outperform 모두 'A > B' 우위 동사", tag: "중요도 비교 (A > B)" },
-      { id: "200", word: "follow / be followed by", core: "A is followed by B: A 발생 후 뒤이어 B 발생 (A ➔ B)", basic: "따라가다", note: "• A follow B: B가 먼저 일어나고 뒤이어 A가 발생 (A ⟵ B)\n• 사건의 시간 선후 관계를 뒤집어 출제하는 1순위 킬러!", tag: "시간 선후 킬러" },
-      { id: "199", word: "according to", core: "B에 따라서 A하다 (B ➔ A 기준·인과 관계)", basic: "~에 따르면", note: "• mold it according to personal tastes: 개인 취향이라는 기준에 따라 빚어내다\n• 단순 인용('~가 말하길') 외에 'B를 근거/기준으로 A가 결정됨'", tag: "기준 · 인과 (A ⟵ B)" },
-      { id: "198", word: "depend on (rely / resort to)", core: "A는 B에 좌우되다, 달려 있다 (A ⟵ B)", basic: "의지하다, 의존하다", note: "• rely on / count on / lean on / resort to 모두 'A ⟵ B' 관계\n• taste depends on psychological factors: 미각은 심리적 요인에 좌우된다", tag: "의존 · 결정 (A ⟵ B)" },
-      { id: "197", word: "require", core: "A require B: A를 위해서는 B가 필요하다 (A ⟵ B)", basic: "요구하다, 필요로 하다", note: "• A be required to B (수동태 주의): A가 B하도록 요구받다\n• 성취(A)를 위해 시행착오(B)라는 선행 조건이 필수적임", tag: "필요 조건 (A ⟵ B)" },
-      { id: "196-B", word: "reflect on / reflection", core: "reflect on A: A를 깊이 숙고하다 (reflection: 심사숙고)", basic: "반사하다", note: "• without reflection: 깊은 생각(성찰) 없이\n• on이 없어도 문맥상 '곰곰이 성찰하다'로 빈출", tag: "심리 · 성찰 속뜻" },
-      { id: "196-A", word: "reflect", core: "A reflect B: A에 B가 반영되다, 나타내다 (A ⟵ B)", basic: "반사하다, 반향을 일으키다", note: "• maps reflect the world views of makers: 지도는 제작자의 세계관을 반영함", tag: "반영 관계 (A ⟵ B)" },
-      { id: "195-B", word: "distinguished vs distinguishing", core: "distinguished: 저명한, 뛰어난 / distinguishing: 독특한, 특유의", basic: "구별된", note: "• distinguished scholar (저명한 학자) vs distinguishing feature (독특한 특징)\n• 분사 형용사 의미 분기 킬러", tag: "분사 형용사 분기" },
-      { id: "195-A", word: "distinguish A from B", core: "A와 B를 구별하다, 식별하다 (A ≠ B)", basic: "구분하다", note: "• distinguish between A and B 동일: 두 개념의 경계를 명확히 가름", tag: "구별 · 대조 (A ≠ B)" },
-      { id: "194-B", word: "determinant / determinism", core: "determinant: 결정 요인 / determinism: 결정론", basic: "determine 파생 명사", note: "• determinacy: 확정성 / determination: 결정, 결단력, 확인\n• genetic determinants: 유전적 결정 요인들", tag: "파생 명사 4총사" },
-      { id: "194-A", word: "determine", core: "A determine B: A가 B를 결정짓다, 좌우하다 (A ➔ B)", basic: "결정하다, 알아내다", note: "• ratings determine the price: 고객 평가가 가격을 결정한다", tag: "인과 결정 (A ➔ B)" },
-      { id: "193", word: "A is a driving force in B", core: "A가 원동력이 되어 B를 이끌다 (A ➔ B)", basic: "A는 B의 원동력이다", note: "• the main factor that causes something to happen\n• 인구 증가(A)가 과학 발달(B)의 추진력이 됨", tag: "원동력 인과 (A ➔ B)" },
-      { id: "192", word: "base (be based on)", core: "A be based on B: B에 근거하여 A가 성립하다 (A ⟵ B)", basic: "근거를 두다; 기초, 토대", note: "• A on which B is based: B가 근거를 두고 있는 토대 A\n• 전치사 + 관계대명사 구조에서 A와 B의 인과 방향 주의!", tag: "근거 인과 (A ⟵ B)" },
-      { id: "191", word: "outnumber", core: "A outnumber B: A가 B보다 수가 더 많다 (A > B)", basic: "수적으로 우세하다", note: "• A is outnumbered by B (수동태): A가 B보다 수가 적다 (A < B)", tag: "수적 우열 (A > B)" },
-      { id: "190", word: "outpace", core: "A outpace B: A가 B를 앞지르다, 능가하다 (A > B)", basic: "앞지르다, 앞서다", note: "• ingenuity will outpace material supplies: 창의력이 물자 공급을 앞지를 것", tag: "속도 우열 (A > B)" },
-      { id: "189", word: "mover (prime mover)", core: "prime mover: 핵심 원동력, 주된 동인 (A ➔ B)", basic: "움직이는 사람(것)", note: "• prime mover in evolution: 진화를 움직이는 근본 동력\n• 단순 이동자가 아니라 사건을 촉발하는 원인(Cause)", tag: "근본 동인 (A ➔ B)" },
+      // === CH.01 혼동어 대조 & 뉘앙스 구별 (001~039) ===
+      { id: "001", ch: "CH1", word: "attitude vs altitude vs latitude vs aptitude", mission: "혼동어 4총사의 각각의 뜻을 0.5초 만에 구분하시오", core: "attitude: 태도 / altitude: 고도 / latitude: 위도·자유재량 / aptitude: 적성", basic: "longitude: 경도 / gratitude: 감사", note: "• allow considerable latitude: 행동의 상당한 자유재량을 허용하다\n• 형태가 비슷해 선지에서 바꿔치기하는 1순위 혼동어" },
+      { id: "002", ch: "CH1", word: "affect (명사 / 형용사)", mission: "'영향을 미치다' 말고 심리·인문 지문 속 명사/형용사 뜻을 대시오", core: "[명사] 감정, 정서 (= emotion) / affective: 정서적인", basic: "동사: 영향을 미치다, 감정을 유발하다", note: "• cognition(인지·이성) ↔ affect(정서·감정) 대립 구조 빈출" },
+      { id: "003", ch: "CH1", word: "priceless vs valueless", mission: "접미사 -less가 붙은 두 단어의 방향성(+/-)과 뜻을 구분하시오", core: "priceless: 값을 매길 수 없이 귀한(+) / valueless: 가치 없는(-)", basic: "priceless = invaluable (극찬의 최고급 어휘)", note: "• -less가 붙었다고 '값어치 없다'로 오독하면 100% 낚임" },
+      { id: "004", ch: "CH1", word: "appliance (단수 vs 복수)", mission: "'가전제품' 말고 단수형으로 학술 지문에 쓰일 때의 뜻을 대시오", core: "(이론·법칙의) 적용, 응용 (= application)", basic: "복수형(appliances): 가정용 기기, 가전제품", note: "• A is the appliance of B: A는 B를 현실에 적용한 것" },
+      { id: "005", ch: "CH1", word: "intelligent vs intelligible", mission: "두 파생 형용사의 의미 차이와 주체(사람 vs 글)를 구분하시오", core: "intelligent: 지적인(사람·AI) / intelligible: 이해하기 쉬운(글·말)", basic: "unintelligible: 난해하여 도저히 이해할 수 없는", note: "• AI는 intelligent하지만 그 알고리즘 설명은 unintelligible할 수 있음" },
+      { id: "006", ch: "CH1", word: "lie vs lay", mission: "자/타동사 구별 및 독해에서 'The solution lies in ~'의 기능을 대시오", core: "lie(자동사): 놓여 있다 / lay(타동사): ~을 놓다", basic: "The solution lies in ~ = 해결책은 ~에 존재한다 (주제문 시그널)", note: "• lie - lay - lain (자동사) vs lay - laid - laid (타동사)" },
+      { id: "007", ch: "CH1", word: "causal vs casual", mission: "철자 u와 s 위치가 다른 두 단어의 뜻을 구분하시오", core: "causal: 인과관계의 / casual: 무심한, 우연한, 격식 없는", basic: "causal link (인과적 연결고리) vs casual coincidence (우연의 일치)", note: "• 과학 지문에서 상관관계와 인과관계를 가르는 핵심 낚시" },
+      { id: "008", ch: "CH1", word: "reap vs rip vs ripe", mission: "단음절 철자 3총사의 각각의 뜻을 구분하시오", core: "reap: 수확하다, 거두다 / rip: 찢다 / ripe: (과일이) 익은", basic: "You reap what you sow: 뿌린 대로 거둔다", note: "• sow/invest(투자하다) ↔ reap benefits(성과를 회수하다)" },
+      { id: "009", ch: "CH1", word: "terrible vs terrific", mission: "같은 어원(terror)에서 출발했으나 정반대인 방향성(+/-)을 구분하시오", core: "terrible: 끔찍한(-) / terrific: 대단히 멋진, 훌륭한(+)", basic: "terrific achievement: 눈부시고 훌륭한 업적 (+)", note: "• 현대 독해에서 terrific은 great, splendid의 극찬 의미" },
+      { id: "010", ch: "CH1", word: "access vs assess", mission: "스펠링이 유사한 두 동사의 뜻을 구분하시오", core: "access: 접근(권), 이용하다 / assess: 평가하다, 사정하다", basic: "access to data (정보 접근) vs assess the risk (위험 평가)", note: "• 명사형: access(접근) vs assessment(평가)" },
+      { id: "011", ch: "CH1", word: "publicity vs publication", mission: "'공공성'이 아닌 publicity의 정확한 명사 뜻을 대시오", core: "publicity: 언론·매스컴의 집중 조명, 주목, 홍보", basic: "publication: 출판, 발행, 출판물", note: "• receive immense publicity: 언론의 대대적 스포트라이트를 받다" },
+      { id: "012", ch: "CH1", word: "alter vs alternate vs alternative", mission: "어근 alter 파생어 3총사의 뜻을 각각 구분하시오", core: "alter: 바꾸다 / alternate: 번갈아 / alternative: 대안의(새로운)", basic: "alternative approach: 기존 통념을 대체하는 혁신적 대안", note: "• 독해에서 alternative는 기존 방식을 깨는 (+) 시그널" },
+      { id: "013", ch: "CH1", word: "root vs route", mission: "발음이 같은 두 단어의 뜻과 대표 연어를 구분하시오", core: "root: 뿌리, 근원 / route: 길, 경로, 노선", basic: "root cause (근본 원인) vs trade route (무역 경로)", note: "• 표면적 현상(symptom) ↔ 근본 원인(root cause)" },
+      { id: "014", ch: "CH1", word: "stationary vs stationery", mission: "철자 a와 e 한 글자 차이인 두 단어의 뜻을 구분하시오", core: "stationary(-ary): 정지된, 비유동적인 / stationery(-ery): 문구류", basic: "stationary state: 변동 없이 멈춘 정체 상태", note: "• stationary(정지) ↔ mobile/dynamic(유동적)" },
+      { id: "015", ch: "CH1", word: "spontaneously vs simultaneously", mission: "두 부사의 의미 차이(자발성 vs 동시성)를 구분하시오", core: "spontaneously: 자발적으로 / simultaneously: 동시에", basic: "외부 강제(coercion) 없이 안에서 저절로 우러나와 = spontaneously", note: "• 독해에서 자발적 참여와 강제 규제를 대조할 때 빈출" },
+      { id: "016", ch: "CH1", word: "comprehensive vs comprehensible", mission: "comprehend 파생 형용사 2개의 방향 차이를 구분하시오", core: "comprehensive: 포괄적인 / comprehensible: 이해할 수 있는", basic: "comprehensive review (총체적 검토) vs comprehensible text (쉬운 글)", note: "• 범위가 넓어 다 포함함(comprehensive) ↔ 머리에 이해됨(comprehensible)" },
+      { id: "017", ch: "CH1", word: "curb vs curve vs carve", mission: "철자 혼동 3총사의 뜻과 curb의 동사 속뜻을 대시오", core: "curb: 억제하다 / curve: 곡선 / carve: 조각하다", basic: "curb inflation: 치솟는 물가를 억누르다 (= restrain)", note: "• 독해에서 curb는 명사 '인도 턱'이 아니라 99% 동사 '억제하다'" },
+      { id: "018", ch: "CH1", word: "mixed", mission: "'섞인' 말고 평가·반응에 쓰일 때의 독해 속뜻을 대시오", core: "찬반이 엇갈리는, 양면적인 (= ambivalent)", basic: "mixed reactions: 호평과 비판이 반반으로 갈리는 반응", note: "• 만장일치(unanimous)의 반대말로 불확실성 시그널" },
+      { id: "019", ch: "CH1", word: "occupy / preoccupation", mission: "영토 점유 말고 정신·심리 지문에서의 속뜻을 대시오", core: "be occupied with: 몰두하다 / preoccupation: 집착, 뇌리를 채운 생각", basic: "정신과 뇌를 꽉 채워 사로잡히게 만들다", note: "• 무관심(indifference) ↔ 집착·몰두(preoccupation)" },
+      { id: "020", ch: "CH1", word: "struggle vs strive", mission: "'애쓰다'로 퉁치지 말고 두 동사의 방향성(+/-) 차이를 대시오", core: "struggle: 허우적대며 고투하다(-) / strive: 목표를 향해 분투하다(+)", basic: "struggle to survive (-) vs strive for excellence (+)", note: "• 곤경 속 발버둥(-) vs 이상을 향한 전진(+)" },
+      { id: "021", ch: "CH1", word: "vacuum", mission: "'진공청소기' 말고 인문·사회 지문에서의 핵심 속뜻을 대시오", core: "외부와 단절된 고립된 상태 (= isolated state)", basic: "No culture develops in a vacuum: 고립되어 혼자 자라는 문화는 없다", note: "• 평가원 시그니처: 모든 문화·이론은 상호작용 속에서 탄생함" },
+      { id: "022", ch: "CH1", word: "myth", mission: "'그리스 신화' 말고 독해 첫 줄에 등장할 때의 기능을 대시오", core: "대중이 잘못 믿고 있는 근거 없는 통념, 허구", basic: "첫 줄 myth는 99% 뒤에서 반박(However)당하는 통념!", note: "• prevailing myth (잘못된 통념) ↔ scientific reality (진실)" },
+      { id: "023", ch: "CH1", word: "alien / alienate", mission: "'외계인' 말고 철학·사회 지문 속 핵심 뜻을 대시오", core: "alien: 본성에 맞지 않는 이질적인 / alienate: 소외시키다", basic: "alien to human nature: 인간 본성에 낯설고 배치되는", note: "• 명사 alienation: 사회적 소외, 단절" },
+      { id: "024", ch: "CH1", word: "weigh", mission: "'무게를 달다' 말고 추상적 판단에서의 속뜻을 대시오", core: "손익을 저울질하다, 깊이 숙고하다 (= ponder)", basic: "weigh options: 선택지들을 머릿속 저울에 올려놓고 신중히 따져보다", note: "• 경솔한 행동(act rashly) ↔ 심사숙고(weigh consequences)" },
+      { id: "025", ch: "CH1", word: "informed", mission: "'알려진'이 아닌 'an informed decision'의 정확한 뜻을 대시오", core: "정확한 지식과 데이터에 근거한, 현명한", basic: "뜬소문이 아닌 객관적 정보에 정통한 상태", note: "• blind guess (눈먼 추측) ↔ well-informed choice (현명한 선택)" },
+      { id: "026", ch: "CH1", word: "incident vs incidental", mission: "명사 incident와 파생 형용사 incidental의 차이를 구분하시오", core: "incident: 사건 / incidental: 핵심이 아닌 부수적인 (= secondary)", basic: "본질이 아니라 길 가다 부수적으로 딸려오는 덜 중요한 것", note: "• core objective (핵심 목표) ↔ incidental byproduct (부수적 부산물)" },
+      { id: "027", ch: "CH1", word: "manipulate", mission: "'다루다' 말고 지문 속 방향성(+/-)과 핵심 뜻을 대시오", core: "교묘하고 부정한 방식으로 여론·통계를 조작하다 (-)", basic: "manipulate statistics: 데이터를 자기 입맛대로 왜곡하다", note: "• 긍정적 '관리'가 아니라 부정한 '조작·악용(-)' 시그널" },
+      { id: "028", ch: "CH1", word: "optional", mission: "'선택적인'이 지문 속에서 갖는 실제 논리적 가치를 대시오", core: "필수가 아닌, 해도 그만인, 부차적인 (= non-essential)", basic: "mandatory(필수적인) ↔ optional(비필수적·덜 중요한)", note: "• 선택 가능 = 의무 아님 = 핵심이 아님" },
+      { id: "029", ch: "CH1", word: "submit vs submit to", mission: "전치사 to 유무에 따른 의미 급변을 구분하시오", core: "submit A: A를 제출하다 / submit to A: A에게 굴복·항복하다 (-)", basic: "submit to authority: 권력에 무릎 꿇고 복종하다", note: "• 저항하다(resist) ↔ 굴복하다(submit to)" },
+      { id: "030", ch: "CH1", word: "yield vs yield to", mission: "전치사 to 유무에 따른 의미 급변을 구분하시오", core: "yield A: (결과를) 산출하다 / yield to A: A에게 굴복·양보하다", basic: "yield results (성과 산출) vs yield to pressure (외압에 항복)", note: "• submit과 쌍둥이 구조: to가 붙으면 항복/양보" },
+      { id: "031", ch: "CH1", word: "fascinate vs tempt", mission: "'유혹하다'로 퉁치지 말고 두 동사의 방향성(+/-)을 구분하시오", core: "fascinate: 매혹하다(+) / tempt: (나쁜 길로) 유혹하다(-)", basic: "fascinated by art (+) vs tempted to cheat (-)", note: "• 지적·예술적 매료(+) vs 부정한 유혹(-)" },
+      { id: "032", ch: "CH1", word: "develop", mission: "'기술 개발' 말고 질병·결함 목적어가 올 때의 뜻을 대시오", core: "(질병·결함·나쁜 것이) 생겨나다, 발현되다", basic: "develop symptoms (증상이 생기다) / develop a flaw (결함이 생기다)", note: "• 나쁜 것이 체내나 시스템 안에서 싹터 자라날 때 빈출" },
+      { id: "033", ch: "CH1", word: "suspect vs doubt", mission: "둘 다 '의심하다'인데 정반대인 방향성(+/-)을 구분하시오", core: "suspect: ~일 거라 추정(+) / doubt: ~가 아닐 거라 불신(-)", basic: "I suspect he is guilty (범인 같아!) vs I doubt it (아닐 걸?)", note: "• 김지영 쌤 시그니처 킬러: 긍정 추정 vs 부정 회의" },
+      { id: "034", ch: "CH1", word: "adopt vs adapt vs adjust", mission: "형태 혼동 동사 3총사의 핵심 이미지 차이를 구분하시오", core: "adopt: 채택하다 / adapt: 적응하다·각색하다 / adjust: 미세 조정하다", basic: "adopt(새 제도 도입) / adapt(환경 적응·영화 각색) / adjust(오차 보정)", note: "• adopt는 원래 없던 것을 새로 들여와 내 것으로 삼는 논리" },
+      { id: "037", ch: "CH1", word: "faithful", mission: "'신앙심이 깊은' 말고 번역·복제품에 쓰일 때의 뜻을 대시오", core: "원본을 왜곡 없이 그대로 재현한 (= accurate, exact)", basic: "a faithful replica: 원본에 한 치의 오차 없이 충실한 복제품", note: "• 왜곡된 묘사(distorted) ↔ 원본에 충실한 재현(faithful)" },
+      { id: "038", ch: "CH1", word: "bother", mission: "'괴롭히다' 말고 부정문·의문문에서 쓰이는 관용 속뜻을 대시오", core: "굳이 애써 신경 쓰다, 수고를 들이다", basic: "Don't bother to ask: 굳이 애써 물어볼 필요 없다", note: "• hardly bother to verify: 확인하려는 수고조차 안 하다" },
+      { id: "039", ch: "CH1", word: "tolerate", mission: "'참다'의 실제 태도 뉘앙스와 의학 지문 속 명사 뜻을 대시오", core: "1) 마음에 안 들지만 마지못해 용인하다  2) 의학: 독성 내성(tolerance)", basic: "적극적 찬성이 아닌 충돌을 피하기 위한 소극적 묵인", note: "• intolerance: 불관용; (의학) 과민증, 알레르기" },
 
-      // === 174 ~ 188 ===
-      { id: "188", word: "give way to", core: "A가 B로 대체되다 (A↓, B↑)", basic: "길을 내어 주다, 양보하다", note: "• A give way to B: 구세대 A는 쇠퇴하고 신세대 B가 주류가 됨", tag: "세대교체 · 대체 공식" },
-      { id: "187", word: "boil down to A", core: "결국 A로 요약·수렴되다", basic: "졸아들다, 요약되다", note: "• narrow down to A / (be) reduced to A 동일\n• 여러 갈래가 핵심 본질 A 하나로 좁혀짐", tag: "핵심 수렴 시그널" },
-      { id: "186", word: "This is not to say that A", core: "그것이 A라는 뜻은 아니다 (양보 ➔ 반전)", basic: "~라고 말하는 것은 아니다", note: "• 꼬리표(양보)를 먼저 던지고 뒤에 'But / Rather'로 진짜 주장(빈칸) 제시!", tag: "양보 후 반전 공식" },
-      { id: "185", word: "It is (not) that S V", core: "~때문이다 / ~때문이 아니다", basic: "~라는 것이다", note: "• 강조구문과 달리 It과 that 사이에 아무것도 없음\n• 원인·이유를 밝히는 기출 빈출 구문", tag: "이유 설명 구문" },
-      { id: "184", word: "give away", core: "1) 거저 주다  2) (비밀을) 누설하다", basic: "나누어 주다, 기부하다", note: "• give away a secret: 비밀이나 정체를 무심코 폭로하다", tag: "다의어 숙어" },
-      { id: "183", word: "cannot but + 동사원형", core: "~하지 않을 수 없다", basic: "~할 수밖에 없다", note: "• cannot help + -ing / cannot help but + 동사원형 동일", tag: "필수 관용 구문" },
-      { id: "182", word: "rob A of B", core: "A에게서 B를 빼앗다, 박탈하다", basic: "강탈하다, 털다", note: "• strip A of B / deprive A of B 동일 구조 (전치사 of 필수)", tag: "박탈 동사 구문" },
-      { id: "181", word: "deal with", core: "(문제를) 다루다, 해결하다", basic: "처리하다, 대처하다", note: "• solve a problem / cope with 동일", tag: "문제 해결 숙어" },
-      { id: "180", word: "in V-ing", core: "~할 때, ~함에 있어서", basic: "~하는 중에", note: "• in doing so: 그렇게 할 때 (독해 연결 고리 빈출)", tag: "전치사 관용구" },
-      { id: "179", word: "rule out", core: "제외하다, 배제하다, 불가능하게 하다", basic: "선을 그어 지우다", note: "• exclude / prevent / make impossible 동일", tag: "배제 · 차단 숙어" },
-      { id: "178", word: "nothing but A", core: "오직 A만 (= only A)", basic: "A를 제외하고는 아무것도 없는", note: "• but = except (A 빼고 아무것도 없음 ➔ 결국 A뿐임)", tag: "강조 관용구" },
-      { id: "177", word: "lay off", core: "1) 그만두다  2) (직원을) 해고하다", basic: "중단하다", note: "• layoff (붙여 쓰면 명사): 정리해고", tag: "다의어 숙어" },
-      { id: "176", word: "take place", core: "발생하다, 일어나다 (= happen)", basic: "개최되다", note: "• 수동태 불가 자동사 표현\n• take the place of (~을 대신하다)와 구별!", tag: "문법 · 숙어 주의" },
-      { id: "175", word: "give rise to", core: "(결과를) 일으키다, 야기하다 (= cause)", basic: "발생시키다", note: "• [원인 A give rise to 결과 B] 소재 간 인과관계 파악 시그널", tag: "인과관계 시그널" },
-      { id: "174", word: "take over", core: "인계받다, 장악하다, 인수하다", basic: "떠맡다, 대신하다", note: "• 기업 인수(takeover) 및 주도권 장악", tag: "기본 핵심 숙어" },
+      // === CH.02 속뜻 & 방향성(+/-) (040~058) ===
+      { id: "040", ch: "CH2", word: "existing", mission: "기본뜻: 존재하는 ➔ 평가원 대립쌍 속뜻을 대시오", core: "새로운 혁신 이전의 '기존의, 구태의연한' (= conventional)", basic: "existing paradigms (기존의 낡은 틀) ↔ novel theory (새로운 이론)", note: "• 지문에서 existing은 대부분 깨부수거나 개선해야 할 대상" },
+      { id: "041", ch: "CH2", word: "irony", mission: "기본뜻: 아이러니 ➔ 지문 속 논리 공식(+/-)을 대시오", core: "예상과 정반대로 뒤틀리는 상황 모순 [(+) ➔ (-)]", basic: "안전을 위해 만든 장치가 오히려 사고를 부르는 역설적 상황", note: "• 원인(+)과 결과(-)가 모순으로 충돌하는 지점" },
+      { id: "042", ch: "CH2", word: "paradox", mission: "기본뜻: 역설 ➔ irony와 구별되는 핵심 논리를 대시오", core: "겉보기엔 논리적 모순이나 깊이 보면 참인 진실", basic: "두 상반된 명제가 동시에 양립하는 논리적 역설", note: "• 물질적 풍요(+)와 정서적 빈곤(-)의 동시 공존" },
+      { id: "043", ch: "CH2", word: "assume", mission: "기본뜻: 가정하다 ➔ 독해 흐름상 뒤에 예고되는 전개를 대시오", core: "사실이 아닐 수도 있는 통념을 가정함 (➔ 뒤에서 반박 예고!)", basic: "People assume that ~ = 대중이 착각하다 (However 반전 대기)", note: "• 두 번째 뜻: assume responsibility (책임을 떠맡다)" },
+      { id: "044", ch: "CH2", word: "compromise", mission: "기본뜻: 타협하다 ➔ 독해 킬러 속뜻과 방향성(+/-)을 대시오", core: "(-) 굽히다, 양보하다, 훼손시키다, 위태롭게 하다", basic: "compromise their identity: 정체성을 훼손하다 (negotiate와 구별)", note: "• 원칙이나 건강·명예를 깎아먹는 마이너스(-) 동사" },
+      { id: "045", ch: "CH2", word: "biology", mission: "기본뜻: 생물학 ➔ 인문·사회 지문에서의 상징적 속뜻을 대시오", core: "타고남, 선천적, 유전적 (= innate, inborn)", basic: "선천성 7패밀리: biology, infant, inborn, innate, gene, DNA, hardwire", note: "• 문화·학습(nurture) ↔ 생물학적 선천성(biology/nature) 대립쌍" },
+      { id: "046", ch: "CH2", word: "exclusive / exclusively", mission: "기본뜻: 전용의 ➔ 독해에서 논리적 범위를 한정하는 속뜻을 대시오", core: "독점적인, 배타적인 / exclusively: 오로지 ~만 (= only)", basic: "almost exclusively: 다른 건 다 배제하고 오직 이것만", note: "• 극단적 한정 시그널로 선지 정오 판별의 핵심" },
+      { id: "047", ch: "CH2", word: "prescribe", mission: "기본뜻: 약을 처방하다 ➔ 사회·문화 지문 속 뜻을 대시오", core: "(법·규칙·문화가 행동 방식을) 규정하다, 지시하다", basic: "culturally prescribed: 문화적으로 규정된", note: "• 미리(pre) 써서(scribe) 정해둔 규범이라는 핵심 이미지" },
+      { id: "048", ch: "CH2", word: "presume", mission: "기본뜻: 추정하다 ➔ 영영 코어 뉘앙스를 대시오", core: "확실한 증거 없이도 ~일 것이라 당연시하며 추정/간주하다", basic: "presumed innocent: 유죄 입증 전까지 무죄로 추정되는", note: "• 근거 없는 추측이 바탕에 깔려 있음" },
+      { id: "049", ch: "CH2", word: "mere", mission: "기본뜻: 겨우 ~의 ➔ 독해 문맥상 반전 트리거 기능을 대시오", core: "사소한 것 하나만으로도 엄청난 결과를 초래함을 강조", basic: "His mere presence: 단지 그가 거기 있었다는 사실만으로도", note: "• '겨우 이것뿐인데도 이 정도 파급력을 낸다'는 강조 장치" },
+      { id: "050", ch: "CH2", word: "static", mission: "기본뜻: 정적인 ➔ 과학/사회 지문 속뜻과 오디오 속뜻을 대시오", core: "움직임·변화 없이 고정된; (오디오·통신) 잡음", basic: "static condition: 발전이나 변화 없이 멈춰 있는 고정 상태", note: "• dynamic(역동적) ↔ static(고정적·정체된)" },
+      { id: "051", ch: "CH2", word: "displace", mission: "기본뜻: 옮겨 놓다 ➔ 사회·경제 지문에서의 2가지 속뜻을 대시오", core: "1) 밀어내고 대체하다  2) (난민·노동자를) 쫓아내다", basic: "displaced workers: 기술 발전으로 일자리를 잃고 쫓겨난 노동자", note: "• dis(떨어져) + place(위치): 본래 있던 자리를 뺏어 대체함" },
+      { id: "052", ch: "CH2", word: "seize vs siege", mission: "기본뜻: 움켜쥐다 ➔ 추상적 목적어 속뜻과 혼동어 siege를 대시오", core: "seize: (기회·주도권을) 꽉 잡다 / siege: 포위 작전", basic: "seize the day (현재를 즐겨라/잡아라) / seize an opportunity", note: "• 철자 z와 g 한 글자 차이 낚시 주의" },
+      { id: "053", ch: "CH2", word: "orient / disorient", mission: "기본뜻: 적응하다 ➔ A-oriented와 disorient의 뜻을 대시오", core: "A-oriented: A 지향적인 / disorient: 방향 감각을 잃게 하다", basic: "process-oriented (과정 지향적) vs product-oriented (결과 지향적)", note: "• 어리둥절하게 만들다(disorient) 파생어 빈출" },
+      { id: "054", ch: "CH2", word: "identify with A", mission: "기본뜻: 식별하다 ➔ 전치사 with가 붙을 때의 속뜻을 대시오", core: "A와 자신을 동일시하다, 깊이 공감하다", basic: "identify himself with the hero: 자신을 주인공과 동일시하다", note: "• 명사 identity: 정체성, 신원" },
+      { id: "055", ch: "CH2", word: "reconsider", mission: "기본뜻: 다시 생각하다 ➔ 영영 코어의 '결정적 의도'를 대시오", core: "기존 결정을 바꾸고 번복할 가능성을 두고 재고하다", basic: "in order to change a choice or decision (변화·철회 시그널)", note: "• 단순한 회상이 아니라 '생각을 바꿀 수 있음'을 내포" },
+      { id: "056", ch: "CH2", word: "counterpart", mission: "기본뜻: 상응하는 것 ➔ '반대'가 아닌 정확한 관계 속뜻을 대시오", core: "다른 장소·상황에서 동등한 지위·기능을 가진 대응 상대방", basic: "urban counterparts: 시골 사람들과 대비되는 도시의 동격 사람들", note: "• 반대(counter)가 아니라 'Same / Similar' 동격 관계!" },
+      { id: "057", ch: "CH2", word: "mobilize", mission: "기본뜻: 군대를 동원하다 ➔ 생물·사회 지문에서의 속뜻을 대시오", core: "(특정 행동을 위해) 즉각 가동하다, 준비시키다, 활용하다", basic: "the body is mobilized to produce cells: 신체가 세포 생성을 위해 가동됨", note: "• 잠자고 있던 자원을 깨워 실행에 옮기는 이미지" },
+      { id: "058", ch: "CH2", word: "initiate / initiative", mission: "기본뜻: 시작하다 ➔ 파생 명사 initiative의 3가지 뜻을 대시오", core: "initiative: 진취성, 주도권, 새로운 주도적 계획", basic: "take the initiative: 남보다 먼저 주도권을 잡다", note: "• 가장 먼저 능동적으로 시작하는 자기 주도 이미지" },
 
-      // === 148 ~ 160 ===
-      { id: "160", word: "be absorbed in A", core: "A에 푹 빠지다, 몰두하다", basic: "A에 흡수되다, 열중하다", note: "• be occupied with A 동일", tag: "몰입 · 집중 숙어" },
-      { id: "159", word: "replace A with B", core: "기존 A를 버리고(X) 새 B로 갈아치우다(O)", basic: "A를 B로 대체하다", note: "• substitute B for A (전치사 with vs for 공무원 단골 낚시!)", tag: "대체 · 전치사 킬러" },
-      { id: "158", word: "even so", core: "그렇기는 하지만, 그럼에도 불구하고", basic: "설령 그렇다 하더라도", note: "• 앞 문장 인정 후 역접 반전 (= nevertheless)", tag: "역접 접속부사" },
-      { id: "157", word: "as 형용사 as", core: "[문두 도치] 비록 ~일지라도 (양보)", basic: "~만큼 ~한", note: "• Important as it is = Although it is important (뒤에 반전 예고)", tag: "양보 도치 구문" },
-      { id: "156", word: "A is to B as C is to D", core: "A와 B의 관계는 C와 D의 관계와 같다", basic: "비례 유추 공식 (A:B = C:D)", note: "• What A is to B, C is to D 동일", tag: "비례 유추 공식" },
-      { id: "155", word: "distinction between A and B", core: "A와 B의 명확한 대립·차이 선언", basic: "A와 B 사이의 구별", note: "• gap between A and B 동일 (A ↔ B 대립쌍 구조)", tag: "대립쌍 시그널" },
-      { id: "154", word: "be programmed to V", core: "선천적으로 타고나다, 내재되다", basic: "~하도록 프로그램 되어 있다", note: "• innate, inborn, hardwired와 같은 선천성 패밀리", tag: "선천성 시그널" },
-      { id: "153", word: "confuse A with B", core: "A와 B를 구별 못 하고 착각하다", basic: "A와 B를 혼동하다", note: "• 필자가 대중의 논리적 오류를 지적할 때 사용", tag: "오류 지적 구문" },
-      { id: "152", word: "aside from A", core: "A는 별개로 하고, A 외에도 (= apart from)", basic: "A를 제외하고", note: "• A 이야기는 끝내고 B라는 새로운 화제로 전환하는 시그널", tag: "화제 전환 시그널" },
-      { id: "151", word: "attend to", core: "1) 주의를 기울이다  2) (용무를) 처리하다", basic: "돌보다, 시중들다", note: "• attend the meeting(타동사: 참석하다)과 전치사 유무 구별", tag: "자·타동사 킬러" },
-      { id: "150", word: "A is a window into B", core: "A를 통해 B의 내막을 들여다볼 수 있다", basic: "A는 B를 보는 창이다", note: "• A = B를 이해하는 통찰의 도구", tag: "비유 독해 공식" },
-      { id: "149", word: "removed from A", core: "A로부터 멀리 떨어진, 동떨어진", basic: "A로부터 제거된", note: "• far removed from reality: 현실과 거리가 아주 먼", tag: "거리 · 단절 숙어" },
-      { id: "148", word: "not A until B", core: "B하고 나서야 비로소 A하다 (순서: B ➔ A)", basic: "B할 때까지 A하지 않다", note: "• Not until B did A... (공무원 부정어 도치 0순위)", tag: "시간 순서 · 도치" },
+      // === CH.03 다의어 N개 (059~138) ===
+      { id: "059", ch: "CH3", word: "establish / established", mission: "'설립하다' 말고 형용사 established의 다의어 뜻을 대시오", core: "확실히 자리 잡은, 공인된, 저명한", basic: "established scholars (저명한 학자들) / well-established (확고한)", note: "• 사회나 학계에서 이미 정설로 인정받는 상태" },
+      { id: "060", ch: "CH3", word: "even / uneven", mission: "'심지어' 말고 형용사 even의 다의어 3가지를 대시오", core: "1) 평평한  2) 균등한, 일정한  3) 짝수의", basic: "uneven: 울퉁불퉁한, 불균등한 / at an even pace: 일정한 속도로", note: "• 짝수(even) ↔ 홀수(odd) 대립쌍" },
+      { id: "061", ch: "CH3", word: "odd / odds", mission: "'이상한' 말고 odd의 수학 뜻과 복수형 odds의 2가지 뜻을 대시오", core: "odd: 홀수의 / odds: 1) 가능성, 확률  2) 고난, 역경", basic: "against all odds: 모든 역경을 딛고 / the odds of: ~할 확률", note: "• 복수형 odds는 평가원 지문 단골 시그니처" },
+      { id: "062", ch: "CH3", word: "mean / means", mission: "'의미하다' 말고 형용사/명사/복수형 means의 3가지 뜻을 대시오", core: "1) [형] 못된, 비열한  2) [명] 평균  3) [복수 means] 수단, 재산", basic: "Regression to the mean (평균으로의 회귀) / means of survival (생존 수단)", note: "• means는 끝에 s가 붙어도 단수 취급 가능('하나의 수단')" },
+      { id: "063", ch: "CH3", word: "claim", mission: "'주장하다' 말고 독해 킬러 다의어 2가지를 대시오", core: "1) (사고·질병이 목숨을) 앗아가다  2) 차지하다, 소유권을 주장하다", basic: "The crash claimed three lives: 사고가 세 명의 목숨을 앗아갔다", note: "• 재난·전염병 지문에서 '사망자를 내다'로 빈출" },
+      { id: "064", ch: "CH3", word: "subject / be subject to", mission: "'주제·과목' 말고 형용사 be subject to A의 뜻을 대시오", core: "A의 영향을 받기 쉬운, A를 받아야 하는 (= vulnerable to)", basic: "subject to change (변경될 수 있는) / subject to distortion (왜곡되기 쉬운)", note: "• 피험자(subjects) 뜻과 함께 1순위 다의어" },
+      { id: "065", ch: "CH3", word: "contemporary / contemporaries", mission: "'현대의' 말고 2가지 핵심 뜻(형용사·명사)을 대시오", core: "1) [형] 동시대의  2) [명사 복수형] 동시대인들, 동년배", basic: "ignored by his contemporaries: 동시대인들에게 외면당한", note: "• '현대의(modern)'와 '그 당시 동시대의' 문맥 구별 필수" },
+      { id: "066", ch: "CH3", word: "demand / demanding", mission: "'요구하다' 말고 파생 형용사 demanding의 다의어 뜻을 대시오", core: "힘든, 고된, 많은 에너지를 요구하는, 까다로운 (-)", basic: "a demanding job (고된 일) ↔ a rewarding job (보람 있는 일: +)", note: "• 손이 많이 가고 진을 빼는 마이너스(-) 뉘앙스" },
+      { id: "067", ch: "CH3", word: "consequential / of no consequence", mission: "'결과의'가 아닌 consequential의 평가원 다의어 뜻을 대시오", core: "중대한, 대단히 중요한 (= important, significant)", basic: "of no consequence: 전혀 중요하지 않은 (= unimportant)", note: "• '결과가 크다 ➔ 중대하다'로 의미 확장" },
+      { id: "068", ch: "CH3", word: "scale", mission: "'규모' 말고 독해에 출제되는 다의어 3가지를 대시오", core: "1) 지도 축척  2) 정의의 저울  3) 물고기 비늘(을 벗기다)", basic: "scale of justice (정의의 저울) / 1:25,000 scale (축척)", note: "• 치과 지문에서 '치석을 긁어내다(scale teeth)'로도 출제" },
+      { id: "069", ch: "CH3", word: "provided (that)", mission: "'제공하다' 말고 문두·문중에 쓰이는 접속사 뜻을 대시오", core: "만약 ~라면 (= If, 조건 접속사)", basic: "provided the act is successful: 만약 그 행위가 성공적이라면", note: "• providing (that) 역시 동일한 가정 조건절" },
+      { id: "070", ch: "CH3", word: "rather", mission: "'꽤, 약간' 말고 부정문 뒤에서 주제문을 여는 연결어 뜻을 대시오", core: "not A, rather B: A가 아니라 오히려 B (필자의 진짜 주장!)", basic: "A rather than B = B가 아니라 A", note: "• 방금 한 말을 정정하며 핵심을 꽂는 시그널" },
+      { id: "071", ch: "CH3", word: "instead", mission: "Instead of A, B 구조에서 A와 B의 관계를 대시오", core: "A는 버리고(X) 대신에 B를 취함(O) (대조 전환 시그널)", basic: "앞 문장의 부정적 상황을 뒤집으며 대안을 제시함", note: "• A와 B가 서로 대립되는 성격을 띰" },
+      { id: "072", ch: "CH3", word: "game", mission: "'경기·놀이' 말고 인류학·수렵 지문 속 다의어 뜻을 대시오", core: "사냥감 (야생 동물·새)", basic: "large game (대형 사냥감) / game abundance (풍부한 사냥감)", note: "• 사전 맨 끝에 숨어 있는 킬러 다의어" },
+      { id: "073", ch: "CH3", word: "motor", mission: "'전동기·자동차' 말고 뇌과학·생물 지문 속 다의어 뜻을 대시오", core: "운동의, 근육 운동 신경의", basic: "motor skills (운동 기능) / motor system (운동 신경계)", note: "• sensory(감각의) ↔ motor(운동의) 대립쌍" },
+      { id: "074", ch: "CH3", word: "rate", mission: "'비율·속도' 말고 동사로 쓰일 때의 다의어 뜻을 대시오", core: "등급을 매기다, 평가하다 (= assess, evaluate)", basic: "at a rapid rate (빠른 속도로) / rate their confidence (자신감을 평가하다)", note: "• 명사 '요금, 속도, 비율' + 동사 '평가하다'" },
+      { id: "075", ch: "CH3", word: "contain", mission: "'포함하다' 말고 감정·전염병 목적어가 올 때의 뜻을 대시오", core: "(감정·적대감·전염병을) 억제하다, 참다, 막다", basic: "contain the outbreak (전염병 확산을 억제하다) / cannot contain oneself", note: "• 밖으로 퍼지지 못하게 안에 가두어 통제하는 이미지" },
+      { id: "076", ch: "CH3", word: "vehicle", mission: "'차량·탈것' 말고 추상 지문에서의 다의어 뜻을 대시오", core: "(목적·사상 전달을 위한) 수단, 매개체 (= medium, means)", basic: "A as the vehicle for B: B를 이루기 위한 수단으로서의 A", note: "• 예술·언어가 사상의 매개체(vehicle)로 쓰인다는 문맥 빈출" },
+      { id: "077", ch: "CH3", word: "flavor", mission: "'풍미·맛' 말고 추상 대상에 쓰이는 다의어 뜻을 대시오", core: "고유한 특징, 특색 (= distinctive quality)", basic: "add an American flavor: 미국적인 특색을 더하다", note: "• 정치·문화 형태가 각기 다른 '특색(flavors)'을 띤다는 문맥" },
+      { id: "078", ch: "CH3", word: "celebrity", mission: "'유명인사' 말고 셀 수 없는 명사로 쓰일 때의 뜻을 대시오", core: "명성, 유명세 (= fame)", basic: "live a life of celebrity: 명성의 삶을 살다", note: "• 가산명사(유명인) vs 불가산명사(명성)" },
+      { id: "079", ch: "CH3", word: "virtual / virtually", mission: "'가상의' 말고 문맥상 정반대인 다의어 뜻을 대시오", core: "사실상의, 거의 ~와 다름없는 / virtually: 사실상, 거의", basic: "virtually impossible: 사실상 불가능한", note: "• virtual reality(가상현실)와 문맥 구별 필수" },
+      { id: "080", ch: "CH3", word: "scarce / scarcely", mission: "경제학 키워드 scarce와 부사 scarcely의 뜻을 구분하시오", core: "scarce: 부족한, 희소한 (scarcity: 희소성) / scarcely: 거의 ~않다", basic: "scarcely = hardly, barely (준부정어 도치 유발)", note: "• 경제학의 기본 전제 = 자원의 희소성(scarcity)" },
+      { id: "081", ch: "CH3", word: "grant", mission: "'승인하다·보조금' 말고 2가지 핵심 관용 표현을 대시오", core: "1) take A for granted: 당연시하다  2) Granted (that)~: 인정하지만", basic: "문두 Granted는 상대 말을 양보한 뒤 반전(But)을 때리는 시그널", note: "• medical grants (의료 보조금)" },
+      { id: "082", ch: "CH3", word: "engage / engaging", mission: "'약혼하다' 말고 독해 킬러 3가지(타동사·engage in·형용사)를 대시오", core: "1) (주의를) 사로잡다  2) engage in: 참여하다  3) engaging: 매력적인", basic: "an engaging vision: 사람들의 마음을 사로잡는 매력적인 비전", note: "• engaging = attractive, fascinating (+)" },
+      { id: "083", ch: "CH3", word: "colony", mission: "'식민지' 말고 생물학 지문에서의 다의어 뜻을 대시오", core: "(개미·꿀벌·세균·산호의) 군집, 무리, 군락", basic: "bee colony (꿀벌 무리) / bacterial colony (세균 군락)", note: "• 함께 모여 사는 생물 집단" },
+      { id: "084", ch: "CH3", word: "settle", mission: "'정착하다' 말고 목적어를 취하는 타동사일 때의 뜻을 대시오", core: "(분쟁·문제를) 해결하다, 합의를 보다 (= solve)", basic: "settle disputes: 분쟁을 해결하다 / settle the problem", note: "• 자동사(정착하다) vs 타동사(해결하다)" },
+      { id: "085", ch: "CH3", word: "dispute / undisputed", mission: "'분쟁·논란'의 파생어 undisputed의 정확한 뜻을 대시오", core: "undisputed: 반박의 여지가 없는, 자타공인 모두가 인정하는", basic: "undisputed champion: 모두가 인정하는 명백한 챔피언", note: "• 부정 접두사 un-이 붙어 '논란 없는 = 확고한(+)'" },
+      { id: "086", ch: "CH3", word: "context", mission: "'글의 문맥' 말고 현실 지문에서의 본질적 뜻을 대시오", core: "어떤 사건과 연관된 구체적 '상황, 배경' (= situation)", basic: "cultural context: 문화적 상황·배경", note: "• 맥락 = 결국 그 일이 벌어진 전체 상황" },
+      { id: "087", ch: "CH3", word: "break", mission: "'깨다·부수다' 말고 'break the news'의 다의어 뜻을 대시오", core: "(주로 안 좋은) 소식을 처음으로 전하다, 알리다", basic: "break it to you: 너에게 그 소식을 전하다", note: "• 침묵을 깨고 소식을 터뜨리는 이미지" },
+      { id: "088", ch: "CH3", word: "relevant", mission: "'관련 있는' 말고 평가원 선지에서의 핵심 다의어 뜻을 대시오", core: "유의미한, 대단히 중요한 (= significant), 적절한", basic: "irrelevant: 무관한, 중요치 않은 (-)", note: "• '관련 있다 ➔ 중요하다'로 직결" },
+      { id: "089", ch: "CH3", word: "appreciate", mission: "'감사하다' 외에 반드시 알아야 할 다의어 4가지를 대시오", core: "1) 진가를 인정하다  2) 감상하다  3) 인식하다  4) (가치가) 오르다", basic: "appreciate the true nature: 진정한 본질을 제대로 인식하다", note: "• 전반적 핵심 이미지: '높이 평가하다'" },
+      { id: "090", ch: "CH3", word: "exceptional", mission: "'예외적인'의 긍정적 극찬 다의어 뜻을 대시오", core: "이례적일 정도로 뛰어난, 탁월한 (= outstanding) (+)", basic: "exceptional talent: 천재적이고 탁월한 재능", note: "• 남들과 다를 정도로 압도적으로 훌륭함(+)" },
+      { id: "091", ch: "CH3", word: "credit", mission: "'신용·외상' 말고 'A be credited to B'의 다의어 뜻을 대시오", core: "A(업적·발견)가 B의 공로로 인정되다 (~의 공으로 돌리다)", basic: "take credit for: ~에 대한 공로를 차지하다", note: "• 대학 학점(worth three credits) 뜻까지 완비" },
+      { id: "092", ch: "CH3", word: "frequency", mission: "'빈도·잦음' 말고 물리·음향 지문에서의 다의어 뜻을 대시오", core: "주파수, 진동수", basic: "high frequency: 고주파 (높은 음높이)", note: "• 빈번함(잦음)과 진동 횟수(주파수) 모두 포함" },
+      { id: "093", ch: "CH3", word: "count", mission: "'수를 세다' 말고 자동사 count와 숙어 2가지를 대시오", core: "1) [자동사] 중요하다 (= matter)  2) count on: 믿다  3) count A as B: 간주하다", basic: "Every vote counts: 모든 한 표가 중요하다", note: "• 자동사 '중요하다'는 진행형으로 쓰지 않음" },
+      { id: "094", ch: "CH3", word: "case", mission: "'경우·소송' 말고 'the case'와 'make the case'의 뜻을 대시오", core: "1) the case: 사실, 진실  2) make the case: 자신의 주장을 펴다", basic: "That is not the case: 그것은 사실이 아니다", note: "• 평가원 빈출 진실·주장 시그널" },
+      { id: "095", ch: "CH3", word: "inquire / inquiry", mission: "'질문하다'의 명사 inquiry가 학술 지문에서 갖는 뜻을 대시오", core: "학술적 연구, 탐구, 조사 (= research, investigation)", basic: "scientific inquiry: 과학적 탐구", note: "• 진리를 파고드는 체계적 탐구" },
+      { id: "096", ch: "CH3", word: "positive", mission: "'긍정적인' 말고 의학·법학 지문 속 다의어 2가지를 대시오", core: "1) (검사 결과) 양성의  2) 적극적인 (positive rights)", basic: "positive test (양성 반응: 병 있음!) ↔ negative (음성)", note: "• 긍정(positive)과 음성(negative)의 의학적 반전 주의" },
+      { id: "097", ch: "CH3", word: "chemistry", mission: "'화학' 말고 인간관계 지문에서의 다의어 뜻을 대시오", core: "(사람 사이의) 교감, 궁합, 끌림", basic: "good chemistry between us: 우리 둘 사이의 훌륭한 교감(케미)", note: "• 화학 반응처럼 서로 통하는 매력" },
+      { id: "098", ch: "CH3", word: "cell", mission: "'생물 세포' 말고 공간·교통 지문 속 다의어 2가지를 대시오", core: "1) 교도소 독방, 감방  2) (차량·비행기의) 승객실", basic: "prison cell (독방) / passenger cell (승객실)", note: "• 작게 구획된 방이나 칸의 이미지" },
+      { id: "099", ch: "CH3", word: "contract", mission: "'계약(서)' 말고 물리·의학 지문 속 동사 뜻 2가지를 대시오", core: "1) 수축하다, 줄어들다  2) (전염병·중병에) 걸리다", basic: "expand or contract (팽창/수축) / contract influenza (독감에 걸리다)", note: "• 수축(contract) ↔ 팽창(expand) 반의어" },
+      { id: "100", ch: "CH3", word: "register", mission: "'등록하다' 말고 감정·인지 지문 속 다의어 2가지를 대시오", core: "1) (얼굴에 감정을) 나타내다  2) (마음에) 인식되다, 알아채다", basic: "It didn't register in my mind: 내 머릿속에 전혀 인식되지 않았다", note: "• 기계 눈금에 기록되듯 마음에 새겨지는 이미지" },
+      { id: "101", ch: "CH3", word: "agent / agency", mission: "'대리인·대행사' 말고 철학·사회 지문 속 핵심 다의어를 대시오", core: "agent: 주체적 행위자 / agency: 주체적 행위 능력, 주체성", basic: "moral agent (도덕적 행위자) / human agency (인간의 주체성)", note: "• 철학 지문에서 가장 중요하게 다뤄지는 핵심 개념" },
+      { id: "102", ch: "CH3", word: "figure", mission: "'모양' 말고 반드시 알아야 할 다의어 4가지를 대시오", core: "1) 숫자·수치  2) 인물  3) 도표·그림  4) figure out: 알아내다", basic: "historical figure (역사적 인물) / figure out (이해하다)", note: "• 지문 출제 빈도 최상위 다의어" },
+      { id: "103", ch: "CH3", word: "account", mission: "'계좌' 말고 3가지 핵심 다의어와 숙어 2개를 대시오", core: "1) 설명·이야기  2) 중요성 (of no account)  3) account for: 차지하다·설명하다", basic: "take into account: 고려하다 / accountable: 책임이 있는", note: "• is of no account = 전혀 중요하지 않은 (= unimportant)" },
+      { id: "104", ch: "CH3", word: "edge", mission: "'모서리·가장자리' 말고 경쟁·비교 지문 속 다의어를 대시오", core: "우위, 장점, 유리함 (= advantage)", basic: "have an edge over: ~보다 우위에 있다 / leading edge: 최첨단", note: "• 칼날처럼 날카로운 경쟁 우위" },
+      { id: "105", ch: "CH3", word: "rewarding", mission: "'보상하는'의 형용사 rewarding의 방향성과 반의어를 대시오", core: "보람 있는, 가치 있는, 만족감을 주는 (+)", basic: "rewarding(+) ↔ demanding(힘든, 고된: -)", note: "• 대립쌍으로 함께 출제되는 핵심 감정 형용사" },
+      { id: "106", ch: "CH3", word: "substance / substantial", mission: "'물질' 말고 추상 다의어와 파생 형용사 substantial을 대시오", core: "substance: 실체, 본질 / substantial: 상당한, 실질적인", basic: "without substance (실체 없는) / substantial leap (상당한 도약)", note: "• substantial = significant, considerable" },
+      { id: "107", ch: "CH3", word: "original / originality", mission: "'원래의' 말고 예술·창의성 지문에서의 핵심 다의어를 대시오", core: "original: 독창적인, 참신한 (+) / originality: 독창성", basic: "imaginative and having new ideas (기존 것을 베끼지 않은 창조성)", note: "• original thinker: 독창적 사상가" },
+      { id: "108", ch: "CH3", word: "measure", mission: "'측정하다' 말고 정책·사회 지문 속 명사 다의어 뜻을 대시오", core: "조치, 대책, 정책 (= step, action)", basic: "take measures to: ~하기 위한 조치를 취하다 / preventative measure (예방 조치)", note: "• 동사(측정하다) vs 명사(조치·대책)" },
+      { id: "109", ch: "CH3", word: "address", mission: "'주소·연설' 말고 동사로 문제 목적어가 올 때의 뜻을 대시오", core: "(문제·상황을) 다루다, 처리하다, 해결하다 (= deal with, tackle)", basic: "address the problem: 문제를 다루고 해결하다", note: "• 독해에서 동사 address는 90% '문제를 다루다'" },
+      { id: "110", ch: "CH3", word: "represent", mission: "'대표하다' 말고 통계·묘사 지문 속 다의어 2가지를 대시오", core: "1) (비율·수치에) 해당하다  2) 표현하다, 기술하다", basic: "represents 20 percent: 20%에 해당하다", note: "• represent A as B: A를 B라고 묘사·간주하다" },
+      { id: "111", ch: "CH3", word: "compound", mission: "'화합물' 말고 동사로 쓰일 때의 방향성(-)과 뜻을 대시오", core: "(문제를) 악화시키다, 가중시키다 (= worsen, aggravate)", basic: "compound the difficulty: 어려움을 더욱 가중시키다", note: "• 여러 악재가 겹쳐 더 심각하게 만드는 마이너스 동사" },
+      { id: "112", ch: "CH3", word: "observe (observation vs observance)", mission: "observe의 2가지 뜻과 명사형 2개의 분기를 구분하시오", core: "1) 관찰하다 ➔ observation(관찰)  2) 준수하다 ➔ observance(준수·의식)", basic: "observe the law: 법을 준수하다", note: "• 명사형 철자에 따라 뜻이 완전히 갈리는 킬러 어휘" },
+      { id: "113", ch: "CH3", word: "anchor", mission: "'배의 닻' 말고 심리·사회 지문 속 동사 다의어 뜻을 대시오", core: "(단단히) 고정시키다, 뿌리박다, 기반을 두다", basic: "anchored in reality: 현실에 확고히 발을 딛고 고정된", note: "• 흔들리지 않게 닻을 내려 고정하는 이미지" },
+      { id: "114", ch: "CH3", word: "margin / marginal / marginalize", mission: "'여백'에서 파생된 marginal과 marginalize의 뜻을 대시오", core: "marginal: 미미한, 중요치 않은, 변두리의 / marginalize: 소외시키다", basic: "core(핵심)가 아닌 가장자리 ➔ marginal interest (미미한 관심)", note: "• 사회 약자를 변두리로 밀어내 '소외시키다(marginalize)'" },
+      { id: "115", ch: "CH3", word: "shallow", mission: "'물이 얕은' 말고 사람·생각에 쓰일 때의 방향성(-)과 뜻을 대시오", core: "얄팍한, 천박한, 피상적인 (-) (↔ deep, profound)", basic: "shallow analysis: 깊이 없는 피상적 분석", note: "• 진지한 사고가 결여된 부정적 형용사" },
+      { id: "116", ch: "CH3", word: "respect / respective / respectable", mission: "'존경' 말고 명사 속뜻과 파생 형용사 2개를 구분하시오", core: "respect: 점, 측면 (in this respect) / respective: 각각의 / respectable: 훌륭한", basic: "respective roles (각자의 역할) / respectable person (존경할 만한 사람)", note: "• respectively: 각각, 제각기" },
+      { id: "117", ch: "CH3", word: "property", mission: "'재산·부동산' 말고 과학·철학 지문 속 다의어 뜻을 대시오", core: "고유 특성, 속성 (= characteristic, attribute)", basic: "chemical properties: 화학적 특성·성질", note: "• 사물이 지닌 본질적 성질" },
+      { id: "118", ch: "CH3", word: "rough / roughly", mission: "'거친' 말고 수량·생각에 쓰일 때의 다의어 뜻을 대시오", core: "rough: 대략적인 (= approximate) / roughly: 대략, 거의", basic: "rough idea (대략적인 생각) / roughly 40% (대략 40%)", note: "• 정밀하지 않고 대충 어림잡은 이미지" },
+      { id: "119", ch: "CH3", word: "succeed (successive vs successful)", mission: "succeed의 2가지 뜻과 파생 형용사 2개를 구분하시오", core: "1) 성공하다 ➔ successful(성공적인)  2) 잇다 ➔ successive(연속적인)", basic: "fourth successive win: 4연속 우승", note: "• 철자 차이로 의미가 갈리는 단골 출제 어휘" },
+      { id: "120", ch: "CH3", word: "custom / customize", mission: "'관습'에서 파생된 동사 customize의 뜻을 대시오", core: "원하는 대로 만들다, 맞춤 제작하다", basic: "customized to individual needs: 개인의 필요에 맞춤 제작된", note: "• 고객 취향에 맞게 변형하는 이미지" },
+      { id: "121", ch: "CH3", word: "climate", mission: "'날씨·기후' 말고 사회·문화 지문 속 다의어 뜻을 대시오", core: "(특정 시기·사회의) 분위기, 풍조, 환경", basic: "climate of discussion (토론 분위기) / economic climate (경제 상황)", note: "• 눈에 보이지 않는 사회적 공기·분위기" },
+      { id: "122", ch: "CH3", word: "pitch", mission: "'공을 던지다' 말고 음악·음향 지문 속 다의어 뜻을 대시오", core: "음의 높낮이, 음고", basic: "pitch and rhythm: 음높이와 리듬", note: "• frequency(주파수)와 함께 음향 지문 단골" },
+      { id: "123", ch: "CH3", word: "cast", mission: "'던지다' 말고 추상 목적어가 올 때의 다의어 2가지를 대시오", core: "1) (그림자를) 드리우다  2) (의심을) 품게 하다", basic: "cast shadow (그림자를 드리우다) / cast doubt on (~에 의문을 제기하다)", note: "• 출연진(cast), 석고 깁스 뜻까지 포함" },
+      { id: "124", ch: "CH3", word: "score", mission: "'점수·득점' 말고 예술·수량 지문 속 다의어 2가지를 대시오", core: "1) 악보 (musical score)  2) 20개 (scores of = 수십의, 아주 많은)", basic: "a score of cars: 20대 정도의 차", note: "• 클래식 음악 지문에서 score는 100% '악보'" },
+      { id: "125", ch: "CH3", word: "integral vs integrity", mission: "integrate 파생어 2개의 핵심 뜻을 각각 대시오", core: "integral: 필수적인 (= essential) / integrity: 도덕적 진실성, 온전함", basic: "integral part (필수적 부분) / moral integrity (도덕적 청렴)", note: "• 둘 다 독해 빈출 최고급 어휘" },
+      { id: "126", ch: "CH3", word: "mark", mission: "'표시·흔적' 말고 동사로 쓰일 때의 다의어 뜻을 대시오", core: "특징짓다, 두드러지게 하다", basic: "be marked by: ~로 특징지어지다", note: "• 다른 대상과 구별되는 고유한 표식을 남기는 이미지" },
+      { id: "127", ch: "CH3", word: "condition", mission: "'상태·조건' 말고 동사로 쓰일 때의 심리학 다의어 뜻을 대시오", core: "길들이다, 훈련시키다, 조건화하다", basic: "conditioned to: ~하도록 길들여진 (파블로프의 개)", note: "• unconditional: 무조건적인 / precondition: 전제 조건" },
+      { id: "128", ch: "CH3", word: "minute", mission: "'분·순간' 말고 형용사 [mainjú:t]로 읽힐 때의 뜻을 대시오", core: "미세한, 극미량의 (= tiny)", basic: "minute amounts of chemicals: 극미량의 화학물질", note: "• examine in minute detail: 아주 미세한 부분까지 검토하다" },
+      { id: "129", ch: "CH3", word: "invariably", mission: "형용사 invariable의 부사형 invariably의 독해 뜻을 대시오", core: "언제나, 변함없이, 예외 없이 (= always, without exception)", basic: "독해에서 만나면 100% '항상'으로 직결", note: "• 변할 수 없는(invariable) ➔ 예외 없이 항상" },
+      { id: "130", ch: "CH3", word: "question", mission: "'질문·의문' 말고 동사로 쓰일 때의 다의어 뜻을 대시오", core: "의심하다, 의문을 제기하다 (= doubt, challenge)", basic: "question the validity: 타당성을 의심하다", note: "• 확정적 수용이 아닌 '불신·회의' 시그널" },
+      { id: "131", ch: "CH3", word: "immune", mission: "'면역성이 있는'의 추상적 확장 숙어 be immune to A의 뜻을 대시오", core: "A의 영향을 받지 않는, A에 흔들리지 않는", basic: "immune to criticism: 비판에 전혀 영향받지 않는", note: "• 질병뿐 아니라 외부 압력·비판에 대한 면역" },
+      { id: "132", ch: "CH3", word: "in light of / in this light", mission: "light가 '관점·측면'으로 쓰이는 두 숙어의 뜻을 대시오", core: "in light of: ~에 비추어 볼 때 / in this light: 이러한 관점에서", basic: "in this light = in this respect", note: "• 빛을 비추어 바라보는 각도(관점)" },
+      { id: "133", ch: "CH3", word: "sound", mission: "'소리' 말고 형용사 sound의 극찬(+) 다의어 뜻을 대시오", core: "건전한, 건강한, 타당한, 믿을 만한 (+)", basic: "sound argument (타당한 논증) / sound sleep (깊은 잠)", note: "• 결함 없이 튼튼하고 논리적인 긍정 형용사" },
+      { id: "134", ch: "CH3", word: "fine", mission: "'좋은·벌금' 말고 정밀·과학 지문 속 형용사 다의어 뜻을 대시오", core: "미세한, 섬세한, 정교한 (➔ refine: 정제하다)", basic: "fine detail (미세한 세부사항) / fine gold (순금)", note: "• 입자가 곱고 정밀한 이미지" },
+      { id: "135", ch: "CH3", word: "treat (vs treaty / retreat)", mission: "treat의 명사 속뜻과 혼동어 treaty, retreat를 구분하시오", core: "treat: [명] 한턱, 특별한 대접 / treaty: 조약 / retreat: 후퇴하다", basic: "It's my treat: 내가 한턱낼게", note: "• 철자 유사 혼동 주의" },
+      { id: "136", ch: "CH3", word: "authorize", mission: "author(권위자)에서 파생된 동사 authorize의 뜻을 대시오", core: "권한을 부여하다, 허가하다, 공인하다", basic: "authorized biography: 공인된 전기", note: "• 공식적 권한과 자격을 실어주는 동사" },
+      { id: "137", ch: "CH3", word: "mechanical", mission: "'기계의' 말고 태도·행동에 쓰일 때의 방향성(-)과 뜻을 대시오", core: "영혼 없는, 무감각한, 형식적인 (-)", basic: "mechanical answer: 진심이 담기지 않은 기계적 답변", note: "• 감정 없이 습관적으로 굴러가는 마이너스 뉘앙스" },
+      { id: "138", ch: "CH3", word: "code", mission: "'암호·부호' 말고 사회·법학 지문 속 다의어 뜻을 대시오", core: "(사회적) 관례, 행동 규범, 규칙, 법전", basic: "code of conduct (행동 규범) / penal code (형법전)", note: "• 사회 구성원이 지켜야 할 불문율·규칙" },
 
-      // === 124 ~ 147 ===
-      { id: "147", word: "other than A", core: "A 이외의, A를 제외하고 (= except)", basic: "A와 다른", note: "• nothing other than A = only A", tag: "예외 · 부정 숙어" },
-      { id: "146", word: "not so much A as B", core: "A라기보다는 B이다 (A 기각, B 강조)", basic: "A만큼 B는 아니다", note: "• B rather than A / not A but B 동일 (주제문 시그널)", tag: "주제문 강조 공식" },
-      { id: "145", word: "A is a product of B", core: "[원인 B ➔ 결과 A] A는 B의 산물이다", basic: "A는 B의 창조물이다", note: "• A is a function of B 동일", tag: "인과 귀속 공식" },
-      { id: "144", word: "at worst", core: "최악의 경우에는 (-)", basic: "가장 나빠도", note: "• 부정적 극단 상황 가정", tag: "극단 가정 숙어" },
-      { id: "143", word: "at best", core: "기껏해야, 잘해야 고작 (= only) (-)", basic: "최선의 상태에서", note: "• 대상의 한계를 깎아내리는 마이너스(-) 시그널", tag: "한계 비판 시그널" },
-      { id: "142", word: "it follows that S V", core: "따라서 ~라는 결론에 이른다 (주제문)", basic: "뒤이어 ~가 오다", note: "• 논리적 필연 결론 도출 시그널", tag: "결론 도출 시그널" },
-      { id: "141", word: "contribute to", core: "[원인 A ➔ 결과 B] A가 B의 원인이 되다", basic: "~에 공헌하다, 기여하다", note: "• 좋은 일뿐 아니라 'contribute to disease(질병의 원인이 되다)' 빈출", tag: "인과관계 동사" },
-      { id: "140", word: "turn sour", core: "(관계·일이) 틀어지다, 잘못되다 (-)", basic: "음식이 시어지다, 상하다", note: "• partnership turned sour: 동업 관계가 틀어졌다", tag: "비유 관용구" },
-      { id: "139", word: "be it A or B", core: "A이든 B이든 간에 (= whether it be A or B)", basic: "양보 도치 구문", note: "• whether 생략으로 동사 be가 문두로 도치됨", tag: "양보 도치 구문" },
-      { id: "138", word: "code", core: "행동 규범, 수칙, 관례, 법전", basic: "암호, 부호", note: "• code of conduct (행동 수칙) / penal code (형법전)", tag: "사회 · 법학 다의어" },
-      { id: "137", word: "mechanical", core: "영혼 없는, 무감각한, 형식적인 (-)", basic: "기계의, 기계적인", note: "• mechanical answer: 진심이 안 담긴 기계적 답변", tag: "방향성 (-) 어휘" },
-      { id: "136", word: "authorize", core: "권한을 부여하다, 공인하다, 허가하다", basic: "권위를 주다", note: "• authorized biography: 공인된 전기", tag: "권한 파생어" },
-      { id: "135-B", word: "treaty vs retreat", core: "treaty: 조약 / retreat: 후퇴하다", basic: "철자 혼동어", note: "• peace treaty (평화 조약) vs forced to retreat (후퇴하다)", tag: "철자 낚시" },
-      { id: "135-A", word: "treat", core: "[명사] 한턱, 특별한 대접, 간식", basic: "대우하다, 치료하다", note: "• It's my treat: 내가 한턱낼게", tag: "명사 속뜻" },
-      { id: "134", word: "fine", core: "[형용사] 미세한, 정밀한, 섬세한", basic: "좋은; 벌금", note: "• fine detail (미세한 세부사항) ➔ refine (정제하다)", tag: "다의어 속뜻" },
-      { id: "133", word: "sound", core: "[형용사] 건전한, 타당한, 믿을 만한 (+)", basic: "소리; 소리가 나다", note: "• sound argument (타당한 논증) / sound sleep (깊은 잠)", tag: "형용사 극찬 (+)" },
-      { id: "132", word: "in light of", core: "~에 비추어 볼 때, ~을 고려하여", basic: "~의 빛 속에서", note: "• in this light: 이러한 관점(측면)에서 볼 때", tag: "관점 숙어" },
-      { id: "131", word: "immune", core: "be immune to A: A에 영향을 받지 않는", basic: "면역성이 있는", note: "• immune to criticism: 비판에 전혀 흔들리지 않는", tag: "영향 면역 속뜻" },
-      { id: "130", word: "question", core: "[동사] 의심하다, 이의를 제기하다 (= doubt)", basic: "질문, 의문", note: "• question the validity: 타당성을 의심하다", tag: "동사 불신 시그널" },
-      { id: "129", word: "invariably", core: "언제나, 예외 없이 (= always)", basic: "변함없이", note: "• 독해에서 만나면 100% '항상'으로 직결", tag: "100% 항상 시그널" },
-      { id: "128", word: "minute", core: "[mainjú:t] 미세한, 극미량의 (= tiny)", basic: "[mínit] 분, 순간", note: "• minute amounts of chemicals: 극미량의 화학물질", tag: "발음·품사 분기" },
-      { id: "127", word: "condition", core: "[동사] 길들이다, 훈련시키다, 조건화하다", basic: "상태, 조건", note: "• conditioned to: ~하도록 길들여진 (파블로프의 개)", tag: "심리 조건화 동사" },
-      { id: "126", word: "mark", core: "[동사] 특징짓다, 두드러지게 하다", basic: "표시, 흔적", note: "• be marked by: ~로 특징지어지다", tag: "동사 특징화" },
-      { id: "125-B", word: "integral", core: "필수적인, 필요불가결한 (= essential)", basic: "내장된, 통합된", note: "• integral part of: ~의 없어서는 안 될 핵심 부분", tag: "필수 형용사" },
-      { id: "125-A", word: "integrity", core: "도덕적 진실성, 청렴; 온전함", basic: "통합성", note: "• moral integrity (도덕적 청렴) / territorial integrity (영토 보전)", tag: "윤리 · 철학 명사" },
-      { id: "124", word: "score", core: "1) 악보 (musical score)  2) 20개", basic: "득점, 점수", note: "• scores of: 수십의, 아주 많은 (= dozens of)", tag: "음악 · 수량 다의어" },
+      // === CH.04 반드시 알아야 할 숙어 & 논리 구문 (139~188) ===
+      { id: "139", ch: "CH4", word: "be it A or B", mission: "가정법 도치 구문의 정확한 해석과 기능을 대시오", core: "A이든 B이든 간에 (= whether it be A or B)", basic: "whether 생략으로 동사 be가 문두로 도치된 양보 구문", note: "• 조건에 상관없이 보편적으로 적용됨을 강조" },
+      { id: "140", ch: "CH4", word: "turn sour", mission: "'음식이 상하다'에서 확장된 관용구 뜻을 대시오", core: "(관계·일이) 틀어지다, 못쓰게 되다 (-)", basic: "things turn sour: 상황이 나쁘게 틀어지다", note: "• 우유가 시어지듯 좋은 관계가 망가지는 비유" },
+      { id: "141", ch: "CH4", word: "A contribute to B", mission: "단순 '기여하다'를 넘어 독해에서 잡아야 할 인과 도식을 대시오", core: "[원인 A ➔ 결과 B] A가 B의 원인이 되다", basic: "좋은 기여뿐 아니라 'contribute to disease(질병의 원인이 되다)' 빈출", note: "• 인과관계 파악의 핵심 동사" },
+      { id: "142", ch: "CH4", word: "it follows that S V", mission: "독해에서 이 구문이 등장할 때의 논리적 역할을 대시오", core: "따라서 ~라는 결론에 이른다 (필자의 논리적 결론 시그널!)", basic: "앞선 전제들로부터 필연적으로 도출되는 귀결", note: "• 주제문·요지 파악의 결정적 단서" },
+      { id: "143", ch: "CH4", word: "at best / at most", mission: "칭찬이 아닌 필자의 마이너스(-) 시각 시그널 뜻을 대시오", core: "기껏해야, 잘해야 고작 (= only) (-)", basic: "대상의 한계를 깎아내리는 비판적 시그널", note: "• at the best(최상의 상태에서: +)와 관사 유무 구별!" },
+      { id: "144", ch: "CH4", word: "at (the) worst", mission: "at best와 대조되는 극단 가정 숙어의 뜻을 대시오", core: "최악의 경우에는 (-)", basic: "가장 나쁜 상황까지 가정할 때 사용", note: "• 부정적 극단 시나리오 제시" },
+      { id: "145", ch: "CH4", word: "A is a product of B", mission: "A와 B 사이의 인과 화살표 방향을 대시오", core: "[원인 B ➔ 결과 A] A는 B의 산물·결과물이다", basic: "A is a creation / function of B 동일 구조", note: "• A가 혼자 생긴 게 아니라 B라는 원인에서 비롯됨" },
+      { id: "146", ch: "CH4", word: "not so much A as B", mission: "A와 B 중 필자가 기각하는 것과 강조하는 것을 구분하시오", core: "A라기보다는 B이다 (A 기각, B 강조 = 주제문!)", basic: "B rather than A / not A but B 동일 공식", note: "• 평가원 주제문 강조 공식 1순위" },
+      { id: "147", ch: "CH4", word: "other than A", mission: "except와 같은 기능을 하는 부정·예외 숙어의 뜻을 대시오", core: "A 이외의, A를 제외하고 (= except)", basic: "nothing other than A = only A", note: "• A를 배제하고 나머지를 가리킬 때 빈출" },
+      { id: "148", ch: "CH4", word: "not A until B", mission: "사건 A와 B의 시간 선후 순서와 문법 도치 공식을 대시오", core: "B하고 나서야 비로소 A하다 (시간 순서: B ➔ A)", basic: "Not until B did A... (공무원 부정어 도치 0순위)", note: "• A와 B의 순서를 뒤집어 출제하는 함정 주의" },
+      { id: "149", ch: "CH4", word: "removed from A", mission: "'제거된'이 아닌 거리·단절 숙어의 뜻을 대시오", core: "A로부터 멀리 떨어진, 동떨어진", basic: "far removed from reality: 현실과 거리가 아주 먼", note: "• 물리적·추상적 단절 표현" },
+      { id: "150", ch: "CH4", word: "A is a window into B", mission: "비유 구문에서 A가 B에 대해 갖는 역할을 대시오", core: "A를 통해 B의 내막을 들여다볼 수 있다 (A = 통찰의 도구)", basic: "A offers a window into B", note: "• 현상 A를 분석해 본질 B를 파악함" },
+      { id: "151", ch: "CH4", word: "attend to", mission: "타동사 attend(참석하다)와 다른 자동사+전치사 뜻을 대시오", core: "1) 주의를 기울이다  2) (용무·환자를) 처리하다, 돌보다", basic: "attend the meeting (참석) vs attend to business (업무 처리)", note: "• 공무원 전치사 문법 단골 출제" },
+      { id: "152", ch: "CH4", word: "aside from A", mission: "순서배열·문장삽입에서 이 숙어가 수행하는 논리 기능을 대시오", core: "A는 별개로 하고, A 외에도 (= apart from)", basic: "앞선 A 이야기는 마무리하고 B라는 새 화제로 전환하는 시그널", note: "• 글의 흐름이 전환되는 경계선 역할" },
+      { id: "153", ch: "CH4", word: "confuse A with B", mission: "필자가 대중의 논리적 오류를 지적할 때 쓰는 뜻을 대시오", core: "A와 B를 구별 못 하고 혼동하다 (A ≠ B인데 착각함)", basic: "실제 진실은 A와 B가 엄연히 다름을 전제", note: "• 대중의 착각을 비판할 때 빈출" },
+      { id: "154", ch: "CH4", word: "be programmed to V", mission: "'프로그램 되다'의 생물·심리 지문 속 숨은 뜻을 대시오", core: "선천적으로 타고나다, 내재되다 (= innate, hardwired)", basic: "후천적 학습이 아닌 유전적·본능적 설계", note: "• innate, inborn과 동일한 선천성 시그널" },
+      { id: "155", ch: "CH4", word: "distinction between A and B", mission: "지문 초반에 이 표현이 뜰 때 글의 전개 방식을 대시오", core: "A와 B의 명확한 차이·대립 선언 (A ↔ B 대조 전개)", basic: "gap between A and B 동일 구조", note: "• 두 개념을 칼같이 나누어 비교·대조함" },
+      { id: "156", ch: "CH4", word: "A is to B as C is to D", mission: "독해 논리 완성의 비례 유추 공식을 해석하시오", core: "A와 B의 관계는 C와 D의 관계와 같다 (A:B = C:D)", basic: "What A is to B, C is to D 동일 도식", note: "• 추상적 개념을 쉬운 비유로 설명할 때 사용" },
+      { id: "157", ch: "CH4", word: "as 형용사 as (문두 도치)", mission: "문두에 형용사+as가 도치될 때의 접속사 뜻을 대시오", core: "비록 ~일지라도 (양보 ➔ 뒤에 반전 예고!)", basic: "Important as it is = Although it is important", note: "• 동등 비교가 아닌 양보 도치 구문" },
+      { id: "158", ch: "CH4", word: "even so", mission: "앞 문장을 인정한 뒤 흐름을 뒤집는 연결어 뜻을 대시오", core: "그렇기는 하지만, 그럼에도 불구하고 (= nevertheless)", basic: "역접 접속부사 빈칸 채우기 단골", note: "• 앞 내용을 수긍하면서도 반론 제기" },
+      { id: "159", ch: "CH4", word: "replace A with B (vs substitute)", mission: "사라지는 것과 남는 것, 그리고 substitute와의 전치사 차이를 대시오", core: "기존 A는 버리고(X) 새 B로 갈아치우다(O)", basic: "substitute B for A (전치사 with vs for 공무원 문법 0순위!)", note: "• 방향이 완전히 반대인 전치사 낚시 주의" },
+      { id: "160", ch: "CH4", word: "be absorbed in A", mission: "'흡수되다'에서 확장된 몰입 숙어의 뜻을 대시오", core: "A에 푹 빠지다, 몰두하다 (= be occupied with A)", basic: "정신이 온통 A에 쏠려 있는 상태", note: "• immersed in, engrossed in과 동의어" },
+      { id: "174", ch: "CH4", word: "take over", mission: "권력·업무·기업 지문에서의 핵심 숙어 뜻을 대시오", core: "인계받다, 장악하다, 인수하다", basic: "takeover (명사): 기업 인수, 권력 장악", note: "• 주도권이 넘어가는 상황 표현" },
+      { id: "175", ch: "CH4", word: "give rise to", mission: "소재 A와 B 사이의 인과 화살표 방향을 대시오", core: "[원인 A ➔ 결과 B] (결과를) 일으키다, 야기하다 (= cause)", basic: "give rise to emotion: 감정을 불러일으키다", note: "• 인과관계를 한눈에 보여주는 핵심 숙어" },
+      { id: "176", ch: "CH4", word: "take place", mission: "뜻과 문법적 주의사항, 그리고 혼동 숙어를 대시오", core: "발생하다, 일어나다 (= happen, 수동태 불가!)", basic: "take the place of (~을 대신하다)와 구별 필수", note: "• 자동사 표현이므로 be taken place는 무조건 오답" },
+      { id: "177", ch: "CH4", word: "lay off", mission: "다의어 숙어 lay off의 2가지 핵심 뜻을 대시오", core: "1) ~을 그만두다, 중단하다  2) (직원을) 해고하다", basic: "layoff (붙여 쓰면 명사): 정리해고", note: "• 경제·노동 지문에서 정리해고로 빈출" },
+      { id: "178", ch: "CH4", word: "nothing but A", mission: "but이 except(제외)로 쓰인 강조 관용구 뜻을 대시오", core: "오직 A만 (= only A)", basic: "A를 제외하고는 아무것도 없음 ➔ 결국 A뿐임", note: "• anything but A (결코 A가 아닌)와 구별!" },
+      { id: "179", ch: "CH4", word: "rule out", mission: "추론·과학 지문에서 가능성을 차단하는 숙어 뜻을 대시오", core: "제외하다, 배제하다, 불가능하게 하다 (= exclude)", basic: "rule out the possibility: 가능성을 완전히 배제하다", note: "• 소거법으로 오답을 지울 때 쓰이는 표현" },
+      { id: "180", ch: "CH4", word: "in V-ing", mission: "독해 연결 고리로 빈출되는 전치사 관용구 뜻을 대시오", core: "~할 때, ~함에 있어서", basic: "in doing so: 그렇게 할 때", note: "• 행위의 상황·조건을 간결하게 제시" },
+      { id: "181", ch: "CH4", word: "deal with", mission: "문제·과제 목적어가 올 때의 핵심 뜻을 대시오", core: "(문제를) 다루다, 처리하다, 해결하다 (= solve, cope with)", basic: "deal with stress: 스트레스에 대처하고 해결하다", note: "• 가장 기본적이면서도 빈출되는 해결 동사" },
+      { id: "182", ch: "CH4", word: "rob A of B", mission: "박탈 동사 구문의 전치사와 동의어 2개를 대시오", core: "A에게서 B를 빼앗다, 박탈하다 (전치사 of 필수!)", basic: "strip A of B / deprive A of B 동일 구조", note: "• robbed the team of victory: 팀에게서 승리를 빼앗았다" },
+      { id: "183", ch: "CH4", word: "cannot but + 동사원형", mission: "이중 부정 관용 구문의 뜻과 동의 표현을 대시오", core: "~하지 않을 수 없다 (= cannot help + -ing)", basic: "cannot help but + 동사원형 동일", note: "• 필연적 행동·감정을 강조" },
+      { id: "184", ch: "CH4", word: "give away", mission: "'거저 주다' 외에 반드시 암기할 두 번째 뜻을 대시오", core: "1) 거저 주다  2) (비밀·정체를) 누설하다, 폭로하다", basic: "give away a secret: 비밀을 무심코 폭로하다", note: "• 스릴러·심리 지문에서 정체 탄로 뜻으로 빈출" },
+      { id: "185", ch: "CH4", word: "It is (not) that S V", mission: "강조구문과 구별되는 이 구문의 정확한 뜻을 대시오", core: "~때문이다 / ~때문이 아니다 (이유 설명 구문)", basic: "It과 that 사이에 아무것도 없는 것이 특징", note: "• 최근 기출에 매우 자주 등장하는 이유 제시 구문" },
+      { id: "186", ch: "CH4", word: "This is not to say that A", mission: "이 문장 뒤에 반드시 이어질 논리 전개와 빈칸 위치를 대시오", core: "그것이 A라는 뜻은 아니다 (양보 ➔ 뒤에 But/Rather 반전!)", basic: "상대방의 오해를 먼저 차단(양보)한 뒤 진짜 핵심 주장 제시", note: "• 빈칸추론 출제 1순위 논리 패턴" },
+      { id: "187", ch: "CH4", word: "boil down to A", mission: "V자 깔때기 도식으로 요약되는 숙어 3총사의 뜻을 대시오", core: "결국 A로 요약·수렴되다 (= narrow down to A, be reduced to A)", basic: "복잡한 여러 갈래가 핵심 본질 A 하나로 좁혀짐", note: "• 글의 결론·요지를 압축하는 시그널" },
+      { id: "188", ch: "CH4", word: "A give way to B", mission: "A와 B 중 쇠퇴하는 것(↓)과 부상하는 것(↑)을 판별하시오", core: "A가 B에게 밀려 대체되다 (A↓, B↑)", basic: "구세대 A는 저물고 신세대 B가 주류로 자리 잡음", note: "• 세대교체·패러다임 전환의 절대 공식" },
 
-      // === 084 ~ 102 ===
-      { id: "102", word: "figure", core: "1) 수치  2) 인물  3) 도표  4) 알아내다", basic: "모양, 형태", note: "• historical figure (역사적 인물) / figure out (이해하다)", tag: "다의어 총집합" },
-      { id: "101-B", word: "agency", core: "[철학/사회] 주체적 행위 능력, 주체성", basic: "대행사, 정부 기관", note: "• human agency: 환경에 휘둘리지 않는 인간의 주체성", tag: "철학 핵심 개념" },
-      { id: "101-A", word: "agent", core: "주체적 행위자, 행동 주체", basic: "대리인, 요원", note: "• moral agent: 도덕적 행위 주체", tag: "철학 행위자" },
-      { id: "100", word: "register", core: "1) (감정을) 나타내다  2) 인식되다, 기억하다", basic: "등록하다", note: "• It didn't register: 머릿속에 전혀 인식되지 않았다", tag: "심리 · 표현 속뜻" },
-      { id: "099", word: "contract", core: "1) 수축하다, 줄어들다  2) (병에) 걸리다", basic: "계약(서); 계약하다", note: "• expand or contract (팽창/수축) / contract flu (독감에 걸리다)", tag: "과학 · 의학 다의어" },
-      { id: "098", word: "cell", core: "1) 독방, 감방  2) (차량) 승객실", basic: "세포", note: "• prison cell (독방) / passenger cell (승객실)", tag: "공간 다의어" },
-      { id: "097", word: "chemistry", core: "(사람 사이의) 교감, 궁합, 끌림", basic: "화학", note: "• good chemistry between us: 우리 사이의 좋은 케미/교감", tag: "비유 속뜻" },
-      { id: "096", word: "positive", core: "1) (검사 결과) 양성의  2) 적극적인  3) 확신하는", basic: "긍정적인", note: "• positive test (양성 반응: 병 있음!) ↔ negative (음성)", tag: "의학 · 태도 다의어" },
-      { id: "095", word: "inquire", core: "inquiry: 학술적 연구, 탐구, 조사", basic: "물어보다, 질문하다", note: "• scientific inquiry: 과학적 탐구", tag: "학술 탐구 어휘" },
-      { id: "094", word: "case", core: "1) the case: 사실, 진실  2) make the case: 주장하다", basic: "경우, 사례, 소송", note: "• That is not the case: 그것은 사실이 아니다", tag: "진실 · 주장 시그널" },
-      { id: "093", word: "count", core: "[자동사] 중요하다, 가치가 있다 (= matter)", basic: "수를 세다", note: "• count on (믿다) / count A as B (A를 B로 간주하다)", tag: "중요성 동사" },
-      { id: "092", word: "frequency", core: "[물리/음향] 주파수, 진동수", basic: "빈도, 잦음", note: "• high frequency: 고주파 (높은 음)", tag: "물리 · 음향 다의어" },
-      { id: "091", word: "credit", core: "be credited to B: B의 공로로 인정되다", basic: "신용, 외상", note: "• take credit for: ~에 대한 공로를 차지하다", tag: "공로 귀속 공식" },
-      { id: "090", word: "exceptional", core: "이례적일 정도로 뛰어난, 탁월한 (+)", basic: "예외적인", note: "• exceptional talent: 천재적이고 탁월한 재능 (= outstanding)", tag: "극찬 (+) 형용사" },
-      { id: "089", word: "appreciate", core: "진가를 인정하다, 감사하다, 감상하다, 인식하다", basic: "높이 평가하다", note: "• (가치가) 오르다 뜻까지 5대 의미 완비", tag: "5대 다의어" },
-      { id: "088", word: "relevant", core: "유의미한, 대단히 중요한, 적절한", basic: "관련 있는", note: "• irrelevant: 무관한, 중요치 않은 (-)", tag: "중요성 형용사" },
-      { id: "087", word: "break", core: "break the news: (안 좋은) 소식을 알리다", basic: "깨지다, 부수다", note: "• break it to you: 너에게 그 소식을 전하다", tag: "관용구 속뜻" },
-      { id: "086", word: "context", core: "어떤 사건과 연관된 구체적 '상황(situation)'", basic: "맥락, 문맥", note: "• cultural context: 문화적 배경/상황", tag: "독해 본질 개념" },
-      { id: "085", word: "dispute", core: "undisputed: 반박 여지가 없는, 자타공인 인정하는", basic: "분쟁, 논란; 반박하다", note: "• undisputed champion: 모두가 인정하는 챔피언", tag: "파생 반전 킬러" },
-      { id: "084", word: "settle", core: "[타동사] (분쟁·문제를) 해결하다 (= solve)", basic: "정착하다", note: "• settle disputes: 분쟁을 해결하다", tag: "타동사 해결 속뜻" },
-
-      // === 070 ~ 083 ===
-      { id: "083", word: "colony", core: "[생물학] (곤충·동물·세균의) 군집, 무리", basic: "식민지", note: "• bee colony (꿀벌 무리) / bacterial colony (세균 군락)", tag: "생물 지문 다의어" },
-      { id: "082", word: "engage", core: "engage in: 참여하다 / engaging: 매력적인", basic: "(관심을) 사로잡다", note: "• an engaging story: 흥미진진하고 매력적인 이야기", tag: "파생 형용사 주의" },
-      { id: "081", word: "grant", core: "1) take for granted: 당연시하다  2) Granted ~: 인정하지만", basic: "승인하다, 주다; 보조금", note: "• 문두 Granted는 양보 후 역접(But) 예고 시그널", tag: "양보 반전 구문" },
-      { id: "080", word: "scarce", core: "부족한, 희소한 (scarcity: 희소성)", basic: "드문", note: "• scarcely: 거의 ~않다 (= hardly, 부사 구별!)", tag: "경제 핵심 어휘" },
-      { id: "079", word: "virtual", core: "1) 사실상의 (virtually: 거의)  2) 가상의", basic: "실질적인", note: "• virtually impossible: 사실상 불가능한", tag: "문맥 대립 다의어" },
-      { id: "078", word: "celebrity", core: "[불가산] 명성 (= fame)", basic: "유명인사, 연예인", note: "• live a life of celebrity: 명성의 삶을 살다", tag: "추상명사 전환" },
-      { id: "077", word: "flavor", core: "고유한 특징, 특색 (= distinctive quality)", basic: "풍미, 맛", note: "• add an American flavor: 미국적 특색을 더하다", tag: "비유 속뜻" },
-      { id: "076", word: "vehicle", core: "(목적 달성을 위한) 수단, 매개체", basic: "차량, 탈것", note: "• A as the vehicle for B: B를 이루기 위한 수단 A", tag: "상징적 매개체" },
-      { id: "075", word: "contain", core: "(감정·적대감·전염병을) 억제하다, 참다", basic: "포함하다, 함유하다", note: "• contain the outbreak: 전염병 확산을 억제하다", tag: "억제 · 통제 속뜻" },
-      { id: "074", word: "rate", core: "[동사] 등급을 매기다, 평가하다 (= assess)", basic: "비율, 요금, 속도", note: "• at a rapid rate: 빠른 속도로", tag: "동사 평가 속뜻" },
-      { id: "073", word: "motor", core: "[의학/신경] 운동의, 근육 운동 신경의", basic: "모터, 자동차", note: "• motor skills: 운동 기능 / motor system: 운동 신경계", tag: "신경과학 다의어" },
-      { id: "072", word: "game", core: "[수렵/인류] 사냥감 (야생 동물)", basic: "게임, 경기", note: "• large game: 대형 사냥감 (사슴, 곰 등)", tag: "사전 끝 숨은 뜻" },
-      { id: "071", word: "instead", core: "Instead of A, B: A는 버리고(X) B를 취함(O)", basic: "대신에", note: "• 앞 문장의 부정적 상황을 뒤집는 대조 시그널", tag: "대조 전환 시그널" },
-      { id: "070", word: "rather", core: "not A, rather B: A가 아니라 오히려 B (주제문)", basic: "꽤, 약간; 오히려", note: "• A rather than B = B가 아니라 A", tag: "주제문 시그널" },
-
-      // === 040 ~ 069 ===
-      { id: "069", word: "provided (that)", core: "[접속사] 만약 ~라면 (= If)", basic: "제공하다", note: "• 문두에 나오면 100% 조건절 If", tag: "조건 접속사 킬러" },
-      { id: "068", word: "scale", core: "1) 축척  2) 저울  3) 물고기 비늘(을 벗기다)", basic: "규모, 범위", note: "• scale of justice (정의의 저울) / 1:25,000 scale (축척)", tag: "다의어 총집합" },
-      { id: "067", word: "consequential", core: "중대한, 대단히 중요한 (= important)", basic: "결과의", note: "• of no consequence: 전혀 중요하지 않은", tag: "중요성 형용사" },
-      { id: "066", word: "demanding", core: "힘든, 고된, 까다로운 (-)", basic: "요구하는", note: "• rewarding(보람 있는: +)과 정반대 대립쌍", tag: "방향성 (-) 어휘" },
-      { id: "065", word: "contemporaries", core: "[복수명사] 동시대인들, 동년배", basic: "현대의, 동시대의", note: "• ignored by his contemporaries: 동시대인들에게 외면받은", tag: "명사 전환 주의" },
-      { id: "064", word: "be subject to A", core: "A의 영향을 받기 쉬운, A를 받아야 하는", basic: "주제, 피험자", note: "• subject to change: 변경될 수 있는", tag: "빈출 숙어 킬러" },
-      { id: "063", word: "claim", core: "1) 목숨을 앗아가다  2) 차지하다", basic: "주장하다", note: "• The crash claimed three lives: 사고가 3명의 목숨을 앗아갔다", tag: "평가원 킬러 속뜻" },
-      { id: "062-B", word: "means", core: "수단, 방법, 재산", basic: "의미하다", note: "• means of survival: 생존 수단", tag: "수단 명사" },
-      { id: "062-A", word: "mean", core: "[형용사] 못된, 비열한 / [명사] 평균", basic: "의미하다", note: "• Regression to the mean: 평균으로의 회귀", tag: "다의어 분기" },
-      { id: "061-B", word: "odds", core: "1) 가능성, 확률  2) 고난, 역경", basic: "odd: 이상한, 홀수의", note: "• against all odds: 모든 역경을 딛고", tag: "평가원 시그니처" },
-      { id: "060", word: "even vs uneven", core: "even: 평평한, 균등한, 짝수의 / uneven: 불균등한", basic: "심지어", note: "• at an even pace: 일정한 속도로", tag: "반의어 대립쌍" },
-      { id: "059", word: "established", core: "확실히 자리 잡은, 공인된, 저명한", basic: "설립하다", note: "• established scholars: 저명한 학자들", tag: "형용사 속뜻" },
-      { id: "058", word: "initiate", core: "개시하다 / initiative: 진취성, 주도권, 계획", basic: "시작하다", note: "• take the initiative: 주도권을 잡다", tag: "파생 명사 킬러" },
-      { id: "057", word: "mobilize", core: "(특정 행동을 위해) 가동하다, 준비시키다", basic: "동원하다", note: "• mobilized to produce cells: 세포 생성을 위해 작동되다", tag: "생물·사회 확장" },
-      { id: "056", word: "counterpart", core: "동등한 지위·기능의 대응 상대방 (Same/Similar)", basic: "상응하는 것", note: "• 반대(counter)가 아니라 동격의 대응 상대!", tag: "오해 방지 1순위" },
-      { id: "055", word: "reconsider", core: "기존 결정을 바꿀 가능성을 두고 재고하다", basic: "다시 생각하다", note: "• in order to change a decision (변화·번복 시그널)", tag: "영영 코어 뉘앙스" },
-      { id: "054", word: "identify with A", core: "A와 자신을 동일시하다", basic: "식별하다", note: "• national identity: 국가 정체성", tag: "전치사 결합 속뜻" },
-      { id: "053", word: "orient", core: "A-oriented: A 지향적인 / disorient: 길을 잃게 하다", basic: "지향하게 하다, 적응하다", note: "• process-oriented: 과정 지향적인", tag: "접사 파생 어휘" },
-      { id: "052", word: "seize vs siege", core: "seize: (기회를) 꽉 잡다 / siege: 포위 작전", basic: "움켜쥐다", note: "• seize the day (지금 이 순간을 잡아라)", tag: "철자 혼동어" },
-      { id: "051", word: "displace", core: "밀어내고 대체하다, (난민 등을) 쫓아내다", basic: "옮겨 놓다", note: "• displaced workers: 일자리를 잃고 쫓겨난 노동자", tag: "어원 분해 어휘" },
-      { id: "050", word: "static", core: "움직임 없이 고정된(정적인); (오디오) 잡음", basic: "정적인", note: "• static condition: 변화 없는 고정 상태", tag: "과학 · 음향 다의어" },
-      { id: "049", word: "mere", core: "깔봄(겨우) ➔ 그 사소한 것 하나만으로도 큰 영향", basic: "겨우 ~의, 단순한", note: "• His mere presence: 단지 그가 거기 있었다는 사실만으로도", tag: "반전 트리거" },
-      { id: "048", word: "presume", core: "확실한 증거 없이 ~일 것이라 추정/간주하다", basic: "추정하다", note: "• presumed innocent: 무죄로 추정되는", tag: "추정 동사" },
-      { id: "047", word: "prescribe", core: "1) (약을) 처방하다  2) (법·규칙이) 규정하다", basic: "처방하다", note: "• culturally prescribed: 문화적으로 규정된", tag: "다의어 속뜻" },
-      { id: "046", word: "exclusive", core: "독점적인, 배타적인 (exclusively: 오로지)", basic: "전용의", note: "• almost exclusively: 거의 오로지 ~만 (= only)", tag: "독점 · 배타 어휘" },
-      { id: "045", word: "biology", core: "상징적 속뜻: 타고남, 선천적, 유전적", basic: "생물학", note: "• 선천성 7패밀리: biology, infant, inborn, innate, gene, DNA, hardwire", tag: "선천성 시그널" },
-      { id: "044", word: "compromise", core: "(-) 굽히다, 양보하다, 훼손시키다, 위태롭게 하다", basic: "타협하다", note: "• compromise their identity: 정체성을 훼손하다 (negotiate와 구별)", tag: "방향성 (-) 어휘" },
-      { id: "043", word: "assume", core: "사실이 아닐 수도 있는 것을 가정하다 (반전 예고)", basic: "가정하다, 추정하다", note: "• assume responsibility: 책임을 떠맡다", tag: "통념 반전 예고" },
-      { id: "042", word: "paradox", core: "겉보기엔 모순이나 깊이 보면 진실인 역설", basic: "역설, 패러독스", note: "• (+)와 (-)가 동시에 양립하는 논리적 모순", tag: "역설 논리" },
-      { id: "041", word: "irony", core: "예상과 정반대로 뒤틀리는 상황 모순 [(+) ➔ (-)]", basic: "아이러니", note: "• 안전장치가 오히려 사고를 부르는 역설적 상황", tag: "상황 반전 모순" },
-      { id: "040", word: "existing", core: "새로운 혁신 이전의 '기존의 구태의연한'", basic: "존재하는", note: "• existing paradigms(기존 틀) ↔ novel theory(새 이론)", tag: "대립쌍 시그널" },
-
-      // === 001 ~ 039 ===
-      { id: "039", word: "tolerate", core: "1) 마지못해 용인하다  2) (의학) 독성을 견뎌내다", basic: "참다, 견디다", note: "• tolerance (관용; 내성) / intolerance (불관용; 과민증)", tag: "소극적 수용 · 내성" },
-      { id: "038", word: "bother", core: "[부정문/의문문] 굳이 애써 신경 쓰다, 수고를 들이다", basic: "괴롭히다, 귀찮게 하다", note: "• Don't bother to ask: 굳이 애써 물어볼 필요 없다", tag: "관용 속뜻" },
-      { id: "037", word: "faithful", core: "원본을 왜곡 없이 그대로 재현한 (= accurate)", basic: "충실한, 신의 있는", note: "• a faithful replica: 원본에 철저히 충실한 복제품", tag: "영영 코어 뉘앙스" },
-      { id: "036", word: "adjust", core: "오차를 바로잡기 위해 미세하게 조정하다", basic: "조정하다, 적응하다", note: "• adjust parameters: 수치를 정밀하게 보정하다", tag: "미세 조정 동사" },
-      { id: "035", word: "adapt", core: "1) 환경에 적응하다  2) (원작을) 각색하다", basic: "맞추다, 적응하다", note: "• adapt a novel for screen: 소설을 영화로 각색하다", tag: "적응 · 각색 다의어" },
-      { id: "034", word: "adopt", core: "원래 없던 새로운 제도·생각을 받아들여 채택하다", basic: "입양하다, 채택하다", note: "• adapt(적응/각색)와 철자 혼동 주의!", tag: "채택 · 획득 논리" },
-      { id: "033", word: "suspect vs doubt", core: "suspect: ~일 거라 추정(+) / doubt: ~가 아닐 거라 불신(-)", basic: "의심하다", note: "• I suspect he is guilty (범인 같아!) vs I doubt it (아닐 걸?)", tag: "평가원 시그니처" },
-      { id: "032", word: "develop", core: "(질병·결함·나쁜 것이) 생겨나다, 발현되다", basic: "개발하다, 발전하다", note: "• develop symptoms: 증상이 생겨나다", tag: "부정적 발현 속뜻" },
-      { id: "031", word: "fascinate vs tempt", core: "fascinate: 매혹하다(+) / tempt: (나쁜 길로) 유혹하다(-)", basic: "유혹하다", note: "• fascinated by art (+) vs tempted to cheat (-)", tag: "방향성 (+/-) 대조" },
-      { id: "030", word: "yield", core: "1) yield A: 산출하다  2) yield to A: 굴복·양보하다", basic: "생산하다, 양보하다", note: "• 전치사 to가 붙으면 '압력에 무릎 꿇고 항복하다'", tag: "전치사 급변 동사" },
-      { id: "029", word: "submit", core: "submit to A: A에게 굴복하다, 항복하다 (-)", basic: "제출하다", note: "• submit A (제출) vs submit to A (항복/복종)", tag: "전치사 급변 동사" },
-      { id: "028", word: "optional", core: "필수가 아닌, 해도 그만인, 부차적인", basic: "선택적인", note: "• mandatory(필수적인) ↔ optional(비필수적·부차적)", tag: "비필수 시그널" },
-      { id: "027", word: "manipulate", core: "교묘하고 부정한 방식으로 여론·데이터를 조작하다 (-)", basic: "조종하다, 다루다", note: "• manipulate statistics: 통계를 입맛대로 조작하다", tag: "방향성 (-) 어휘" },
-      { id: "026", word: "incidental", core: "핵심이 아닌 곁다리의, 부수적인 (= secondary)", basic: "우발적인", note: "• incident(사건)의 파생형: 본질이 아닌 부수적 부산물", tag: "부차적 요소 어휘" },
-      { id: "025", word: "informed", core: "정확한 지식과 정보에 근거한, 현명한", basic: "inform: 알리다", note: "• an informed decision: 데이터에 근거한 현명한 결정", tag: "분사 형용사 킬러" },
-      { id: "024", word: "weigh", core: "손익을 저울질하다, 깊이 숙고하다 (= ponder)", basic: "무게를 달다", note: "• weigh options: 선택지들을 신중히 저울질하다", tag: "심사숙고 동사" },
-      { id: "023", word: "alien", core: "본성에 맞지 않는 이질적인, 낯선 (alienate: 소외시키다)", basic: "외계인, 외국인", note: "• alien to human nature: 인간 본성에 낯설고 이질적인", tag: "이질성 · 소외 어휘" },
-      { id: "022", word: "myth", core: "대중이 잘못 믿고 있는 근거 없는 통념, 허구", basic: "신화", note: "• 독해 첫 줄 myth는 99% 뒤에서 반박(However)당하는 통념!", tag: "통념 비판 시그널" },
-      { id: "021", word: "vacuum", core: "외부와 단절된 고립된 상태 (= isolated state)", basic: "진공, 공백", note: "• No culture develops in a vacuum: 고립되어 자라는 문화는 없다", tag: "평가원 시그니처" },
-      { id: "020", word: "struggle vs strive", core: "struggle: 허우적대며 고투하다(-) / strive: 목표를 향해 분투하다(+)", basic: "투쟁하다, 애쓰다", note: "• struggle to survive (-) vs strive for excellence (+)", tag: "방향성 (+/-) 대조" },
-      { id: "019", word: "occupy", core: "be occupied with: 몰두하다 / preoccupation: 집착", basic: "차지하다, 점유하다", note: "• 정신과 뇌를 꽉 채워 몰두하게 만들다", tag: "심리적 몰두 어휘" },
-      { id: "018", word: "mixed", core: "(의견·평가가) 찬반이 엇갈리는, 양면적인", basic: "섞인, 혼합된", note: "• mixed reactions: 호평과 비판이 반반으로 갈리는 반응", tag: "양면성 시그널" },
-      { id: "017", word: "curb vs curve vs carve", core: "curb: 억제하다 / curve: 곡선 / carve: 조각하다", basic: "철자 혼동어", note: "• curb inflation: 치솟는 물가를 억누르다", tag: "철자 낚시 1순위" },
-      { id: "016", word: "comprehensive vs comprehensible", core: "comprehensive: 포괄적인 / comprehensible: 이해할 수 있는", basic: "파생 혼동어", note: "• comprehensive review (총체적 검토) vs comprehensible text (쉬운 글)", tag: "파생어 낚시" },
-      { id: "015", word: "spontaneously vs simultaneously", core: "spontaneously: 자발적으로 / simultaneously: 동시에", basic: "부사 혼동어", note: "• 외부 강제 없이 안에서 저절로 우러나와 (자발성)", tag: "부사 철자 낚시" },
-      { id: "014", word: "stationary vs stationery", core: "stationary(-ary): 정지된 / stationery(-ery): 문구류", basic: "철자 혼동어", note: "• stationary state: 변동 없이 멈춘 정체 상태", tag: "한 끗 철자 낚시" },
-      { id: "013", word: "root vs route", core: "root: 뿌리, 근원 / route: 길, 경로, 노선", basic: "발음 혼동어", note: "• root cause (근본 원인) vs trade route (무역 경로)", tag: "동음이의 혼동어" },
-      { id: "012", word: "alter vs alternate vs alternative", core: "alter: 바꾸다 / alternate: 번갈아 / alternative: 대안의(새로운)", basic: "어근 파생 혼동", note: "• alternative approach: 기존 방식을 대체하는 새로운 대안", tag: "파생어 3총사" },
-      { id: "011", word: "publicity", core: "언론·매스컴의 집중 조명, 주목, 홍보", basic: "public: 공공의", note: "• receive immense publicity: 언론의 대대적 주목을 받다", tag: "명사 속뜻 주의" },
-      { id: "010", word: "access vs assess", core: "access: 접근(권) / assess: 평가하다, 사정하다", basic: "철자 혼동어", note: "• access to data (접근) vs assess the risk (평가)", tag: "철자 낚시" },
-      { id: "009", word: "terrible vs terrific", core: "terrible: 끔찍한(-) / terrific: 대단히 멋진, 훌륭한(+)", basic: "방향성 반대 혼동", note: "• terrific achievement: 눈부시고 훌륭한 업적 (+)", tag: "방향성 (+/-) 반전" },
-      { id: "008", word: "reap vs rip vs ripe", core: "reap: 수확하다, 거두다 / rip: 찢다 / ripe: 익은", basic: "단음절 철자 혼동", note: "• You reap what you sow: 뿌린 대로 거둔다", tag: "단음절 철자 낚시" },
-      { id: "007", word: "causal vs casual", core: "causal: 인과관계의 / casual: 무심한, 우연한, 격식 없는", basic: "철자 u/s 위치 낚시", note: "• causal link (인과적 연결고리) vs casual coincidence (우연의 일치)", tag: "평가원 단골 낚시" },
-      { id: "006", word: "lie vs lay", core: "lie(자동사): 놓여 있다 / lay(타동사): ~을 놓다", basic: "자·타동사 혼동", note: "• The solution lies in ~: 해결책은 ~에 놓여 있다 (핵심 제시)", tag: "문법 · 독해 뼈대" },
-      { id: "005", word: "intelligent vs intelligible", core: "intelligent: 지적인 / intelligible: 이해하기 쉬운", basic: "파생 혼동어", note: "• unintelligible: 난해하여 도저히 이해할 수 없는", tag: "파생어 낚시" },
-      { id: "004", word: "appliance", core: "[단수/학술] (이론의) 적용, 응용 / [복수] 가전제품", basic: "기기, 장치", note: "• A is the appliance of B: A는 B를 현실에 적용한 것", tag: "단·복수 의미 전환" },
-      { id: "003", word: "priceless vs valueless", core: "priceless: 값을 매길 수 없이 귀한(+) / valueless: 가치 없는(-)", basic: "접미사 반전 낚시", note: "• priceless = invaluable (극찬의 최고급 어휘)", tag: "접미사 반전 킬러" },
-      { id: "002", word: "affect", core: "[명사] 감정, 정서 (= emotion) / [동사] 감정을 유발하다", basic: "영향을 미치다", note: "• affective: 정서적인 (심리·인문 지문 1순위 다의어)", tag: "심리학 다의어" },
-      { id: "001", word: "attitude (vs altitude/latitude/aptitude)", core: "attitude: 태도 / altitude: 고도 / latitude: 위도·자유재량 / aptitude: 적성", basic: "태도, 입장", note: "• longitude: 경도 / gratitude: 감사 (형태 낚시 5총사)", tag: "혼동어 5총사" }
+      // === CH.05 관계를 주는 단어: 인과 화살표 & 부등호 (189~205) ===
+      { id: "189", ch: "CH5", word: "prime mover (A ➔ B)", mission: "A와 B 사이의 인과 화살표 방향과 뜻을 대시오", core: "A가 B를 일으키는 핵심 원동력, 주된 동인 (A ➔ B)", basic: "prime mover in evolution: 진화를 촉발하는 근본 동력", note: "• 단순 이동자가 아니라 사건의 원인(Cause)" },
+      { id: "190", ch: "CH5", word: "A outpace B", mission: "A와 B 사이의 부등호 방향과 수동태 전환 시 변화를 대시오", core: "A가 B를 앞지르다, 능가하다 (A > B)", basic: "수동태 A be outpaced by B ➔ A < B로 부등호 반전!", note: "• 속도·성장률 비교 지문 빈출" },
+      { id: "191", ch: "CH5", word: "A outnumber B", mission: "A와 B 사이의 수량 부등호 방향을 판별하시오", core: "A가 B보다 수가 더 많다 (A > B)", basic: "A is outnumbered by B (수동태) ➔ A < B", note: "• 수적 우열 비교의 핵심 동사" },
+      { id: "192", ch: "CH5", word: "A be based on B", mission: "A와 B 사이의 인과·근거 화살표 방향을 대시오", core: "B가 근간이 되어 A가 성립하다 (A ⟵ B)", basic: "A on which B is based ➔ A가 근거이고 B가 결과 (A ➔ B)", note: "• 전치사+관계대명사 구조에서 A와 B 위치 주의!" },
+      { id: "193", ch: "CH5", word: "A is a driving force in B", mission: "A와 B 사이의 인과 화살표 방향을 대시오", core: "A가 원동력이 되어 B를 이끌다 (A ➔ B)", basic: "인구 증가(A)가 과학 발달(B)의 추진력이 됨", note: "• cause와 동일한 인과 방향" },
+      { id: "194", ch: "CH5", word: "A determine B (+ 파생어 4개)", mission: "인과 방향과 determinant vs determinism 차이를 대시오", core: "A가 B를 결정짓다 (A ➔ B) / determinant: 결정 요인 / determinism: 결정론", basic: "determinacy: 확정성 / determination: 결정, 결단력", note: "• 파생 명사 4총사 구별 필수" },
+      { id: "195", ch: "CH5", word: "distinguish A from B (+ 분사형)", mission: "A와 B의 관계 기호와 distinguished vs distinguishing 차이를 대시오", core: "A와 B를 구별하다 (A ≠ B) / distinguished: 저명한 / distinguishing: 독특한", basic: "두 개념의 경계를 명확히 가르는 대조 동사", note: "• 분사 형용사 의미 분기 주의" },
+      { id: "196", ch: "CH5", word: "A reflect B (vs reflect on A)", mission: "인과 방향(A ⟵ B)과 전치사 on이 붙을 때의 뜻을 대시오", core: "A에 B가 반영되다 (A ⟵ B) / reflect on A: 깊이 숙고하다", basic: "reflection: 반사, 반영; 심사숙고", note: "• 지도는 제작자의 세계관을 반영함(결과 ⟵ 원인)" },
+      { id: "197", ch: "CH5", word: "A require B", mission: "A와 B 사이의 필요조건 화살표 방향을 대시오", core: "A를 위해서는 B가 필요하다 (A ⟵ B)", basic: "성취(A)를 위해 시행착오(B)라는 선행 조건이 필수적임", note: "• A be required to B: A가 B하도록 요구받다" },
+      { id: "198", ch: "CH5", word: "A depend on B (rely / resort to)", mission: "A와 B 사이의 의존·결정 화살표 방향을 대시오", core: "A는 B에 좌우되다, 달려 있다 (A ⟵ B)", basic: "rely on / count on / lean on / resort to 동일 도식", note: "• B가 변하면 A가 결정되는 종속 변수 관계" },
+      { id: "199", ch: "CH5", word: "A according to B", mission: "단순 인용 외에 기준·인과 화살표 방향을 대시오", core: "B에 따라서 A하다 (B ➔ A 기준·인과 관계)", basic: "개인 취향(B)이라는 기준에 따라 빚어내다(A)", note: "• B가 기준·원인이 되어 A가 결정됨" },
+      { id: "200", ch: "CH5", word: "A is followed by B (vs A follow B)", mission: "수동태와 능동태에서 사건 A와 B의 시간 순서를 판별하시오", core: "A is followed by B: A 발생 후 뒤이어 B 발생 (A ➔ B)", basic: "A follow B: B가 먼저 일어나고 뒤이어 A 발생 (A ⟵ B)", note: "• 시간 선후 관계를 뒤집어 출제하는 1순위 킬러!" },
+      { id: "201", ch: "CH5", word: "A outweigh B", mission: "A와 B 사이의 가치 부등호와 수동태 반전을 판별하시오", core: "A가 B보다 더 중요하다, 능가하다 (A > B)", basic: "A be outweighed by B ➔ A < B로 부등호 반전!", note: "• outstand / outnumber / outperform 모두 'A > B'" },
+      { id: "202", ch: "CH5", word: "outgrow / outgrowth", mission: "동사 부등호와 평가원 정답 선지 명사 outgrowth의 뜻을 대시오", core: "outgrow: 더 커지다 (A > B) / outgrowth: [명사] 결과, 결과물 (A ⟵ B)", basic: "A is an outgrowth of B: A는 B에서 비롯된 자연적 결과물", note: "• 2년 연속 평가원·수능 정답 선지 출제 명사" },
+      { id: "203", ch: "CH5", word: "A is subordinate to B", mission: "A와 B 사이의 위계 부등호 방향을 판별하시오", core: "A가 B에 종속되다, 부차적이다 (A < B)", basic: "facts are subordinate to political view: 사실이 정치적 관점에 종속됨", note: "• 덜 중요하거나 아래에 예속되는 위계 관계" },
+      { id: "204", ch: "CH5", word: "A is independent of/from B", mission: "A와 B 사이의 관계 기호와 뜻을 대시오", core: "A와 B는 서로 분리된·무관한 관계 (A ≠ B)", basic: "independent of time and place: 시간과 장소에 구애받지 않는", note: "• 서로 영향을 주지 않는 완전한 별개 관계" },
+      { id: "205", ch: "CH5", word: "owe A to B", mission: "A와 B 사이의 인과 귀속 화살표 방향을 대시오", core: "A는 B 덕분이다, A를 B에게 빚지다 (A ⟵ B)", basic: "modern people owe much to ancestors: 현대인은 조상 덕을 보고 있다", note: "• 결과 A가 원인 B로부터 비롯됨을 나타내는 도식" }
     ];
+
+    const CHAPTER_LABELS = {
+      CH1: "Ch.1 혼동어 대조",
+      CH2: "Ch.2 속뜻·방향성",
+      CH3: "Ch.3 다의어 N개",
+      CH4: "Ch.4 숙어·논리",
+      CH5: "Ch.5 관계·화살표"
+    };
 
     let activeDeck = [];
     let currentIdx = 0;
@@ -418,35 +418,176 @@
     let touchStartX = 0;
     let touchEndX = 0;
 
+    // === 4중 영구 저장 엔진 ===
+    const DB_NAME = 'VFlashPermanentDB';
+    const STORE_NAME = 'progress';
+
+    function openIDB() {
+      return new Promise((resolve, reject) => {
+        if (!window.indexedDB) return reject('No IDB');
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = e => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains(STORE_NAME)) {
+            db.createObjectStore(STORE_NAME);
+          }
+        };
+        req.onsuccess = e => resolve(e.target.result);
+        req.onerror = e => reject(e);
+      });
+    }
+
+    async function saveToIDB(data) {
+      try {
+        const db = await openIDB();
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).put(data, 'vflash_state');
+      } catch (e) {}
+    }
+
+    async function loadFromIDB() {
+      try {
+        const db = await openIDB();
+        return await new Promise((resolve) => {
+          const tx = db.transaction(STORE_NAME, 'readonly');
+          const req = tx.objectStore(STORE_NAME).get('vflash_state');
+          req.onsuccess = () => resolve(req.result || null);
+          req.onerror = () => resolve(null);
+        });
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function saveToCacheAPI(data) {
+      try {
+        if ('caches' in window) {
+          const cache = await caches.open('vflash-perma-cache-v1');
+          const res = new Response(JSON.stringify(data), {
+            headers: { 'Content-Type': 'application/json' }
+          });
+          await cache.put('/vflash-state-backup.json', res);
+        }
+      } catch (e) {}
+    }
+
+    async function loadFromCacheAPI() {
+      try {
+        if ('caches' in window) {
+          const cache = await caches.open('vflash-perma-cache-v1');
+          const res = await cache.match('/vflash-state-backup.json');
+          if (res) return await res.json();
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    function encodeState(s, m) {
+      try {
+        return btoa(encodeURIComponent(JSON.stringify({ s, m })));
+      } catch (e) {
+        return '';
+      }
+    }
+
+    function decodeState(str) {
+      try {
+        const obj = JSON.parse(decodeURIComponent(atob(str)));
+        if (obj && typeof obj.s === 'object' && typeof obj.m === 'object') {
+          return obj;
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    function syncUrlHash(s, m) {
+      try {
+        const hasData = Object.keys(s).length > 0 || Object.keys(m).length > 0;
+        if (!hasData) {
+          if (window.location.hash.startsWith('#save=')) {
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+          }
+          return;
+        }
+        const encoded = encodeState(s, m);
+        if (encoded) {
+          history.replaceState(null, '', '#save=' + encoded);
+        }
+      } catch (e) {}
+    }
+
+    async function saveState() {
+      const payload = { s: streaks, m: mistakes, t: Date.now() };
+      try {
+        localStorage.setItem('vflash_streaks', JSON.stringify(streaks));
+        localStorage.setItem('vflash_mistakes', JSON.stringify(mistakes));
+      } catch (e) {}
+      saveToIDB(payload);
+      saveToCacheAPI(payload);
+      syncUrlHash(streaks, mistakes);
+      updateCounts();
+    }
+
+    async function loadAllStorages() {
+      if (window.location.hash.startsWith('#save=')) {
+        const hashStr = window.location.hash.slice(6);
+        const fromHash = decodeState(hashStr);
+        if (fromHash && (Object.keys(fromHash.s).length > 0 || Object.keys(fromHash.m).length > 0)) {
+          streaks = fromHash.s;
+          mistakes = fromHash.m;
+          await saveState();
+          return;
+        }
+      }
+
+      const idbData = await loadFromIDB();
+      const cacheData = await loadFromCacheAPI();
+      let lsStreaks = {};
+      let lsMistakes = {};
+      try {
+        lsStreaks = JSON.parse(localStorage.getItem('vflash_streaks') || '{}');
+        lsMistakes = JSON.parse(localStorage.getItem('vflash_mistakes') || '{}');
+      } catch (e) {}
+
+      const candidates = [
+        idbData,
+        cacheData,
+        { s: lsStreaks, m: lsMistakes, t: 0 }
+      ].filter(Boolean);
+
+      let best = { s: {}, m: {} };
+      let maxScore = -1;
+
+      for (const c of candidates) {
+        const score = Object.keys(c.s || {}).length + Object.keys(c.m || {}).length;
+        if (score > maxScore) {
+          maxScore = score;
+          best = { s: c.s || {}, m: c.m || {} };
+        }
+      }
+
+      streaks = best.s;
+      mistakes = best.m;
+
+      if (maxScore > 0) {
+        await saveState();
+      }
+    }
+
     async function init() {
-      // Safari ITP 대응: 영구 저장소 권한 요청
       if (navigator.storage && navigator.storage.persist) {
         try {
           await navigator.storage.persist();
         } catch (e) {}
       }
 
-      try {
-        streaks = JSON.parse(localStorage.getItem('vflash_streaks') || '{}');
-        mistakes = JSON.parse(localStorage.getItem('vflash_mistakes') || '{}');
-      } catch(e) {}
+      await loadAllStorages();
       applyFilter();
       setupSwipe();
     }
 
-    function saveState() {
-      try {
-        localStorage.setItem('vflash_streaks', JSON.stringify(streaks));
-        localStorage.setItem('vflash_mistakes', JSON.stringify(mistakes));
-      } catch (e) {}
-      updateCounts();
-    }
-
-    // 백업 / 복구 모달 제어
     function openBackupModal() {
-      const payload = JSON.stringify({ s: streaks, m: mistakes });
-      const encoded = btoa(encodeURIComponent(payload));
-      document.getElementById('backup-code-box').value = encoded;
+      document.getElementById('backup-code-box').value = encodeState(streaks, mistakes);
       document.getElementById('backup-modal').classList.remove('hidden');
     }
 
@@ -466,25 +607,17 @@
       });
     }
 
-    function restoreBackupCode() {
+    async function restoreBackupCode() {
       const raw = document.getElementById('backup-code-box').value.trim();
-      if (!raw) {
-        showToast("코드를 먼저 붙여넣어 주세요");
-        return;
-      }
-      try {
-        const decoded = JSON.parse(decodeURIComponent(atob(raw)));
-        if (decoded && typeof decoded.s === 'object' && typeof decoded.m === 'object') {
-          streaks = decoded.s;
-          mistakes = decoded.m;
-          saveState();
-          applyFilter();
-          closeBackupModal();
-          showToast("학습 기록이 완벽히 복구되었습니다!");
-        } else {
-          showToast("올바르지 않은 코드 형식입니다");
-        }
-      } catch (e) {
+      const decoded = raw ? decodeState(raw) : { s: {}, m: {} };
+      if (decoded) {
+        streaks = decoded.s;
+        mistakes = decoded.m;
+        await saveState();
+        applyFilter();
+        closeBackupModal();
+        showToast(raw ? "학습 기록이 복구되었습니다!" : "학습 기록이 초기화되었습니다.");
+      } else {
         showToast("복구 실패: 코드를 다시 확인해 주세요");
       }
     }
@@ -494,11 +627,11 @@
       onlyMistakes = false;
       
       document.querySelectorAll('[id^="tab-"]').forEach(btn => {
-        btn.className = "px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition";
+        btn.className = "px-3 py-1.5 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition";
       });
       const activeTab = document.getElementById(`tab-${filterKey}`);
       if (activeTab) {
-        activeTab.className = "px-3 py-1 rounded-full font-bold whitespace-nowrap bg-neutral-100 text-neutral-950 transition";
+        activeTab.className = "px-3 py-1.5 rounded-full font-bold whitespace-nowrap bg-neutral-100 text-neutral-950 transition";
       }
 
       document.getElementById('btn-mistake-filter').className = "px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-1.5 transition";
@@ -520,11 +653,7 @@
     function applyFilter() {
       let list = [...VOCAB_DB];
       if (currentFilter !== 'ALL') {
-        const [min, max] = currentFilter.split('-').map(Number);
-        list = list.filter(item => {
-          const num = parseInt(item.id.split('-')[0], 10);
-          return num >= min && num <= max;
-        });
+        list = list.filter(item => item.ch === currentFilter);
       }
 
       if (onlyMistakes) {
@@ -533,7 +662,7 @@
           showToast("오답 노트가 비어 있습니다!");
           onlyMistakes = false;
           document.getElementById('btn-mistake-filter').className = "px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-1.5 transition";
-          list = [...VOCAB_DB];
+          list = currentFilter === 'ALL' ? [...VOCAB_DB] : VOCAB_DB.filter(item => item.ch === currentFilter);
         }
       }
 
@@ -556,11 +685,13 @@
       const st = streaks[item.id] || 0;
 
       document.getElementById('progress-text').innerText = `${currentIdx + 1} / ${activeDeck.length}`;
-      document.getElementById('card-id').innerText = `No. ${item.id}`;
+      document.getElementById('card-chapter-badge').innerText = CHAPTER_LABELS[item.ch] || item.ch;
+      document.getElementById('card-id').innerText = `No.${item.id}`;
       document.getElementById('card-streak').innerText = `${st}/2`;
-      document.getElementById('card-tag').innerText = item.tag || "";
 
       document.getElementById('front-word').innerText = item.word;
+      document.getElementById('front-mission').innerText = item.mission;
+
       document.getElementById('back-word').innerText = item.word;
       document.getElementById('back-core').innerText = item.core;
       document.getElementById('back-basic').innerText = item.basic;
@@ -596,7 +727,7 @@
       }
     }
 
-    function judgeCard(known) {
+    async function judgeCard(known) {
       if (activeDeck.length === 0) return;
       const item = activeDeck[currentIdx];
 
@@ -617,13 +748,13 @@
         activeDeck.splice(targetPos, 0, failed);
       }
 
-      saveState();
+      await saveState();
       renderCard();
     }
 
     function speakWord() {
       if (activeDeck.length === 0) return;
-      const clean = activeDeck[currentIdx].word.replace(/\(.*\)/g, '').trim();
+      const clean = activeDeck[currentIdx].word.split('vs')[0].replace(/\(.*\)/g, '').trim();
       const uttr = new SpeechSynthesisUtterance(clean);
       uttr.lang = 'en-US';
       uttr.rate = 0.92;
@@ -639,16 +770,6 @@
         el.classList.remove('opacity-100');
         el.classList.add('opacity-0');
       }, 1000);
-    }
-
-    function resetProgress() {
-      if (confirm("학습 기록을 초기화할까요?")) {
-        streaks = {};
-        mistakes = {};
-        saveState();
-        setFilter('ALL');
-        showToast("초기화되었습니다");
-      }
     }
 
     function setupSwipe() {
