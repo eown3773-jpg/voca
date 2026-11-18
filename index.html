@@ -37,7 +37,7 @@
       <div class="flex items-center gap-2">
         <span class="w-2 h-2 rounded-full bg-emerald-500" title="4중 자동 영구 저장 활성화됨"></span>
         <span class="text-xs font-black tracking-wider text-neutral-300">V-FLASH</span>
-        <span id="progress-text" class="text-xs font-mono text-neutral-500 ml-1">1 / 177</span>
+        <span id="progress-text" class="text-xs font-mono text-neutral-500 ml-1">1 / 192</span>
       </div>
 
       <div class="flex items-center gap-1.5">
@@ -54,7 +54,10 @@
 
     <!-- CHAPTER THEME TABS -->
     <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1 text-xs">
-      <button onclick="setFilter('ALL')" id="tab-ALL" class="px-3 py-1.5 rounded-full font-bold whitespace-nowrap bg-neutral-100 text-neutral-950 transition">
+      <button onclick="setFilter('CH6')" id="tab-CH6" class="px-3 py-1.5 rounded-full font-bold whitespace-nowrap bg-neutral-100 text-neutral-950 transition">
+        Ch.6 초기본 확장 ★
+      </button>
+      <button onclick="setFilter('ALL')" id="tab-ALL" class="px-3 py-1.5 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
         전체
       </button>
       <button onclick="setFilter('CH1')" id="tab-CH1" class="px-3 py-1.5 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition">
@@ -82,10 +85,10 @@
       <!-- CARD TOP: CHAPTER THEME BADGE & STREAK -->
       <div class="flex items-center justify-between">
         <span id="card-chapter-badge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-md bg-rose-500/15 text-rose-400">
-          Ch.1 혼동어 구별
+          Ch.6 초기본 본질·확장
         </span>
         <div class="flex items-center gap-2">
-          <span id="card-id" class="text-xs font-mono text-neutral-500">No.001</span>
+          <span id="card-id" class="text-xs font-mono text-neutral-500">No.206</span>
           <span id="card-streak" class="text-xs font-mono font-bold text-neutral-400">0/2</span>
           <button onclick="event.stopPropagation(); speakWord();" class="p-1.5 -mr-1.5 text-neutral-400 hover:text-white transition">
             <i class="ph-bold ph-speaker-high text-base"></i>
@@ -96,12 +99,12 @@
       <!-- FRONT FACE: THEME-SPECIFIC ACTIVE MISSION -->
       <div id="face-front" class="my-auto text-center px-1 card-enter">
         <h2 id="front-word" class="text-3xl sm:text-4xl font-black tracking-tight text-white leading-snug mb-5">
-          stationary vs stationery
+          school
         </h2>
         
         <div class="inline-block bg-neutral-950/90 border border-neutral-800 rounded-2xl px-4 py-3 max-w-full">
           <p id="front-mission" class="text-sm font-bold text-amber-300 leading-relaxed">
-            두 단어의 철자 차이와 각각의 뜻을 구분하시오
+            '학교' 말고 철학·생물 지문에서의 확장 뜻 2가지를 대시오
           </p>
         </div>
       </div>
@@ -109,9 +112,9 @@
       <!-- BACK FACE: ANSWER & CORE LOGIC -->
       <div id="face-back" class="my-auto hidden card-enter space-y-4 overflow-y-auto scrollbar-none py-1">
         <div>
-          <div id="back-word" class="text-sm font-bold text-neutral-400 mb-1">stationary vs stationery</div>
+          <div id="back-word" class="text-sm font-bold text-neutral-400 mb-1">school</div>
           <div id="back-core" class="text-xl sm:text-2xl font-black text-rose-400 leading-snug">
-            stationary(-ary): 정지된 / stationery(-ery): 문구류
+            1) (사상·철학의) 학파  2) (물고기·돌고래의) 떼, 무리
           </div>
         </div>
 
@@ -120,11 +123,11 @@
         <div class="space-y-3 text-sm">
           <div>
             <span id="back-basic-label" class="text-[11px] font-bold text-neutral-500 block mb-0.5">기본 뜻 · 출발점</span>
-            <p id="back-basic" class="text-neutral-200 font-semibold">철자 a vs e 한 끗 차이</p>
+            <p id="back-basic" class="text-neutral-200 font-semibold">학교 (무언가를 함께 배우고 모이는 집단 이미지)</p>
           </div>
           <div>
-            <span id="back-note-label" class="text-[11px] font-bold text-neutral-500 block mb-0.5">출제 포인트 · 실전 적용</span>
-            <p id="back-note" class="text-neutral-300 leading-relaxed whitespace-pre-line">• stationary state: 변동 없이 멈춘 정체 상태</p>
+            <span id="back-note-label" class="text-[11px] font-bold text-neutral-500 block mb-0.5">출제 포인트 · 손필기 핵심</span>
+            <p id="back-note" class="text-neutral-300 leading-relaxed whitespace-pre-line">• school of thought: 특정 사상·학파 (I belong to no school)</p>
           </div>
         </div>
       </div>
@@ -196,7 +199,7 @@
   </div>
 
   <script>
-    // ch: 'CH1'(혼동어), 'CH2'(속뜻·방향성), 'CH3'(다의어), 'CH4'(숙어·논리), 'CH5'(관계·화살표)
+    // ch: 'CH1'(혼동어), 'CH2'(속뜻·방향성), 'CH3'(다의어), 'CH4'(숙어·논리), 'CH5'(관계·화살표), 'CH6'(초기본 확장)
     const VOCAB_DB = [
       // === CH.01 혼동어 대조 & 뉘앙스 구별 (001~039) ===
       { id: "001", ch: "CH1", word: "attitude vs altitude vs latitude vs aptitude", mission: "혼동어 4총사의 각각의 뜻을 0.5초 만에 구분하시오", core: "attitude: 태도 / altitude: 고도 / latitude: 위도·자유재량 / aptitude: 적성", basic: "longitude: 경도 / gratitude: 감사", note: "• allow considerable latitude: 행동의 상당한 자유재량을 허용하다\n• 형태가 비슷해 선지에서 바꿔치기하는 1순위 혼동어" },
@@ -396,21 +399,39 @@
       { id: "202", ch: "CH5", word: "outgrow / outgrowth", mission: "동사 부등호와 평가원 정답 선지 명사 outgrowth의 뜻을 대시오", core: "outgrow: 더 커지다 (A > B) / outgrowth: [명사] 결과, 결과물 (A ⟵ B)", basic: "A is an outgrowth of B: A는 B에서 비롯된 자연적 결과물", note: "• 2년 연속 평가원·수능 정답 선지 출제 명사" },
       { id: "203", ch: "CH5", word: "A is subordinate to B", mission: "A와 B 사이의 위계 부등호 방향을 판별하시오", core: "A가 B에 종속되다, 부차적이다 (A < B)", basic: "facts are subordinate to political view: 사실이 정치적 관점에 종속됨", note: "• 덜 중요하거나 아래에 예속되는 위계 관계" },
       { id: "204", ch: "CH5", word: "A is independent of/from B", mission: "A와 B 사이의 관계 기호와 뜻을 대시오", core: "A와 B는 서로 분리된·무관한 관계 (A ≠ B)", basic: "independent of time and place: 시간과 장소에 구애받지 않는", note: "• 서로 영향을 주지 않는 완전한 별개 관계" },
-      { id: "205", ch: "CH5", word: "owe A to B", mission: "A와 B 사이의 인과 귀속 화살표 방향을 대시오", core: "A는 B 덕분이다, A를 B에게 빚지다 (A ⟵ B)", basic: "modern people owe much to ancestors: 현대인은 조상 덕을 보고 있다", note: "• 결과 A가 원인 B로부터 비롯됨을 나타내는 도식" }
+      { id: "205", ch: "CH5", word: "owe A to B", mission: "A와 B 사이의 인과 귀속 화살표 방향을 대시오", core: "A는 B 덕분이다, A를 B에게 빚지다 (A ⟵ B)", basic: "modern people owe much to ancestors: 현대인은 조상 덕을 보고 있다", note: "• 결과 A가 원인 B로부터 비롯됨을 나타내는 도식" },
+
+      // === CH.06 초기본 단어의 본질과 확장 (206~220) ===
+      { id: "206", ch: "CH6", word: "school", mission: "'학교' 말고 철학·생물 지문에서의 확장 뜻 2가지를 대시오", core: "1) (사상·철학의) 학파  2) (물고기·돌고래의) 떼, 무리", basic: "학교 (무언가를 함께 배우고 모이는 집단 이미지)", note: "• school of thought: 특정 사상·학파 (I belong to no school)\n• a school of fish: 물고기 떼" },
+      { id: "207", ch: "CH6", word: "new (be new to A)", mission: "'새로운'의 확장 숙어 'be new to A'가 사람·사물에 쓰일 때의 뜻을 대시오", core: "A에 미숙하다, 경험이 없다, 생소하다", basic: "이전에 한 번도 보거나 겪어보지 못해 낯선 이미지", note: "• Teachers who are new to ~: ~에 경험이 없고 서툰 교사들" },
+      { id: "208", ch: "CH6", word: "cost / at the expense of A", mission: "cost의 (-) 이미지와 'at the cost/expense of A'의 2가지 해석법을 대시오", core: "1) A를 대가로, 희생하여 (-)  2) A를 활용하여, 발판 삼아 (+)", basic: "들어오는 돈이 아니라 빠져나가는 손해·대가·희생(-)", note: "• take its toll (큰 피해를 주다)와 동의어\n• 문맥이 (+)면 'A를 활용해', (-)면 'A를 희생시켜'로 판별!" },
+      { id: "209", ch: "CH6", word: "level / level the playing field", mission: "형용사·동사 level의 확장 뜻과 관용구 'level the playing field'를 대시오", core: "1) [형] 평평한, 수평의  2) [동] 평평하게 하다  3) 공정한 경쟁의 장을 만들다", basic: "어느 한쪽도 높거나 기울지 않고 완전히 평평한 상태 (↔ odd/uneven)", note: "• level the playing field: 기울어진 운동장을 바로잡아 공정한 기회를 주다" },
+      { id: "210", ch: "CH6", word: "cultural vs universal", mission: "평가원 독해에서 'cultural'과 'universal'이 이루는 논리적 대립쌍을 대시오", core: "cultural: 특정 지역·집단만의 고유한 (= specific) ↔ universal: 보편적인", basic: "문화적 = 특정 사회에만 해당하는 특수성 (범주적 차이)", note: "• cultural (특정적·다양한·국지적) ↔ universal (인류 공통적·보편적)" },
+      { id: "211", ch: "CH6", word: "discount", mission: "'가격 할인' 말고 추상 대상(아이디어·사실·노력)이 목적어로 올 때의 뜻을 대시오", core: "(-) 무가치한 것으로 치부하다, 무시하다, 깎아내리다", basic: "제값을 쳐주지 않고 가치를 깎아내리는 본질 이미지", note: "• discount important situational forces: 중요한 상황적 요인을 무시하다" },
+      { id: "212", ch: "CH6", word: "economy (economies / with truth)", mission: "'경제' 외에 반드시 알아야 할 2가지 뜻과 'economy with truth'를 대시오", core: "1) 국가 (economies: 선진국들)  2) 절약, 아끼기  3) 진실을 숨김·은폐", basic: "최소한의 자원만 쓰고 낭비하지 않는 '아끼는' 코어 이미지", note: "• developed economies (선진국들) / make economies (절약하다)\n• economy with the truth: 진실을 아껴서 말 안 함 ➔ 진실을 은폐하는 것!" },
+      { id: "213", ch: "CH6", word: "star", mission: "명사 '별'에서 확장된 동사 star의 뜻을 대시오", core: "주연을 맡다, 주역으로 출연하다, 돋보이다", basic: "밤하늘에서 가장 밝게 빛나는 중심 존재 이미지", note: "• a movie starring ~: ~가 주연을 맡은 영화" },
+      { id: "214", ch: "CH6", word: "put (as Bacon put it)", mission: "'놓다' 말고 독해 지문에서 인용구와 함께 쓰일 때의 확장 뜻을 대시오", core: "(생각·말을) 표현하다, 말하다, 쓰다", basic: "머릿속 생각을 글이나 말의 형태로 밖으로 꺼내어 '놓는' 이미지", note: "• as Bacon put it (베이컨이 표현했듯이) / To put this in other words (달리 말하면)" },
+      { id: "215", ch: "CH6", word: "over (A over B)", mission: "전치사 over가 비교·선호 문맥(A over B)에서 갖는 관계 방향을 대시오", core: "B보다 A를 더 우선시하다, 선호하다 (A > B)", basic: "B의 바로 위(over) 상위에 A가 올라타 있는 이미지", note: "• aesthetic concerns over human needs: 인간 필요보다 미적 관심을 우선시함 (A > B)" },
+      { id: "216", ch: "CH6", word: "file", mission: "'서류철' 말고 뇌과학·정보 지문에서 동사 file의 확장 뜻을 대시오", core: "(체계적으로) 보관하다, 분류해 정리해 놓다, 모으다", basic: "정보나 기억을 서류함에 차곡차곡 철해 넣는 이미지", note: "• Your brain has filed it: 뇌가 그것을 차곡차곡 정리해 저장해 놓았다" },
+      { id: "217", ch: "CH6", word: "invite / inviting", mission: "'초대하다' 말고 사물·경험에 쓰이는 확장 동사 및 형용사 뜻을 대시오", core: "invite: 매혹하다, 끌다, 유혹하다 / inviting: 매력적인 (= engaging)", basic: "기분 좋게 안으로 들어오라고 손짓하는 긍정(+) 이미지", note: "• The city quality is so inviting: 도시의 질이 대단히 매력적이다" },
+      { id: "218", ch: "CH6", word: "general (vs common)", mission: "general의 본질 코어 이미지와 'common'과의 결정적 차이를 대시오", core: "general: 세부·예외를 묶은 '전체적인, 전반적인' (whole) ≠ common(평범한)", basic: "일반 병원(X) ➔ 종합 병원(general hospital: 전체 과목을 다 다룸)", note: "• in general: 전반적으로 / general manager: 총지배인" },
+      { id: "219", ch: "CH6", word: "common / commons", mission: "common의 본질 뜻(vs general)과 명사 commons(공유지)를 대시오", core: "common: 평범한, 흔한 (not special) / commons: 공유지, 공유자원", basic: "This is too common(너무 흔해빠졌다) ≠ This is too general(너무 포괄적이다)", note: "• Tragedy of the Commons: 공유지의 비극 (평가원 단골 소재!)" },
+      { id: "220", ch: "CH6", word: "social / socialize", mission: "'사회의' 말고 생물·심리 지문에서 social과 socialize의 본질 뜻을 대시오", core: "social: 사교적인, 무리 짓기를 좋아하는 / socialize: 어울리다, 사회화하다", basic: "혼자 떨어져 살지 않고 집단(community)을 이루어 모이기를 좋아하는 성질", note: "• social animals: 무리 생활을 하는 사교적 동물들" }
     ];
 
     const CHAPTER_LABELS = {
-      CH1: "Ch.1 혼동어 대조",
+      CH1: "Ch.1 혼동어 구별",
       CH2: "Ch.2 속뜻·방향성",
       CH3: "Ch.3 다의어 N개",
       CH4: "Ch.4 숙어·논리",
-      CH5: "Ch.5 관계·화살표"
+      CH5: "Ch.5 관계·화살표",
+      CH6: "Ch.6 초기본 본질·확장"
     };
 
     let activeDeck = [];
     let currentIdx = 0;
     let isFlipped = false;
-    let currentFilter = 'ALL';
+    let currentFilter = 'CH6';
     let onlyMistakes = false;
     let streaks = {};
     let mistakes = {};
