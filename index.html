@@ -37,7 +37,7 @@
       <div class="flex items-center gap-2">
         <span class="w-2 h-2 rounded-full bg-emerald-500" title="4중 자동 영구 저장 활성화됨"></span>
         <span class="text-xs font-black tracking-wider text-neutral-300">V-FLASH</span>
-        <span id="progress-text" class="text-xs font-mono text-neutral-500 ml-1">1 / 192</span>
+        <span id="progress-text" class="text-xs font-mono text-neutral-500 ml-1">1 / 207</span>
       </div>
 
       <div class="flex items-center gap-1.5">
@@ -199,7 +199,6 @@
   </div>
 
   <script>
-    // ch: 'CH1'(혼동어), 'CH2'(속뜻·방향성), 'CH3'(다의어), 'CH4'(숙어·논리), 'CH5'(관계·화살표), 'CH6'(초기본 확장)
     const VOCAB_DB = [
       // === CH.01 혼동어 대조 & 뉘앙스 구별 (001~039) ===
       { id: "001", ch: "CH1", word: "attitude vs altitude vs latitude vs aptitude", mission: "혼동어 4총사의 각각의 뜻을 0.5초 만에 구분하시오", core: "attitude: 태도 / altitude: 고도 / latitude: 위도·자유재량 / aptitude: 적성", basic: "longitude: 경도 / gratitude: 감사", note: "• allow considerable latitude: 행동의 상당한 자유재량을 허용하다\n• 형태가 비슷해 선지에서 바꿔치기하는 1순위 혼동어" },
@@ -401,7 +400,7 @@
       { id: "204", ch: "CH5", word: "A is independent of/from B", mission: "A와 B 사이의 관계 기호와 뜻을 대시오", core: "A와 B는 서로 분리된·무관한 관계 (A ≠ B)", basic: "independent of time and place: 시간과 장소에 구애받지 않는", note: "• 서로 영향을 주지 않는 완전한 별개 관계" },
       { id: "205", ch: "CH5", word: "owe A to B", mission: "A와 B 사이의 인과 귀속 화살표 방향을 대시오", core: "A는 B 덕분이다, A를 B에게 빚지다 (A ⟵ B)", basic: "modern people owe much to ancestors: 현대인은 조상 덕을 보고 있다", note: "• 결과 A가 원인 B로부터 비롯됨을 나타내는 도식" },
 
-      // === CH.06 초기본 단어의 본질과 확장 (206~220) ===
+      // === CH.06 초기본 단어의 본질과 확장 (206~235) ===
       { id: "206", ch: "CH6", word: "school", mission: "'학교' 말고 철학·생물 지문에서의 확장 뜻 2가지를 대시오", core: "1) (사상·철학의) 학파  2) (물고기·돌고래의) 떼, 무리", basic: "학교 (무언가를 함께 배우고 모이는 집단 이미지)", note: "• school of thought: 특정 사상·학파 (I belong to no school)\n• a school of fish: 물고기 떼" },
       { id: "207", ch: "CH6", word: "new (be new to A)", mission: "'새로운'의 확장 숙어 'be new to A'가 사람·사물에 쓰일 때의 뜻을 대시오", core: "A에 미숙하다, 경험이 없다, 생소하다", basic: "이전에 한 번도 보거나 겪어보지 못해 낯선 이미지", note: "• Teachers who are new to ~: ~에 경험이 없고 서툰 교사들" },
       { id: "208", ch: "CH6", word: "cost / at the expense of A", mission: "cost의 (-) 이미지와 'at the cost/expense of A'의 2가지 해석법을 대시오", core: "1) A를 대가로, 희생하여 (-)  2) A를 활용하여, 발판 삼아 (+)", basic: "들어오는 돈이 아니라 빠져나가는 손해·대가·희생(-)", note: "• take its toll (큰 피해를 주다)와 동의어\n• 문맥이 (+)면 'A를 활용해', (-)면 'A를 희생시켜'로 판별!" },
@@ -416,7 +415,22 @@
       { id: "217", ch: "CH6", word: "invite / inviting", mission: "'초대하다' 말고 사물·경험에 쓰이는 확장 동사 및 형용사 뜻을 대시오", core: "invite: 매혹하다, 끌다, 유혹하다 / inviting: 매력적인 (= engaging)", basic: "기분 좋게 안으로 들어오라고 손짓하는 긍정(+) 이미지", note: "• The city quality is so inviting: 도시의 질이 대단히 매력적이다" },
       { id: "218", ch: "CH6", word: "general (vs common)", mission: "general의 본질 코어 이미지와 'common'과의 결정적 차이를 대시오", core: "general: 세부·예외를 묶은 '전체적인, 전반적인' (whole) ≠ common(평범한)", basic: "일반 병원(X) ➔ 종합 병원(general hospital: 전체 과목을 다 다룸)", note: "• in general: 전반적으로 / general manager: 총지배인" },
       { id: "219", ch: "CH6", word: "common / commons", mission: "common의 본질 뜻(vs general)과 명사 commons(공유지)를 대시오", core: "common: 평범한, 흔한 (not special) / commons: 공유지, 공유자원", basic: "This is too common(너무 흔해빠졌다) ≠ This is too general(너무 포괄적이다)", note: "• Tragedy of the Commons: 공유지의 비극 (평가원 단골 소재!)" },
-      { id: "220", ch: "CH6", word: "social / socialize", mission: "'사회의' 말고 생물·심리 지문에서 social과 socialize의 본질 뜻을 대시오", core: "social: 사교적인, 무리 짓기를 좋아하는 / socialize: 어울리다, 사회화하다", basic: "혼자 떨어져 살지 않고 집단(community)을 이루어 모이기를 좋아하는 성질", note: "• social animals: 무리 생활을 하는 사교적 동물들" }
+      { id: "220", ch: "CH6", word: "social / socialize", mission: "'사회의' 말고 생물·심리 지문에서 social과 socialize의 본질 뜻을 대시오", core: "social: 사교적인, 무리 짓기를 좋아하는 / socialize: 어울리다, 사회화하다", basic: "혼자 떨어져 살지 않고 집단(community)을 이루어 모이기를 좋아하는 성질", note: "• social animals: 무리 생활을 하는 사교적 동물들" },
+      { id: "221", ch: "CH6", word: "part / partial vs impartial", mission: "'부분'에서 확장된 partial과 부정접두사 impartial의 대립 뜻을 대시오", core: "partial: 편파적인, 불공평한, 부분적인 ↔ impartial: 공정한, 편견 없는 (= fair)", basic: "한쪽 편(part)만 들고 편애함(partial) ↔ 어느 편도 들지 않음(impartial)", note: "• partiality(편파성) ↔ impartiality(공정성, 공평무사)" },
+      { id: "222", ch: "CH6", word: "still", mission: "'여전히' 말고 형용사·명사로 쓰일 때의 확장 뜻을 대시오", core: "1) [형] 움직이지 않는, 정지한, 고요한  2) [명] 정적, 고요 (stillness)", basic: "시간이 멈춘 듯 소리나 움직임이 전혀 없는 정지 이미지", note: "• still water (잔잔한 물) / stand still (가만히 서 있다) / still pictures (정지 사진)" },
+      { id: "223", ch: "CH6", word: "manner / manners", mission: "단수 manner와 복수형 manners의 의미 분기를 구분하시오", core: "manner(단수): 방식, 방법 / manners(복수): 예절, 예의범절", basic: "in all manner of ways (온갖 방식으로) vs bad manners (나쁜 예절)", note: "• 단·복수에 따라 '방법'과 '예의'로 뜻이 갈리는 핵심 어휘" },
+      { id: "224", ch: "CH6", word: "things", mission: "'물건들' 말고 독해 지문에서 가장 빈번하게 쓰이는 확장 뜻을 대시오", core: "상황, 형편, 사정, 일의 돌아가는 형국", basic: "Things are not good (상황이 좋지 않다) / How are things? (요즘 어때요?)", note: "• 눈에 보이는 사물이 아니라 추상적인 '전반적 상황'을 지칭" },
+      { id: "225", ch: "CH6", word: "shoe (in someone's shoes)", mission: "'신발'에서 확장된 관용구 'in A's shoes'의 정확한 뜻을 대시오", core: "A의 입장이 되어, A의 처지에서 (= in A's position/situation)", basic: "다른 사람의 신발을 직접 신고 걸어보며 그 처지를 이해하는 이미지", note: "• put yourself in someone else's shoes: 역지사지로 남의 입장에 서 보다" },
+      { id: "226", ch: "CH6", word: "tackle", mission: "'태클하다' 말고 문제·과제 목적어가 올 때의 확장 뜻을 대시오", core: "(어려운 문제·과제에) 단호히 맞서 다루다, 해결하다 (= deal with, confront)", basic: "상대 선수를 정면으로 부딪쳐 저지하는 단호한 의지의 이미지", note: "• tackle inflation (인플레에 맞서 해결하다) / tackle problems (문제를 다루다)" },
+      { id: "227", ch: "CH6", word: "coin", mission: "'동전' 말고 동사 coin과 수동태 'be coined to V'의 뜻을 대시오", core: "1) (새로운 낱말·용어를) 처음으로 만들어내다  2) A be coined to B: B하기 위해 만들어지다", basic: "금속을 찍어 세상에 없던 새 화폐를 주조하듯 새 단어를 탄생시키는 이미지", note: "• newly-coined words (신조어) / coined the term (그 용어를 처음 만들었다)" },
+      { id: "228", ch: "CH6", word: "pay", mission: "'돈을 지불하다' 말고 문맥에 따른 (+)/(-) 양면 확장 뜻을 대시오", core: "1) (+) 이득이 되다, 보상을 주다 (사물 주어)  2) (-) (희생·행동의) 대가를 치르다 (사람 주어)", basic: "주고받는 계산의 이미지: 행위가 이득을 돌려줌(+) vs 잘못에 대한 대가를 치름(-)", note: "• Crime doesn't pay (범죄는 수지가 안 맞는다: +) / You'll pay for that (대가를 치를 거다: -)" },
+      { id: "229", ch: "CH6", word: "mirror", mission: "'거울'에서 확장된 동사 mirror의 뜻과 인과 방향을 대시오", core: "잘 보여주다, 반영하다 (= reflect) [A mirror B ➔ A ⟵ B]", basic: "거울이 앞의 사물을 그대로 비추듯 현상이 원인을 반영하는 이미지", note: "• Heritage is a mirror reflecting the past (유산은 과거를 반영하는 거울이다)" },
+      { id: "230", ch: "CH6", word: "second / secondary", mission: "'두 번째'에서 확장된 형용사 secondary의 평가원 핵심 뜻을 대시오", core: "1) 2류의, 열등한 (inferior)  2) 부차적인, 덜 중요한 (= incidental, optional)", basic: "1등(primary)이 아니라 그 뒤로 밀려난 중요도 낮은 2순위 이미지", note: "• secondary importance (부차적 중요성) / secondary education (중등교육: 중·고교)" },
+      { id: "231", ch: "CH6", word: "increasingly", mission: "'증가하게'라고 어색하게 직역하지 않고 자연스럽게 옮기는 뜻을 대시오", core: "점점, 갈수록, 더욱더 (= more and more)", basic: "시간이 흐를수록 정도가 계속 커져가는 추세 부사", note: "• increasingly unrealistic (점점 더 비현실적인)" },
+      { id: "232", ch: "CH6", word: "party", mission: "'파티·잔치' 말고 정치·법률·관계 지문 속 확장 뜻 2가지를 대시오", core: "1) 정당, 단체 (political party)  2) (사건·계약·갈등의) 당사자, 측", basic: "특정 목적이나 이해관계로 묶인 '한 편(쪽)'의 이미지", note: "• third party (제3자) / guilty/innocent party (가해자/피해자 측) / each party (각 당사자)" },
+      { id: "233", ch: "CH6", word: "beyond", mission: "'~너머에' 말고 추상 대상과 결합할 때의 '부정어 기능'을 대시오", core: "A의 수준을 넘어선 = A로는 할 수 없는, ~을 초월한 (부정어 역할!)", basic: "내 손과 능력의 한계선 바깥으로 벗어나 닿지 않는 이미지", note: "• beyond repair (수리 불가능한) / beyond my reach (내 손이 닿지 않는) / beyond doubt (의심할 여지 없는)" },
+      { id: "234", ch: "CH6", word: "very (the very + 명사)", mission: "부사 '매우'가 아닌 형용사 'the very + 명사'의 뜻을 대시오", core: "바로 그 (정확히 일치함을 강조하는 지칭어)", basic: "다른 것이 아닌 딱 그 대상을 손가락으로 짚어 강조하는 이미지", note: "• the very features (바로 그 특징들) / the very essence (바로 그 본질)" },
+      { id: "235", ch: "CH6", word: "pale", mission: "'창백한' 말고 비교 문맥에서 형용사·동사 pale의 확장 뜻을 대시오", core: "초라한, 어설픈, 별것 아닌 것으로 보이다 (pale in comparison with)", basic: "핏기 없이 흐릿하여 다른 것에 비해 존재감이 턱없이 부족한 이미지", note: "• a pale imitation (어설픈 모방품) / pales in comparison with (~에 비하면 초라하고 낮다)" }
     ];
 
     const CHAPTER_LABELS = {
