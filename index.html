@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>V-Flash | 챕터별 중점 주제 맞춤형 V단어</title>
+  <title>V-Flash | 단어별 망각곡선 자동 복습 V단어</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
   <style>
@@ -34,31 +34,34 @@
   <!-- TOP HEADER -->
   <header class="pt-3 pb-2 px-4 max-w-md mx-auto w-full z-20">
     <div class="flex items-center justify-between mb-2">
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-1.5">
         <span class="w-2 h-2 rounded-full bg-emerald-500" title="4중 자동 영구 저장 활성화됨"></span>
         <span class="text-xs font-black tracking-wider text-neutral-300">V-FLASH</span>
-        <span id="progress-text" class="text-xs font-mono text-neutral-500 ml-1">1 / 238</span>
+        <span id="progress-text" class="text-xs font-mono text-neutral-500 ml-0.5">1 / 238</span>
       </div>
 
-      <div class="flex items-center gap-1.5">
-        <button onclick="setStatusMode('ACTIVE')" id="mode-ACTIVE" class="px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-100 text-neutral-950 transition">
+      <div class="flex items-center gap-1">
+        <button onclick="setStatusMode('DUE')" id="mode-DUE" class="px-2 py-1 rounded-full text-[11px] font-bold bg-neutral-900 text-amber-300 border border-amber-500/40 flex items-center gap-1 transition">
+          <i class="ph-fill ph-alarm"></i>
+          <span>복습</span>
+          <span id="due-count" class="font-mono">0</span>
+        </button>
+        <button onclick="setStatusMode('ACTIVE')" id="mode-ACTIVE" class="px-2 py-1 rounded-full text-[11px] font-bold bg-neutral-100 text-neutral-950 transition">
           미암기 <span id="active-count" class="font-mono">0</span>
         </button>
-        <button onclick="setStatusMode('MISTAKE')" id="mode-MISTAKE" class="px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-1 transition">
+        <button onclick="setStatusMode('MISTAKE')" id="mode-MISTAKE" class="px-2 py-1 rounded-full text-[11px] font-bold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-0.5 transition">
           <i class="ph-fill ph-fire text-rose-500"></i>
-          <span>오답</span>
           <span id="mistake-count" class="text-rose-400 font-mono">0</span>
         </button>
-        <button onclick="setStatusMode('MASTERED')" id="mode-MASTERED" class="px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-1 transition">
+        <button onclick="setStatusMode('MASTERED')" id="mode-MASTERED" class="px-2 py-1 rounded-full text-[11px] font-bold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-0.5 transition">
           <i class="ph-bold ph-check-circle text-emerald-500"></i>
-          <span>완료</span>
           <span id="mastered-count" class="text-emerald-400 font-mono">0</span>
         </button>
         <button onclick="reshuffleCurrentDeck()" title="순서 다시 섞기" class="p-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white transition">
-          <i class="ph-bold ph-shuffle text-sm"></i>
+          <i class="ph-bold ph-shuffle text-xs"></i>
         </button>
         <button onclick="openBackupModal()" title="백업 및 복구" class="p-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white transition">
-          <i class="ph-bold ph-floppy-disk text-sm"></i>
+          <i class="ph-bold ph-floppy-disk text-xs"></i>
         </button>
       </div>
     </div>
@@ -93,12 +96,13 @@
   <main class="flex-1 max-w-md mx-auto w-full px-4 py-2 flex flex-col justify-center">
     <div id="flashcard" onclick="flipCard()" class="w-full h-full max-h-[540px] bg-neutral-900 border border-neutral-800/90 rounded-[2rem] p-7 flex flex-col justify-between relative shadow-2xl cursor-pointer transition-transform duration-150 active:scale-[0.99]">
       
-      <!-- CARD TOP: CHAPTER THEME BADGE & STREAK -->
+      <!-- CARD TOP: CHAPTER THEME BADGE & SRS STAGE -->
       <div class="flex items-center justify-between">
         <span id="card-chapter-badge" class="text-[11px] font-bold px-2.5 py-0.5 rounded-md bg-rose-500/15 text-rose-400">
           Ch.6 초기본 본질·확장
         </span>
         <div class="flex items-center gap-2">
+          <span id="card-srs-badge" class="text-[10px] font-bold px-2 py-0.5 rounded bg-neutral-800 text-neutral-400">신규</span>
           <span id="card-id" class="text-xs font-mono text-neutral-500">No.206</span>
           <span id="card-streak" class="text-xs font-mono font-bold text-neutral-400">0/2</span>
           <button onclick="event.stopPropagation(); speakWord();" class="p-1.5 -mr-1.5 text-neutral-400 hover:text-white transition">
@@ -122,12 +126,12 @@
 
       <!-- EMPTY DECK STATE -->
       <div id="face-empty" class="my-auto text-center px-4 hidden card-enter space-y-4">
-        <div class="w-14 h-14 rounded-full bg-emerald-500/15 text-emerald-400 flex items-center justify-center mx-auto text-2xl">
+        <div id="empty-icon" class="w-14 h-14 rounded-full bg-emerald-500/15 text-emerald-400 flex items-center justify-center mx-auto text-2xl">
           <i class="ph-bold ph-confetti"></i>
         </div>
         <h3 id="empty-title" class="text-xl font-black text-white">현재 챕터 모두 암기 완료!</h3>
         <p id="empty-desc" class="text-xs text-neutral-400 leading-relaxed">
-          모든 단어가 [완료] 보관함으로 이동되었습니다.<br>상단에서 다른 챕터를 선택하거나 완료된 단어를 다시 복습하세요.
+          모든 단어가 [완료] 보관함으로 이동되었습니다.<br>1일·7일·14일·30일이 지나면 [복습] 탭에 자동으로 나타납니다.
         </p>
       </div>
 
@@ -174,7 +178,7 @@
     <div id="controls-back" class="hidden grid grid-cols-2 gap-3">
       <button onclick="judgeCard(false)" class="py-4 rounded-2xl bg-neutral-900 border border-rose-500/40 active:bg-rose-950/60 text-rose-400 font-black text-base flex items-center justify-center gap-2 transition">
         <i class="ph-bold ph-x text-lg"></i>
-        <span>모름 (랜덤 재출제)</span>
+        <span>모름 (초기화)</span>
       </button>
       <button onclick="judgeCard(true)" class="py-4 rounded-2xl bg-rose-500 active:bg-rose-600 text-white font-black text-base flex items-center justify-center gap-2 shadow-lg shadow-rose-500/20 transition">
         <i class="ph-bold ph-check text-lg"></i>
@@ -196,7 +200,7 @@
       <div class="flex items-center justify-between">
         <h3 class="text-base font-black text-white flex items-center gap-2">
           <i class="ph-bold ph-shield-check text-emerald-500"></i>
-          <span>4중 자동 영구 저장 & 백업 코드</span>
+          <span>망각곡선 기록 & 백업 코드</span>
         </h3>
         <button onclick="closeBackupModal()" class="text-neutral-500 hover:text-white p-1">
           <i class="ph-bold ph-x text-lg"></i>
@@ -204,7 +208,7 @@
       </div>
       
       <p class="text-xs text-neutral-400 leading-relaxed">
-        학습 기록은 <strong class="text-emerald-400">IndexedDB + Cache + URL 주소창</strong>에 실시간 자동 저장됩니다. 기기 변경 시에만 아래 코드를 사용하세요.
+        단어별 <strong class="text-amber-300">완벽 인출 시각(1일·7일·14일·30일 주기)</strong>과 학습 기록이 자동 저장됩니다.
       </p>
 
       <textarea id="backup-code-box" rows="3" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-3 text-xs font-mono text-neutral-300 focus:outline-none focus:border-rose-500" placeholder="복구할 백업 코드 붙여넣기"></textarea>
@@ -502,15 +506,45 @@
       CH6: "Ch.6 초기본 본질·확장"
     };
 
+    // 망각곡선 주기 (단위: 일) - Stage 1: 1일 뒤, Stage 2: 7일 뒤, Stage 3: 14일 뒤, Stage 4: 30일 뒤
+    const SRS_INTERVAL_DAYS = {
+      1: 1,
+      2: 7,
+      3: 14,
+      4: 30
+    };
+    const DAY_MS = 24 * 60 * 60 * 1000;
+
     let activeDeck = [];
     let currentIdx = 0;
     let isFlipped = false;
     let currentFilter = 'CH6';
-    let statusMode = 'ACTIVE'; // 'ACTIVE' (미암기), 'MISTAKE' (오답), 'MASTERED' (암기완료)
+    let statusMode = 'ACTIVE'; // 'DUE' (오늘 복습), 'ACTIVE' (미암기), 'MISTAKE' (오답), 'MASTERED' (완료)
     let streaks = {};
     let mistakes = {};
+    let srsData = {}; // { [id]: { stage: 1~5, lastAt: timestamp } }
     let touchStartX = 0;
     let touchEndX = 0;
+
+    // === 망각곡선 도래 여부 판별 ===
+    function isCardDue(id) {
+      const info = srsData[id];
+      if (!info || !info.stage || info.stage >= 5) return false;
+      const days = SRS_INTERVAL_DAYS[info.stage];
+      if (!days) return false;
+      return (Date.now() - info.lastAt) >= (days * DAY_MS);
+    }
+
+    function getSrsLabel(id) {
+      const info = srsData[id];
+      if (!info || !info.stage) return "미암기";
+      if (info.stage >= 5) return "완전졸업";
+      const days = SRS_INTERVAL_DAYS[info.stage];
+      const elapsedDays = Math.floor((Date.now() - info.lastAt) / DAY_MS);
+      const remainDays = days - elapsedDays;
+      if (remainDays <= 0) return `${days}일차 복습도래!`;
+      return `${days}일주기 (D-${remainDays})`;
+    }
 
     // === 4중 자동 영구 저장 엔진 (IndexedDB + Cache API + localStorage + URL Hash) ===
     const DB_NAME = 'VFlashPermaDB';
@@ -576,9 +610,9 @@
       return null;
     }
 
-    function encodeState(s, m) {
+    function encodeState(s, m, r) {
       try {
-        return btoa(encodeURIComponent(JSON.stringify({ s, m })));
+        return btoa(encodeURIComponent(JSON.stringify({ s, m, r })));
       } catch (e) {
         return '';
       }
@@ -588,22 +622,22 @@
       try {
         const obj = JSON.parse(decodeURIComponent(atob(str)));
         if (obj && typeof obj.s === 'object' && typeof obj.m === 'object') {
-          return obj;
+          return { s: obj.s, m: obj.m, r: obj.r || {} };
         }
       } catch (e) {}
       return null;
     }
 
-    function syncUrlHash(s, m) {
+    function syncUrlHash(s, m, r) {
       try {
-        const hasData = Object.keys(s).length > 0 || Object.keys(m).length > 0;
+        const hasData = Object.keys(s).length > 0 || Object.keys(m).length > 0 || Object.keys(r).length > 0;
         if (!hasData) {
           if (window.location.hash.startsWith('#save=')) {
             history.replaceState(null, '', window.location.pathname + window.location.search);
           }
           return;
         }
-        const encoded = encodeState(s, m);
+        const encoded = encodeState(s, m, r);
         if (encoded) {
           history.replaceState(null, '', '#save=' + encoded);
         }
@@ -611,14 +645,15 @@
     }
 
     async function saveState() {
-      const payload = { s: streaks, m: mistakes, t: Date.now() };
+      const payload = { s: streaks, m: mistakes, r: srsData, t: Date.now() };
       try {
         localStorage.setItem('vflash_streaks', JSON.stringify(streaks));
         localStorage.setItem('vflash_mistakes', JSON.stringify(mistakes));
+        localStorage.setItem('vflash_srs', JSON.stringify(srsData));
       } catch (e) {}
       saveToIDB(payload);
       saveToCacheAPI(payload);
-      syncUrlHash(streaks, mistakes);
+      syncUrlHash(streaks, mistakes, srsData);
       updateCounts();
     }
 
@@ -629,6 +664,8 @@
         if (fromHash && (Object.keys(fromHash.s).length > 0 || Object.keys(fromHash.m).length > 0)) {
           streaks = fromHash.s;
           mistakes = fromHash.m;
+          srsData = fromHash.r || {};
+          migrateLegacyMastered();
           await saveState();
           return;
         }
@@ -638,33 +675,47 @@
       const cacheData = await loadFromCacheAPI();
       let lsStreaks = {};
       let lsMistakes = {};
+      let lsSrs = {};
       try {
         lsStreaks = JSON.parse(localStorage.getItem('vflash_streaks') || '{}');
         lsMistakes = JSON.parse(localStorage.getItem('vflash_mistakes') || '{}');
+        lsSrs = JSON.parse(localStorage.getItem('vflash_srs') || '{}');
       } catch (e) {}
 
       const candidates = [
         idbData,
         cacheData,
-        { s: lsStreaks, m: lsMistakes, t: 0 }
+        { s: lsStreaks, m: lsMistakes, r: lsSrs, t: 0 }
       ].filter(Boolean);
 
-      let best = { s: {}, m: {} };
+      let best = { s: {}, m: {}, r: {} };
       let maxScore = -1;
 
       for (const c of candidates) {
-        const score = Object.keys(c.s || {}).length + Object.keys(c.m || {}).length;
+        const score = Object.keys(c.s || {}).length + Object.keys(c.m || {}).length + Object.keys(c.r || {}).length;
         if (score > maxScore) {
           maxScore = score;
-          best = { s: c.s || {}, m: c.m || {} };
+          best = { s: c.s || {}, m: c.m || {}, r: c.r || {} };
         }
       }
 
       streaks = best.s;
       mistakes = best.m;
+      srsData = best.r;
+      migrateLegacyMastered();
 
       if (maxScore > 0) {
         await saveState();
+      }
+    }
+
+    // 기존에 이미 완료(streak >= 2)했던 단어들에도 자동으로 Stage 1 타임스탬프 부여
+    function migrateLegacyMastered() {
+      const now = Date.now();
+      for (const id of Object.keys(streaks)) {
+        if ((streaks[id] || 0) >= 2 && !srsData[id]) {
+          srsData[id] = { stage: 1, lastAt: now };
+        }
       }
     }
 
@@ -676,12 +727,21 @@
       }
 
       await loadAllStorages();
-      applyFilter();
+
+      // 앱 접속 시 도래한 복습 단어가 있으면 자동으로 [복습] 탭 우선 활성화
+      const totalDue = VOCAB_DB.filter(item => isCardDue(item.id)).length;
+      if (totalDue > 0) {
+        currentFilter = 'ALL';
+        setFilter('ALL');
+        setStatusMode('DUE');
+      } else {
+        applyFilter();
+      }
       setupSwipe();
     }
 
     function openBackupModal() {
-      document.getElementById('backup-code-box').value = encodeState(streaks, mistakes);
+      document.getElementById('backup-code-box').value = encodeState(streaks, mistakes, srsData);
       document.getElementById('backup-modal').classList.remove('hidden');
     }
 
@@ -703,10 +763,12 @@
 
     async function restoreBackupCode() {
       const raw = document.getElementById('backup-code-box').value.trim();
-      const decoded = raw ? decodeState(raw) : { s: {}, m: {} };
+      const decoded = raw ? decodeState(raw) : { s: {}, m: {}, r: {} };
       if (decoded) {
         streaks = decoded.s;
         mistakes = decoded.m;
+        srsData = decoded.r || {};
+        migrateLegacyMastered();
         await saveState();
         applyFilter();
         closeBackupModal();
@@ -732,20 +794,26 @@
 
     function setStatusMode(mode) {
       statusMode = mode;
-      const modes = ['ACTIVE', 'MISTAKE', 'MASTERED'];
+      const modes = ['DUE', 'ACTIVE', 'MISTAKE', 'MASTERED'];
       modes.forEach(m => {
         const btn = document.getElementById(`mode-${m}`);
         if (!btn) return;
         if (m === mode) {
-          if (m === 'MISTAKE') {
-            btn.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/50 flex items-center gap-1 transition";
+          if (m === 'DUE') {
+            btn.className = "px-2 py-1 rounded-full text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/60 flex items-center gap-1 transition";
+          } else if (m === 'MISTAKE') {
+            btn.className = "px-2 py-1 rounded-full text-[11px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/50 flex items-center gap-0.5 transition";
           } else if (m === 'MASTERED') {
-            btn.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 flex items-center gap-1 transition";
+            btn.className = "px-2 py-1 rounded-full text-[11px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 flex items-center gap-0.5 transition";
           } else {
-            btn.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-100 text-neutral-950 transition";
+            btn.className = "px-2 py-1 rounded-full text-[11px] font-bold bg-neutral-100 text-neutral-950 transition";
           }
         } else {
-          btn.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-1 transition";
+          if (m === 'DUE') {
+            btn.className = "px-2 py-1 rounded-full text-[11px] font-bold bg-neutral-900 text-amber-300/80 border border-neutral-800 flex items-center gap-1 transition";
+          } else {
+            btn.className = "px-2 py-1 rounded-full text-[11px] font-bold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-0.5 transition";
+          }
         }
       });
       applyFilter();
@@ -774,12 +842,14 @@
         : VOCAB_DB.filter(item => item.ch === currentFilter);
 
       let filtered = [];
-      if (statusMode === 'ACTIVE') {
+      if (statusMode === 'DUE') {
+        filtered = baseList.filter(item => isCardDue(item.id));
+      } else if (statusMode === 'ACTIVE') {
         filtered = baseList.filter(item => (streaks[item.id] || 0) < 2);
       } else if (statusMode === 'MISTAKE') {
         filtered = baseList.filter(item => (mistakes[item.id] || 0) > 0 && (streaks[item.id] || 0) < 2);
       } else if (statusMode === 'MASTERED') {
-        filtered = baseList.filter(item => (streaks[item.id] || 0) >= 2);
+        filtered = baseList.filter(item => (streaks[item.id] || 0) >= 2 && !isCardDue(item.id));
       }
 
       activeDeck = shuffleArray(filtered);
@@ -793,10 +863,12 @@
         ? VOCAB_DB 
         : VOCAB_DB.filter(item => item.ch === currentFilter);
 
+      const dueCnt = baseList.filter(item => isCardDue(item.id)).length;
       const activeCnt = baseList.filter(item => (streaks[item.id] || 0) < 2).length;
       const mistakeCnt = baseList.filter(item => (mistakes[item.id] || 0) > 0 && (streaks[item.id] || 0) < 2).length;
-      const masteredCnt = baseList.filter(item => (streaks[item.id] || 0) >= 2).length;
+      const masteredCnt = baseList.filter(item => (streaks[item.id] || 0) >= 2 && !isCardDue(item.id)).length;
 
+      document.getElementById('due-count').innerText = dueCnt;
       document.getElementById('active-count').innerText = activeCnt;
       document.getElementById('mistake-count').innerText = mistakeCnt;
       document.getElementById('mastered-count').innerText = masteredCnt;
@@ -819,9 +891,12 @@
         ctrlBack.classList.add('hidden');
         ctrlMastered.classList.add('hidden');
 
-        if (statusMode === 'ACTIVE') {
+        if (statusMode === 'DUE') {
+          document.getElementById('empty-title').innerText = "오늘 복습할 단어가 0개입니다!";
+          document.getElementById('empty-desc').innerText = "완벽 인출 후 1일 · 7일 · 14일 · 30일이 지난 단어만\n정확한 시각에 맞춰 이곳에 자동으로 나타납니다.";
+        } else if (statusMode === 'ACTIVE') {
           document.getElementById('empty-title').innerText = "현재 챕터 모두 암기 완료!";
-          document.getElementById('empty-desc').innerText = "모든 단어가 [완료] 보관함으로 분리되었습니다.\n상단에서 다른 챕터를 선택하거나 [완료] 탭을 확인하세요.";
+          document.getElementById('empty-desc').innerText = "모든 단어가 [완료] 보관함으로 이동되었습니다.\n1일·7일·14일·30일 뒤에 [복습] 탭에서 자동 알림됩니다.";
         } else if (statusMode === 'MISTAKE') {
           document.getElementById('empty-title').innerText = "틀린 단어가 없습니다!";
           document.getElementById('empty-desc').innerText = "현재 챕터에 오답으로 기록된 단어가 없습니다.";
@@ -840,6 +915,17 @@
 
       const item = activeDeck[currentIdx];
       const st = streaks[item.id] || 0;
+      const srsText = getSrsLabel(item.id);
+      const srsBadge = document.getElementById('card-srs-badge');
+
+      srsBadge.innerText = srsText;
+      if (isCardDue(item.id)) {
+        srsBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300";
+      } else if ((streaks[item.id] || 0) >= 2) {
+        srsBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300";
+      } else {
+        srsBadge.className = "text-[10px] font-bold px-2 py-0.5 rounded bg-neutral-800 text-neutral-400";
+      }
 
       document.getElementById('progress-text').innerText = `${currentIdx + 1} / ${activeDeck.length}`;
       document.getElementById('card-chapter-badge').innerText = CHAPTER_LABELS[item.ch] || item.ch;
@@ -898,28 +984,51 @@
       const item = activeDeck[currentIdx];
 
       if (known) {
-        streaks[item.id] = (streaks[item.id] || 0) + 1;
-        if (streaks[item.id] >= 2) {
-          mistakes[item.id] = 0;
+        // [복습] 모드에서 완벽 인출 시 다음 망각곡선 단계로 승급 (1일 -> 7일 -> 14일 -> 30일 -> 졸업)
+        if (statusMode === 'DUE' && srsData[item.id]) {
+          const nextStage = (srsData[item.id].stage || 1) + 1;
+          srsData[item.id] = { stage: nextStage, lastAt: Date.now() };
           activeDeck.splice(currentIdx, 1);
-          showToast("암기 완료! [완료] 보관함으로 이동");
+          if (nextStage >= 5) {
+            showToast("30일 복습까지 완료! 완전 졸업했습니다 🎉");
+          } else {
+            const nextDays = SRS_INTERVAL_DAYS[nextStage];
+            showToast(`복습 통과! 다음 복습은 ${nextDays}일 뒤입니다`);
+          }
         } else {
-          const passed = activeDeck.splice(currentIdx, 1)[0];
-          const minOffset = Math.min(4, activeDeck.length);
-          const maxOffset = activeDeck.length;
-          const randomPos = minOffset + Math.floor(Math.random() * (maxOffset - minOffset + 1));
-          activeDeck.splice(randomPos, 0, passed);
-          showToast("1회 통과! 한 번 더 맞추면 완료됩니다");
+          // 일반 [미암기] / [오답] 모드에서 완벽 인출 시
+          streaks[item.id] = (streaks[item.id] || 0) + 1;
+          if (streaks[item.id] >= 2) {
+            mistakes[item.id] = 0;
+            srsData[item.id] = { stage: 1, lastAt: Date.now() };
+            activeDeck.splice(currentIdx, 1);
+            showToast("암기 완료! 24시간(1일) 뒤 [복습] 탭에 자동 등장합니다");
+          } else {
+            const passed = activeDeck.splice(currentIdx, 1)[0];
+            const minOffset = Math.min(4, activeDeck.length);
+            const maxOffset = activeDeck.length;
+            const randomPos = minOffset + Math.floor(Math.random() * (maxOffset - minOffset + 1));
+            activeDeck.splice(randomPos, 0, passed);
+            showToast("1회 통과! 한 번 더 맞추면 완료됩니다");
+          }
         }
       } else {
+        // 모름(망각 발생): 주기 리셋 및 미암기/오답 덱으로 강등
         streaks[item.id] = 0;
         mistakes[item.id] = (mistakes[item.id] || 0) + 1;
-        const failed = activeDeck.splice(currentIdx, 1)[0];
-        const minGap = Math.min(3, activeDeck.length);
-        const maxGap = Math.min(7, activeDeck.length);
-        const randomGap = minGap + Math.floor(Math.random() * (maxGap - minGap + 1));
-        activeDeck.splice(randomGap, 0, failed);
-        showToast(`${randomGap}장 뒤 랜덤 위치에 재출제됩니다`);
+        delete srsData[item.id];
+
+        if (statusMode === 'DUE') {
+          activeDeck.splice(currentIdx, 1);
+          showToast("망각 감지! [미암기/오답] 덱으로 이동되었습니다");
+        } else {
+          const failed = activeDeck.splice(currentIdx, 1)[0];
+          const minGap = Math.min(3, activeDeck.length);
+          const maxGap = Math.min(7, activeDeck.length);
+          const randomGap = minGap + Math.floor(Math.random() * (maxGap - minGap + 1));
+          activeDeck.splice(randomGap, 0, failed);
+          showToast(`${randomGap}장 뒤 랜덤 위치에 재출제됩니다`);
+        }
       }
 
       await saveState();
@@ -931,6 +1040,7 @@
       const item = activeDeck[currentIdx];
       streaks[item.id] = 0;
       mistakes[item.id] = 1;
+      delete srsData[item.id];
       activeDeck.splice(currentIdx, 1);
       await saveState();
       renderCard();
@@ -954,7 +1064,7 @@
       setTimeout(() => {
         el.classList.remove('opacity-100');
         el.classList.add('opacity-0');
-      }, 1000);
+      }, 1200);
     }
 
     function setupSwipe() {
