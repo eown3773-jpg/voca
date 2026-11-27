@@ -37,14 +37,25 @@
       <div class="flex items-center gap-2">
         <span class="w-2 h-2 rounded-full bg-emerald-500" title="4중 자동 영구 저장 활성화됨"></span>
         <span class="text-xs font-black tracking-wider text-neutral-300">V-FLASH</span>
-        <span id="progress-text" class="text-xs font-mono text-neutral-500 ml-1">1 / 207</span>
+        <span id="progress-text" class="text-xs font-mono text-neutral-500 ml-1">1 / 238</span>
       </div>
 
       <div class="flex items-center gap-1.5">
-        <button onclick="toggleMistakeFilter()" id="btn-mistake-filter" class="px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-1.5 transition">
+        <button onclick="setStatusMode('ACTIVE')" id="mode-ACTIVE" class="px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-100 text-neutral-950 transition">
+          미암기 <span id="active-count" class="font-mono">0</span>
+        </button>
+        <button onclick="setStatusMode('MISTAKE')" id="mode-MISTAKE" class="px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-1 transition">
           <i class="ph-fill ph-fire text-rose-500"></i>
-          <span>오답만</span>
+          <span>오답</span>
           <span id="mistake-count" class="text-rose-400 font-mono">0</span>
+        </button>
+        <button onclick="setStatusMode('MASTERED')" id="mode-MASTERED" class="px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-1 transition">
+          <i class="ph-bold ph-check-circle text-emerald-500"></i>
+          <span>완료</span>
+          <span id="mastered-count" class="text-emerald-400 font-mono">0</span>
+        </button>
+        <button onclick="reshuffleCurrentDeck()" title="순서 다시 섞기" class="p-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white transition">
+          <i class="ph-bold ph-shuffle text-sm"></i>
         </button>
         <button onclick="openBackupModal()" title="백업 및 복구" class="p-1.5 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white transition">
           <i class="ph-bold ph-floppy-disk text-sm"></i>
@@ -109,6 +120,17 @@
         </div>
       </div>
 
+      <!-- EMPTY DECK STATE -->
+      <div id="face-empty" class="my-auto text-center px-4 hidden card-enter space-y-4">
+        <div class="w-14 h-14 rounded-full bg-emerald-500/15 text-emerald-400 flex items-center justify-center mx-auto text-2xl">
+          <i class="ph-bold ph-confetti"></i>
+        </div>
+        <h3 id="empty-title" class="text-xl font-black text-white">현재 챕터 모두 암기 완료!</h3>
+        <p id="empty-desc" class="text-xs text-neutral-400 leading-relaxed">
+          모든 단어가 [완료] 보관함으로 이동되었습니다.<br>상단에서 다른 챕터를 선택하거나 완료된 단어를 다시 복습하세요.
+        </p>
+      </div>
+
       <!-- BACK FACE: ANSWER & CORE LOGIC -->
       <div id="face-back" class="my-auto hidden card-enter space-y-4 overflow-y-auto scrollbar-none py-1">
         <div>
@@ -152,11 +174,18 @@
     <div id="controls-back" class="hidden grid grid-cols-2 gap-3">
       <button onclick="judgeCard(false)" class="py-4 rounded-2xl bg-neutral-900 border border-rose-500/40 active:bg-rose-950/60 text-rose-400 font-black text-base flex items-center justify-center gap-2 transition">
         <i class="ph-bold ph-x text-lg"></i>
-        <span>모름 (2장 뒤 재출제)</span>
+        <span>모름 (랜덤 재출제)</span>
       </button>
       <button onclick="judgeCard(true)" class="py-4 rounded-2xl bg-rose-500 active:bg-rose-600 text-white font-black text-base flex items-center justify-center gap-2 shadow-lg shadow-rose-500/20 transition">
         <i class="ph-bold ph-check text-lg"></i>
         <span>완벽 인출</span>
+      </button>
+    </div>
+
+    <div id="controls-mastered" class="hidden">
+      <button onclick="unmasterCurrentCard()" class="w-full py-4 rounded-2xl bg-neutral-900 border border-amber-500/40 active:bg-amber-950/50 text-amber-300 font-bold text-sm flex items-center justify-center gap-2 transition">
+        <i class="ph-bold ph-arrow-counter-clockwise text-base"></i>
+        <span>까먹었음 ➔ 미암기 덱으로 다시 복귀시키기</span>
       </button>
     </div>
   </footer>
@@ -400,7 +429,7 @@
       { id: "204", ch: "CH5", word: "A is independent of/from B", mission: "A와 B 사이의 관계 기호와 뜻을 대시오", core: "A와 B는 서로 분리된·무관한 관계 (A ≠ B)", basic: "independent of time and place: 시간과 장소에 구애받지 않는", note: "• 서로 영향을 주지 않는 완전한 별개 관계" },
       { id: "205", ch: "CH5", word: "owe A to B", mission: "A와 B 사이의 인과 귀속 화살표 방향을 대시오", core: "A는 B 덕분이다, A를 B에게 빚지다 (A ⟵ B)", basic: "modern people owe much to ancestors: 현대인은 조상 덕을 보고 있다", note: "• 결과 A가 원인 B로부터 비롯됨을 나타내는 도식" },
 
-      // === CH.06 초기본 단어의 본질과 확장 (206~235) ===
+      // === CH.06 초기본 단어의 본질과 확장 (206~266) ===
       { id: "206", ch: "CH6", word: "school", mission: "'학교' 말고 철학·생물 지문에서의 확장 뜻 2가지를 대시오", core: "1) (사상·철학의) 학파  2) (물고기·돌고래의) 떼, 무리", basic: "학교 (무언가를 함께 배우고 모이는 집단 이미지)", note: "• school of thought: 특정 사상·학파 (I belong to no school)\n• a school of fish: 물고기 떼" },
       { id: "207", ch: "CH6", word: "new (be new to A)", mission: "'새로운'의 확장 숙어 'be new to A'가 사람·사물에 쓰일 때의 뜻을 대시오", core: "A에 미숙하다, 경험이 없다, 생소하다", basic: "이전에 한 번도 보거나 겪어보지 못해 낯선 이미지", note: "• Teachers who are new to ~: ~에 경험이 없고 서툰 교사들" },
       { id: "208", ch: "CH6", word: "cost / at the expense of A", mission: "cost의 (-) 이미지와 'at the cost/expense of A'의 2가지 해석법을 대시오", core: "1) A를 대가로, 희생하여 (-)  2) A를 활용하여, 발판 삼아 (+)", basic: "들어오는 돈이 아니라 빠져나가는 손해·대가·희생(-)", note: "• take its toll (큰 피해를 주다)와 동의어\n• 문맥이 (+)면 'A를 활용해', (-)면 'A를 희생시켜'로 판별!" },
@@ -445,7 +474,23 @@
       { id: "247", ch: "CH6", word: "gauge", mission: "계기판 '게이지'에서 확장된 동사 gauge의 독해 뜻을 대시오", core: "판단하다, 측정하다, 추정하다 (= measure, estimate)", basic: "눈금자로 수치나 세기를 정밀하게 재어 가늠하는 이미지", note: "• gauge the cognitive abilities (인지 능력을 측정하다) / gauge the risk (위험성을 판단하다)" },
       { id: "248", ch: "CH6", word: "end (to this end)", mission: "'끝·종료' 말고 시험에 치명적으로 등장하는 명사 뜻과 숙어를 대시오", core: "목적, 목표 (= goal, purpose) / to this end: 이 목표를 위하여", basic: "달성하고자 하는 최종 도달점(목표) 이미지", note: "• the means to achieve desired goals, not the end in itself (그 자체가 목적이 아님)" },
       { id: "249", ch: "CH6", word: "A survive B", mission: "전치사 없이 타동사로 쓰인 'A survive B'의 정확한 뜻을 대시오", core: "A가 B보다 더 오래 살다, 살아남아 존속하다 (= outlive)", basic: "B가 끝난 뒤에도 A가 살아남아 명맥을 잇는 이미지", note: "• hardware could survive software (하드웨어가 소프트웨어보다 더 오래 존속할 수 있다)" },
-      { id: "250", ch: "CH6", word: "clear", mission: "'분명한·투명한' 말고 동사 clear의 핵심 확장 뜻을 대시오", core: "(장애물·초목 등을) 완전히 제거하다, 치우다 (= remove entirely)", basic: "가로막고 있던 것을 말끔히 걷어내어 탁 트이게 만드는 이미지", note: "• a hurdle they want to clear (치워 버리고 싶은 장애물)" }
+      { id: "250", ch: "CH6", word: "clear", mission: "'분명한·투명한' 말고 동사 clear의 핵심 확장 뜻을 대시오", core: "(장애물·초목 등을) 완전히 제거하다, 치우다 (= remove entirely)", basic: "가로막고 있던 것을 말끔히 걷어내어 탁 트이게 만드는 이미지", note: "• a hurdle they want to clear (치워 버리고 싶은 장애물)" },
+      { id: "251", ch: "CH6", word: "literature", mission: "'문학' 말고 학술·논문 지문에서 단수형으로 쓰이는 핵심 뜻을 대시오", core: "(특정 분야의) 연구 문헌, 학술 자료", basic: "글로 쓰여 축적된 지식의 총체 (live by the book: 책/규칙대로 살다)", note: "• in some parts of the literature (일부 학술 문헌에서는)" },
+      { id: "252", ch: "CH6", word: "make up", mission: "'화장하다' 말고 반드시 암기할 확장 뜻 4가지를 대시오", core: "1) (거짓·이야기를) 꾸며내다  2) 화해하다  3) (손실·시간을) 보충하다  4) 구성하다", basic: "흩어진 조각을 모아 채우거나 새로 엮어 만드는 코어 이미지", note: "• make up scenarios (시나리오를 꾸며내다) / make up for the loss (손실을 보충하다)" },
+      { id: "253", ch: "CH6", word: "long (long for)", mission: "형용사 '긴'에서 확장된 동사 'long for A'의 정확한 뜻을 대시오", core: "A를 간절히 바라다, 고대하다, 열망하다 (= yearn for)", basic: "오랜 시간(long) 목을 길게 빼고 간절히 기다리는 이미지", note: "• long for a lasting peace (지속적인 평화를 간절히 열망하다)" },
+      { id: "254", ch: "CH6", word: "competition", mission: "'경쟁·대회' 말고 최근 평가원에서 자주 출제되는 사람·집단 뜻을 대시오", core: "경쟁자, 경쟁 상대 (= competitor, rival)", basic: "경쟁 행위 자체에서 '경쟁하는 상대방'으로 의미 확장", note: "• the competition responded by opening on Saturdays (경쟁업체들이 토요일 개장으로 대응했다)" },
+      { id: "255", ch: "CH6", word: "trunk", mission: "'트렁크·코끼리 코' 말고 전문 지식·생물 지문 속 확장 뜻 2가지를 대시오", core: "1) (사람·동물의) 몸통  2) (나무의) 굵은 줄기", basic: "사물이나 생명체의 중심이 되는 굵은 기둥 이미지", note: "• tree trunks (나무 줄기) / without bipedalism, use the trunk (몸통을 사용하다)" },
+      { id: "256", ch: "CH6", word: "mad (like mad)", mission: "'화난·미친' 말고 긍정·부정 문맥 모두에서 쓰이는 강조 확장 뜻을 대시오", core: "맹렬한, 열광적인, 무모한 / like mad: 미친 듯이, 맹렬하게", basic: "이성의 통제를 벗어나 폭발적으로 몰아치는 에너지 이미지", note: "• photosynthesize like mad (맹렬히 광합성을 하다) / mad chase (무모한 추구)" },
+      { id: "257", ch: "CH6", word: "modest", mission: "'겸손한'보다 지문에서 훨씬 더 자주 쓰이는 첫 번째 핵심 뜻을 대시오", core: "크지 않은, 대단하지 않은, 보통의, 적당한 (not very large)", basic: "과시하지 않고 자그마하게 자리 잡은 소박한 규모 이미지", note: "• prices remained modest (가격이 그리 높지 않았다) / modest in effect size (효과 크기가 별로 크지 않은)" },
+      { id: "258", ch: "CH6", word: "local / localize", mission: "'지역의'를 넘어 평가원 핵심 코어 이미지와 동사 localize를 대시오", core: "local: 국지적인, 특정 영역에 한정된 / localize: 국한시키다, 제한하다 (= restrict)", basic: "전체(whole)가 아니라 '특정한 한 구역(particular area)'에만 갇혀 있는 이미지", note: "• localized brain damage (국지적 뇌 손상) / creativity is localized to ~ (창의성이 특정 영역에 국한되다)" },
+      { id: "259", ch: "CH6", word: "room", mission: "'방' 말고 불가산 명사로 추상 지문에서 쓰이는 핵심 뜻을 대시오", core: "여지, 가능성 (= possibility, scope)", basic: "무언가가 들어설 수 있는 비어 있는 공간 이미지", note: "• room for different interpretations (다른 해석의 여지) / leaves no room for (여지를 남기지 않다)" },
+      { id: "260", ch: "CH6", word: "way (adv.)", mission: "명사 '길·방법'이 아니라 수식어와 함께 부사로 쓰일 때의 뜻을 대시오", core: "아주 멀리, 큰 차이로, 훨씬 (= very, far)", basic: "길게 뻗어나간 거리만큼 정도 차이가 압도적으로 큼을 강조", note: "• go way beyond (훨씬 넘어서다) / way ahead of (훨씬 앞질러)" },
+      { id: "261", ch: "CH6", word: "earthly / worldly", mission: "'지구·세상'에서 확장된 earthly와 worldly의 핵심 뜻을 대시오", core: "세속적인, 현세의, 현실 세계의 (↔ spiritual, metaphysical 형이상학적)", basic: "하늘이나 추상적 관념이 아닌 '인간이 발 딛고 사는 현실 세상'의 이미지", note: "• earthly immortality (세속적 불멸) / worldly success (세속적 성공)" },
+      { id: "262", ch: "CH6", word: "fashion", mission: "'패션·유행' 말고 문맥상 '방식'과 동사 fashion의 뜻을 대시오", core: "1) [명] 방식, 방법 (in an orderly fashion)  2) [동] 형성하다, 만들다 (= form, make)", basic: "손으로 빚어 특정한 모양이나 스타일을 만들어내는 이미지", note: "• old-fashioned (구식의) / fashion the spear (창을 만들다)" },
+      { id: "263", ch: "CH6", word: "ground", mission: "'땅·지면'에서 확장된 동사 ground의 뜻과 명사 '근거' 이미지를 대시오", core: "v. ~에 근거를 두다, 기반을 두다 (grounds = 근거, 이유)", basic: "건물이 흔들리지 않도록 단단한 땅바닥(ground) 위에 기초를 세우는 이미지", note: "• firmly grounded in scientific fact (과학적 사실에 확고히 근거를 둔)" },
+      { id: "264", ch: "CH6", word: "define / defining", mission: "'정의하다'에서 확장된 형용사 defining의 평가원 핵심 뜻을 대시오", core: "결정적인, 가장 중요한, 본질을 규정하는 (= crucial, decisive)", basic: "그 대상의 정체성을 딱 규정지어 주는 가장 핵심적인 순간·특징 이미지", note: "• defining feature (본질적 특징) / defining moments (결정적인 순간들)" },
+      { id: "265", ch: "CH6", word: "tell (tell A apart / tell A from B)", mission: "'말하다·알리다' 말고 독해 킬러 확장 뜻 2가지를 대시오", core: "1) 구별하다, 식별하다 (tell them apart)  2) 알다, 판단하다", basic: "말로 정확히 짚어낼 수 있을 만큼 차이를 분별해 내는 이미지", note: "• our brains can't tell them apart (우리 뇌는 그것들을 분간할 수 없다)" },
+      { id: "266", ch: "CH6", word: "arm / arms", mission: "'팔' 말고 동사 arm과 복수 명사 arms의 확장 뜻을 대시오", core: "1) [동] 무장시키다, 갖추게 하다 (armed with)  2) [명] 무기 (arms race: 군비 경쟁)", basic: "맨손이 아니라 손(팔)에 강력한 도구나 무기를 쥐여주는 이미지", note: "• armed with all the facts (모든 사실로 무장된) / an arms race (무기 경쟁)" }
     ];
 
     const CHAPTER_LABELS = {
@@ -461,16 +506,15 @@
     let currentIdx = 0;
     let isFlipped = false;
     let currentFilter = 'CH6';
-    let onlyMistakes = false;
+    let statusMode = 'ACTIVE'; // 'ACTIVE' (미암기), 'MISTAKE' (오답), 'MASTERED' (암기완료)
     let streaks = {};
     let mistakes = {};
-
     let touchStartX = 0;
     let touchEndX = 0;
 
-    // === 4중 영구 저장 엔진 ===
-    const DB_NAME = 'VFlashPermanentDB';
-    const STORE_NAME = 'progress';
+    // === 4중 자동 영구 저장 엔진 (IndexedDB + Cache API + localStorage + URL Hash) ===
+    const DB_NAME = 'VFlashPermaDB';
+    const STORE_NAME = 'userProgress';
 
     function openIDB() {
       return new Promise((resolve, reject) => {
@@ -674,7 +718,6 @@
 
     function setFilter(filterKey) {
       currentFilter = filterKey;
-      onlyMistakes = false;
       
       document.querySelectorAll('[id^="tab-"]').forEach(btn => {
         btn.className = "px-3 py-1.5 rounded-full font-bold whitespace-nowrap bg-neutral-900 text-neutral-400 border border-neutral-800 transition";
@@ -684,52 +727,116 @@
         activeTab.className = "px-3 py-1.5 rounded-full font-bold whitespace-nowrap bg-neutral-100 text-neutral-950 transition";
       }
 
-      document.getElementById('btn-mistake-filter').className = "px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-1.5 transition";
       applyFilter();
     }
 
-    function toggleMistakeFilter() {
-      onlyMistakes = !onlyMistakes;
-      const btn = document.getElementById('btn-mistake-filter');
-      if (onlyMistakes) {
-        btn.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/50 flex items-center gap-1.5 transition";
-        showToast("오답 단어만 모았습니다");
-      } else {
-        btn.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-1.5 transition";
-      }
+    function setStatusMode(mode) {
+      statusMode = mode;
+      const modes = ['ACTIVE', 'MISTAKE', 'MASTERED'];
+      modes.forEach(m => {
+        const btn = document.getElementById(`mode-${m}`);
+        if (!btn) return;
+        if (m === mode) {
+          if (m === 'MISTAKE') {
+            btn.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/50 flex items-center gap-1 transition";
+          } else if (m === 'MASTERED') {
+            btn.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 flex items-center gap-1 transition";
+          } else {
+            btn.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-100 text-neutral-950 transition";
+          }
+        } else {
+          btn.className = "px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-1 transition";
+        }
+      });
       applyFilter();
+    }
+
+    function shuffleArray(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function reshuffleCurrentDeck() {
+      if (activeDeck.length <= 1) return;
+      activeDeck = shuffleArray(activeDeck);
+      currentIdx = 0;
+      renderCard();
+      showToast("순서를 무작위로 다시 섞었습니다");
     }
 
     function applyFilter() {
-      let list = [...VOCAB_DB];
-      if (currentFilter !== 'ALL') {
-        list = list.filter(item => item.ch === currentFilter);
+      let baseList = currentFilter === 'ALL' 
+        ? [...VOCAB_DB] 
+        : VOCAB_DB.filter(item => item.ch === currentFilter);
+
+      let filtered = [];
+      if (statusMode === 'ACTIVE') {
+        filtered = baseList.filter(item => (streaks[item.id] || 0) < 2);
+      } else if (statusMode === 'MISTAKE') {
+        filtered = baseList.filter(item => (mistakes[item.id] || 0) > 0 && (streaks[item.id] || 0) < 2);
+      } else if (statusMode === 'MASTERED') {
+        filtered = baseList.filter(item => (streaks[item.id] || 0) >= 2);
       }
 
-      if (onlyMistakes) {
-        list = list.filter(item => (mistakes[item.id] || 0) > 0 && (streaks[item.id] || 0) < 2);
-        if (list.length === 0) {
-          showToast("오답 노트가 비어 있습니다!");
-          onlyMistakes = false;
-          document.getElementById('btn-mistake-filter').className = "px-2.5 py-1 rounded-full text-xs font-bold bg-neutral-900 text-neutral-400 border border-neutral-800 flex items-center gap-1.5 transition";
-          list = currentFilter === 'ALL' ? [...VOCAB_DB] : VOCAB_DB.filter(item => item.ch === currentFilter);
-        }
-      }
-
-      activeDeck = list;
+      activeDeck = shuffleArray(filtered);
       currentIdx = 0;
       renderCard();
       updateCounts();
     }
 
     function updateCounts() {
-      const mCount = VOCAB_DB.filter(item => (mistakes[item.id] || 0) > 0 && (streaks[item.id] || 0) < 2).length;
-      document.getElementById('mistake-count').innerText = mCount;
+      const baseList = currentFilter === 'ALL' 
+        ? VOCAB_DB 
+        : VOCAB_DB.filter(item => item.ch === currentFilter);
+
+      const activeCnt = baseList.filter(item => (streaks[item.id] || 0) < 2).length;
+      const mistakeCnt = baseList.filter(item => (mistakes[item.id] || 0) > 0 && (streaks[item.id] || 0) < 2).length;
+      const masteredCnt = baseList.filter(item => (streaks[item.id] || 0) >= 2).length;
+
+      document.getElementById('active-count').innerText = activeCnt;
+      document.getElementById('mistake-count').innerText = mistakeCnt;
+      document.getElementById('mastered-count').innerText = masteredCnt;
     }
 
     function renderCard() {
-      if (activeDeck.length === 0) return;
-      if (currentIdx >= activeDeck.length) currentIdx = 0;
+      const front = document.getElementById('face-front');
+      const back = document.getElementById('face-back');
+      const empty = document.getElementById('face-empty');
+      const ctrlFront = document.getElementById('controls-front');
+      const ctrlBack = document.getElementById('controls-back');
+      const ctrlMastered = document.getElementById('controls-mastered');
+
+      if (activeDeck.length === 0) {
+        document.getElementById('progress-text').innerText = `0 / 0`;
+        front.classList.add('hidden');
+        back.classList.add('hidden');
+        empty.classList.remove('hidden');
+        ctrlFront.classList.add('hidden');
+        ctrlBack.classList.add('hidden');
+        ctrlMastered.classList.add('hidden');
+
+        if (statusMode === 'ACTIVE') {
+          document.getElementById('empty-title').innerText = "현재 챕터 모두 암기 완료!";
+          document.getElementById('empty-desc').innerText = "모든 단어가 [완료] 보관함으로 분리되었습니다.\n상단에서 다른 챕터를 선택하거나 [완료] 탭을 확인하세요.";
+        } else if (statusMode === 'MISTAKE') {
+          document.getElementById('empty-title').innerText = "틀린 단어가 없습니다!";
+          document.getElementById('empty-desc').innerText = "현재 챕터에 오답으로 기록된 단어가 없습니다.";
+        } else {
+          document.getElementById('empty-title').innerText = "아직 완료된 단어가 없습니다";
+          document.getElementById('empty-desc').innerText = "[미암기] 탭에서 2회 연속 완벽 인출하면 이곳으로 자동 분류됩니다.";
+        }
+        return;
+      }
+
+      empty.classList.add('hidden');
+      if (currentIdx >= activeDeck.length) {
+        activeDeck = shuffleArray(activeDeck);
+        currentIdx = 0;
+      }
 
       const item = activeDeck[currentIdx];
       const st = streaks[item.id] || 0;
@@ -752,6 +859,7 @@
     }
 
     function flipCard() {
+      if (activeDeck.length === 0) return;
       if (!isFlipped) {
         isFlipped = true;
         updateFace();
@@ -763,17 +871,25 @@
       const back = document.getElementById('face-back');
       const ctrlFront = document.getElementById('controls-front');
       const ctrlBack = document.getElementById('controls-back');
+      const ctrlMastered = document.getElementById('controls-mastered');
 
       if (isFlipped) {
         front.classList.add('hidden');
         back.classList.remove('hidden');
         ctrlFront.classList.add('hidden');
-        ctrlBack.classList.remove('hidden');
+        if (statusMode === 'MASTERED') {
+          ctrlBack.classList.add('hidden');
+          ctrlMastered.classList.remove('hidden');
+        } else {
+          ctrlBack.classList.remove('hidden');
+          ctrlMastered.classList.add('hidden');
+        }
       } else {
         front.classList.remove('hidden');
         back.classList.add('hidden');
         ctrlFront.classList.remove('hidden');
         ctrlBack.classList.add('hidden');
+        ctrlMastered.classList.add('hidden');
       }
     }
 
@@ -785,21 +901,40 @@
         streaks[item.id] = (streaks[item.id] || 0) + 1;
         if (streaks[item.id] >= 2) {
           mistakes[item.id] = 0;
-          showToast("완벽 암기 완료");
+          activeDeck.splice(currentIdx, 1);
+          showToast("암기 완료! [완료] 보관함으로 이동");
+        } else {
+          const passed = activeDeck.splice(currentIdx, 1)[0];
+          const minOffset = Math.min(4, activeDeck.length);
+          const maxOffset = activeDeck.length;
+          const randomPos = minOffset + Math.floor(Math.random() * (maxOffset - minOffset + 1));
+          activeDeck.splice(randomPos, 0, passed);
+          showToast("1회 통과! 한 번 더 맞추면 완료됩니다");
         }
-        currentIdx++;
       } else {
         streaks[item.id] = 0;
         mistakes[item.id] = (mistakes[item.id] || 0) + 1;
-        showToast("2장 뒤에 다시 나옵니다");
-
         const failed = activeDeck.splice(currentIdx, 1)[0];
-        const targetPos = Math.min(currentIdx + 2, activeDeck.length);
-        activeDeck.splice(targetPos, 0, failed);
+        const minGap = Math.min(3, activeDeck.length);
+        const maxGap = Math.min(7, activeDeck.length);
+        const randomGap = minGap + Math.floor(Math.random() * (maxGap - minGap + 1));
+        activeDeck.splice(randomGap, 0, failed);
+        showToast(`${randomGap}장 뒤 랜덤 위치에 재출제됩니다`);
       }
 
       await saveState();
       renderCard();
+    }
+
+    async function unmasterCurrentCard() {
+      if (activeDeck.length === 0) return;
+      const item = activeDeck[currentIdx];
+      streaks[item.id] = 0;
+      mistakes[item.id] = 1;
+      activeDeck.splice(currentIdx, 1);
+      await saveState();
+      renderCard();
+      showToast("[미암기] 및 [오답] 덱으로 복귀시켰습니다");
     }
 
     function speakWord() {
